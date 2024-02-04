@@ -30,7 +30,7 @@ patterns = [
     ('COMMENT', r'##.*'),
     #.* matches any sequence of characters until the end of the line
 
-    ('STRING_LITERAL', r'~.*~'),
+    ('STRING_LITERAL', r'~(?:[^~\\]|\\.)*~'),
     #catches any string that is written as a part of code
 
     ('SEPARATOR', r';|:|,'),
@@ -76,6 +76,16 @@ def lexer(code):
     # Return the list of tokens
     return tokens
 
+def read_geko_file(file_path):
+    with open(file_path, 'r') as file:
+        return file.read()
+
+
+file_path = 'testcase5.geko'  # Replace the string with the actual path to  .geko file
+geko_code = read_geko_file(file_path)
+
+tokens = lexer(geko_code)
+
 example_code = '''
 num main() {
     ## num x = 5;
@@ -107,7 +117,6 @@ num main() {
 
 '''
 
-tokens = lexer(example_code)
 def print_table(nested_tuple):
     # Find the maximum length of each column
     max_len_col1 = max(len(item[0]) for item in nested_tuple)
@@ -127,15 +136,3 @@ print_table(tokens)
 # -----------------------------------------------------------------------------------
 # The code below reads the file and tokenises it, then prints it.
 # uncomment the following code to read files from the
-
-
-# def read_geko_file(file_path):
-#     with open(file_path, 'r') as file:
-#         return file.read()
-
-
-# file_path = 'my_program.geko'  # Replace the string with the actual path to  .geko file
-# geko_code = read_geko_file(file_path)
-
-# tokens = lexer(geko_code)
-# print_table(tokens)
