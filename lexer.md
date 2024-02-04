@@ -5,7 +5,7 @@ The lexical analyzer plays a crucial role in processing the source code of a pro
 | :-: | :-: | :-: | :-: |
 |KEYWORD|This class stores reserved words in a programming language that have predefined meanings in the programming language.|num \| str \| flag \| fix \| show \| iter \| list \| tup \| enter \| yield \| let \| in \| void \| while \| repeat \| given \| other \| otherwise \| define \| test \| pop \| arrest \| main \| length \| head \| tail \| isEmpty \| append \| skip \| stop \| yay \| nay|-|
 |MAIN|This token class stores the entry point of a program. Cannot be defined differently. Has to be preceded by keyword num.|main|-|
-|IDENTIFIER|This class stores names given to variables, functions, etc.|[a-zA-Z_][a-zA-Z0-9_]*||
+|IDENTIFIER|This class stores names given to variables, functions, etc.|[a-zA-Z_][a-zA-Z0-9_]*|[a-zA-Z0-9_]* signifies that zero or more combinations of underscore, lowercase letter, uppercase letter, digit or underscore can come after the first letter. [a-zA-Z_] signifies that no number can come as the first character of a variable. |
 |PARENTHESIS|Used to demarcate scope, and define lists, arrays, and tuples.|[\[\]{}()]|-|
 |NUM_LITERAL|Defined as any number in between -1023 and +1024 (tentative).|-?\b\d+\b|Also takes into account negative numbers with “-?”. “\d+” matches one or more digits.|
 |COMMENT|A comment in our language, Geko, is defined by two simultaneous octothorpe (hashtag) symbols consecutively. This consists of a single line comment. Multi-line comments are not defined for Geko.|##.*|Checks for two ## at the beginning. Anything after these two symbols, until end-of-line character,  is considered as a comment and discarded by the compiler.|
