@@ -10,9 +10,9 @@ The lexical analyzer plays a crucial role in processing the source code of a pro
 |NUM_LITERAL|Defined as any number in between -1023 and +1024 (tentative).|-?\b\d+\b|Also takes into account negative numbers with “-?”. “\d+” matches one or more digits.|
 |COMMENT|A comment in our language, Geko, is defined by two simultaneous octothorpe (hashtag) symbols consecutively. This consists of a single line comment. Multi-line comments are not defined for Geko.|##.*|Checks for two ## at the beginning. Anything after these two symbols, until end-of-line character,  is considered as a comment and discarded by the compiler.|
 |STRING_LITERAL| Bounded by two tilde signs. Anything inside two tilde signs, except a newline character,  is considered as a string literal.|\~.*\~|Checks for the bounds of two tilde signs. Any character in between except a newline character will be considered as a given string literal.|
-|SEPARATOR||||
-|COMPARISON_OPERATOR||||
-|ASSIGNMENT_OPERATOR||||
-|UNARY_OPERATOR||||
+|SEPARATOR| Classifies three specific separators in a given input string.| ;\|:\|,|Checks for either a semicolon, a colon, or a comma. It will match any of these three characters individually.|
+|COMPARISON_OPERATOR|Geko supports equal_to, not_equal_to, less_than_or_equal_to, greater_than_or_equal_to, greater_than, and less_than comparisons. The following regular expression checks the same.|==\|!=\|<=\|>=\|>\|<|-|
+|ASSIGNMENT_OPERATOR|Variables can be assigned values in various ways: conventional “assign” i.e “=” character assigns the left side what is written on the right side of it. “/=” divides the left variable by the RHS value and assigns it to the LHS variable. Similarly, the “+=”, “-=”, and “*=”  assignment operators add, subtract, and multiply the RHS value to the LHS value. The “%=” assignment operator takes the modulo of the LHS value w.r.t the RHS value, and stores it in the LHS variable.| =\|/=\|\*=\|\+=\|-=\|%= |-|
+|UNARY_OPERATOR|These operators operate on a single operand.|\+\+\|--\|`|-|
 |BINARY_OPERATOR||||
 |LOGICAL_OPERATOR||||
