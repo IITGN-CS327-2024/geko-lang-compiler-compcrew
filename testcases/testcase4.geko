@@ -57,6 +57,8 @@ num main() {
     boolSix = boolTwo||boolNine;
     boolSeven = !boolThree;
 
-
+    ##sample wrong testcase, to check the precedence of operators:
+    num a = 32;
+    num b = --a+++--; ##wrong syntax, but the precedence of "++" over "+" is seen over here.
     yield 0;
 }
