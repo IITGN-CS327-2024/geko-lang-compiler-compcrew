@@ -66,9 +66,9 @@ def lexer(code):
             string_val = value[1:-1]
 
             # Add tokens for string delimiters (~) and the string value
-            tokens.append(('tilde', '~'))
+            tokens.append(('TILDE', '~'))
             tokens.append((kind, string_val))
-            tokens.append(('tilde', '~'))
+            tokens.append(('TILDE', '~'))
         else:
             # For other token types, simply add the kind and value to the tokens list
             tokens.append((kind, value))
