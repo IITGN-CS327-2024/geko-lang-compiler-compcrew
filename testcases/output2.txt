@@ -53,9 +53,9 @@ KEYWORD             num
 PARENTHESIS         (                                                                                   
 KEYWORD             enter                                                                               
 PARENTHESIS         (                                                                                   
-tilde               ~                                                                                   
+TILDE               ~                                                                                   
 STRING_LITERAL      Enter any number                                                                    
-tilde               ~                                                                                   
+TILDE               ~                                                                                   
 PARENTHESIS         )                                                                                   
 PARENTHESIS         )                                                                                   
 SEPARATOR           ;                                                                                   
@@ -150,9 +150,9 @@ PARENTHESIS         )
 PARENTHESIS         {                                                                                   
 KEYWORD             show                                                                                
 PARENTHESIS         (                                                                                   
-tilde               ~                                                                                   
+TILDE               ~                                                                                   
 STRING_LITERAL      This is a testcase!                                                                 
-tilde               ~                                                                                   
+TILDE               ~                                                                                   
 PARENTHESIS         )                                                                                   
 SEPARATOR           ;                                                                                   
 KEYWORD             yield                                                                               
