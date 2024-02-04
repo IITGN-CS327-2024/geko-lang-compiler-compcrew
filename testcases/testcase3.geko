@@ -1,0 +1,19 @@
+## This is the test code for strings and exceptional handling
+num main () {
+    str name1 = ~Adam1~;
+    str name2 = ~Eve2~;
+    str name = name1 + name2;
+    show(name);
+    test {
+   	 given (length(name) <= 10) {
+   		 str sub_name = name[2:6];
+   		 show (sub_name);
+   	 }
+   	 otherwise {
+   		 pop (~IndexError~);
+   	 }
+    }
+    arrest (~IndexError~) {
+   	 show(~Index Error: The range of index is out of the length of the string!~);
+    }
+}
