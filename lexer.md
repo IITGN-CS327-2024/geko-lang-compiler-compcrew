@@ -9,7 +9,7 @@ The lexical analyzer plays a crucial role in processing the source code of a pro
 |PARENTHESIS|Used to demarcate scope, and define lists, arrays, and tuples.|[\[\]{}()]|-|
 |NUM_LITERAL|Defined as any number in between -1023 and +1024 (tentative).|-?\b\d+\b|Also takes into account negative numbers with “-?”. “\d+” matches one or more digits.|
 |COMMENT|A comment in our language, Geko, is defined by two simultaneous octothorpe (hashtag) symbols consecutively. This consists of a single line comment. Multi-line comments are not defined for Geko.|##.*|Checks for two ## at the beginning. Anything after these two symbols, until end-of-line character,  is considered as a comment and discarded by the compiler.|
-|STRING_LITERAL||||
+|STRING_LITERAL| Bounded by two tilde signs. Anything inside two tilde signs, except a newline character,  is considered as a string literal.|\~.*\~|Checks for the bounds of two tilde signs. Any character in between except a newline character will be considered as a given string literal.|
 |SEPARATOR||||
 |COMPARISON_OPERATOR||||
 |ASSIGNMENT_OPERATOR||||
