@@ -14,5 +14,5 @@ The lexical analyzer plays a crucial role in processing the source code of a pro
 |COMPARISON_OPERATOR|Geko supports equal_to, not_equal_to, less_than_or_equal_to, greater_than_or_equal_to, greater_than, and less_than comparisons. The following regular expression checks the same.|==\|!=\|<=\|>=\|>\|<|-|
 |ASSIGNMENT_OPERATOR|Variables can be assigned values in various ways: conventional “assign” i.e “=” character assigns the left side what is written on the right side of it. “/=” divides the left variable by the RHS value and assigns it to the LHS variable. Similarly, the “+=”, “-=”, and “*=”  assignment operators add, subtract, and multiply the RHS value to the LHS value. The “%=” assignment operator takes the modulo of the LHS value w.r.t the RHS value, and stores it in the LHS variable.| =\|/=\|\*=\|\+=\|-=\|%= |-|
 |UNARY_OPERATOR|These operators operate on a single operand.|\+\+\|--\|`|-|
-|BINARY_OPERATOR||||
-|LOGICAL_OPERATOR||||
+|BINARY_OPERATOR|This class represents binary operators commonly used in programming languages which are exponentiation (**), division (/), multiplication (*), addition (+), subtraction (-), and modulus (%).|\*\*\|/\|\*\|\+\|-\|% |-|
+|LOGICAL_OPERATOR|This class contains the operators that are often used in boolean and bitwise operations to manipulate and evaluate conditions in programming.| &&\|\|\|\|&\|\\|\|!\|\^ |-|
