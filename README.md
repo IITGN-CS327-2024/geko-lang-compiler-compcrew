@@ -14,3 +14,4 @@
 
 - The lexer file is named as lexer.py, and all the tescases are nested under the testcases folder.
 - Each test file has the .geko extension, unique to our Geko language.
+- Peek into lexer.py for more information on how lexer.py works.
