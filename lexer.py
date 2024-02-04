@@ -31,7 +31,9 @@ patterns = [
     #.* matches any sequence of characters until the end of the line
 
     ('STRING_LITERAL', r'~(?:[^~\\]|\\.)*~'),
-    #catches any string that is written as a part of code
+    #matches strings enclosed within tilde (~) characters while allowing for the presence of escaped tildes and other characters
+    #[^~\\] matches any character that is not a tilde (~) or a backslash (\)
+    #\\. matches an escaped character (any character preceded by a backslash)
 
     ('SEPARATOR', r';|:|,'),
     ('COMPARISON_OPERATOR', r'==|!=|<=|>=|>|<'),
