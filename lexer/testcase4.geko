@@ -1,0 +1,64 @@
+num main() {
+    ## defining integral values:
+    num numOne = 4;
+    num numTwo = 3;
+    num numThree = 23;
+    num numFour = 16;
+    num numFive = 28;
+    num numSix;
+    num numSeven;
+    fix num numEight = 42;
+    fix num numNine = 18;
+    fix num numTen = 31;
+    num numEleven;
+    num numTwelve;
+
+    ## defining boolean values:
+    flag boolOne = yay;
+    flag boolTwo = nay;
+    flag boolThree = nay;
+    flag boolFour = yay;
+    flag boolFive = nay;
+    flag boolSix;
+    flag boolSeven;
+    fix flag boolEight = nay;
+    fix flag boolNine = yay;
+    fix flag boolTen = nay;
+
+    ## usage of 'let' keyboard:
+    let numOne = 4 in numSix = numOne**2;
+    
+    ## Testing various comparison operators:
+    given(numOne == numTwo){show(~equalto_operator~);}
+    other(numOne != numThree){show(~notequalto_operator~);}
+    other(numOne >= numFour){show(~greaterequalto_operator~);}
+    other(numOne <= numEight){show(~lessequalto_operator~);}
+    other(numOne > numNine){show(~greaterthan_operator~);}
+    other(numOne < numTen){show(~lessthan_operator~);}    
+
+
+    ## Testing various assignment and unary operators below:
+    numTwo += numOne;
+    numThree -= numOne;
+    numFour /= numOne; ##only integral division is allowed. No Floats are defined in our language.
+    numFive *= --numOne;  ##unary "--" operator
+    numSix = ++numFive; ##unary "++" operator
+    numSeven %= numOne; 
+
+    ## Testing various Logical and Bitwise operators:
+    ## Bitwise:
+    numSeven = numOne&numTwo;
+    numEleven = numOne|numTwo;
+    numTwelve = !numOne;
+    numFive = numEleven^numTwelve;
+
+    ##Logical:
+    boolFive = boolOne&&boolEight;
+    boolSix = boolTwo||boolNine;
+    boolSeven = !boolThree;
+
+    ##sample wrong testcase, to check the precedence of operators:
+    num a = 32;
+    num b = --a+++--; ##wrong syntax, but the precedence of "++" over "+" is seen over here.
+    yield 0;
+}
