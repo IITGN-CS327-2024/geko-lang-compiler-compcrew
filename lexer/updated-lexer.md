@@ -54,11 +54,11 @@ The lexical analyzer plays a crucial role in processing the source code of a pro
 |END_OF_LINE|Represents the end of line character ';'.|`;`|Matches the end of line character ';'.|
 |SLICING_COLON|Represents the slicing colon character ':'.|`:`|Matches the slicing colon character ':'.|
 |ELEMENT_SEPERATOR|Represents the element separator character ','.|`,`|Matches the ',' character used to separate elements in a list or tuple.|
-|COMPARISON_OPERATOR|Represents comparison operators such as equal to, not equal to, less than or equal to, greater than or equal to, greater than, and less than.|`== \| != \| <= \| >= \| > \| <`|Matches comparison operators used to compare values in expressions.|
-|ASSIGNMENT_OPERATOR|Represents assignment operators used to assign values to variables, including conventional assignment, division-assignment, multiplication-assignment, addition-assignment, subtraction-assignment, and modulo-assignment.|`= \| /= \| \*= \| \+= \| -= \| %=`|Matches various assignment operators used to assign values to variables.|
-|UNARY_OPERATOR|Represents unary operators that operate on a single operand, such as increment, decrement, and logical negation.|``` \+\+ \| -- \| \` ```|Matches unary operators used to perform operations on a single operand.|
-|BINARY_OPERATOR|Represents binary operators used to perform arithmetic and logical operations on two operands, including exponentiation, division, multiplication, addition, subtraction, and modulo.|`\*\* \| / \| \* \| \+ \| - \| %`|Matches binary operators used to perform operations on two operands.|
-|LOGICAL_OPERATOR|Represents logical operators used to perform logical operations on boolean values, including AND, OR, NOT, XOR, and bitwise operators.|`&& \| \|\| \| & \| \| \| ! \| \^ `|Matches logical operators used to combine or negate boolean values.|
+|COMPARISON_OPERATOR|Represents comparison operators such as equal to, not equal to, less than or equal to, greater than or equal to, greater than, and less than.|`==\|!=\|<=\|>=\|>\|<`|Matches comparison operators used to compare values in expressions.|
+|ASSIGNMENT_OPERATOR|Represents assignment operators used to assign values to variables, including conventional assignment, division-assignment, multiplication-assignment, addition-assignment, subtraction-assignment, and modulo-assignment.|`=\|/=\|\*=\|\+=\|-=\|%=`|Matches various assignment operators used to assign values to variables.|
+|UNARY_OPERATOR|Represents unary operators that operate on a single operand, such as increment, decrement, and logical negation.|``` \+\+\|--\|\` ```|Matches unary operators used to perform operations on a single operand.|
+|BINARY_OPERATOR|Represents binary operators used to perform arithmetic and logical operations on two operands, including exponentiation, division, multiplication, addition, subtraction, and modulo.|`\*\*\|/\|\*\| \+\|-\|%`|Matches binary operators used to perform operations on two operands.|
+|LOGICAL_OPERATOR|Represents logical operators used to perform logical operations on boolean values, including AND, OR, NOT, XOR, and bitwise operators.|`&&\|\|\|\|&\|\|\|!\|\^ `|Matches logical operators used to combine or negate boolean values.|
 
 
 </span>
