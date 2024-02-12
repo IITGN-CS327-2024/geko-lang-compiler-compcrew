@@ -4,6 +4,7 @@ The lexical analyzer plays a crucial role in processing the source code of a pro
 1. Download the 'lexer' folder and open it on terminal.
 2. Run the command ```$python3 tokens.py <.geko file>``` on terminal to get the output (tokenised form of the code) on the terminal.
 ## List of All Regular Languages
+(This has been updated with respect to the previous one)
 
  <span style="white-space: nowrap;">
   
