@@ -54,7 +54,7 @@ patterns = [
 
     # ('PARENTHESIS', r'[\[\]{}()]'),
     ('OPEN_PARENTHESIS', r'\('),
-    ('CLOSE_PARENTHESIS', r'\('),
+    ('CLOSE_PARENTHESIS', r'\)'),
     ('OPEN_BRACES', r'\{'),
     ('CLOSE_BRACES', r'\}'),
     ('OPEN_BRACKET', r'\['),
