@@ -14,4 +14,6 @@ file_path = sys.argv[1]
 geko_code = read_geko_file(file_path)
 
 tokens = lexer(geko_code)
+print(tokens)
 print_table(tokens)
+

@@ -1,0 +1,1967 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> program
+Rule 1     program -> function_definition_list DEFINE NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS block YIELD NUM_LITERAL SEMICOLON
+Rule 2     function_definition_list -> function_definition function_definition_list
+Rule 3     function_definition_list -> empty
+Rule 4     function_definition -> DEFINE function_type IDENTIFIER OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS block
+Rule 5     function_type -> NUM
+Rule 6     function_type -> STR
+Rule 7     function_type -> FLAG
+Rule 8     function_type -> VOID
+Rule 9     parameter_list -> parameter ELEMENT_SEPERATOR parameter_list
+Rule 10    parameter_list -> parameter
+Rule 11    parameter_list -> empty
+Rule 12    parameter -> data_type IDENTIFIER
+Rule 13    block -> OPEN_BRACES statement_list CLOSE_BRACES
+Rule 14    statement_list -> statement SEMICOLON statement_list
+Rule 15    statement_list -> statement SEMICOLON
+Rule 16    statement_list -> empty
+Rule 17    statement -> variable_declaration
+Rule 18    statement -> assignment_statement
+Rule 19    statement -> block
+Rule 20    statement -> show_statement
+Rule 21    statement -> conditional_statement
+Rule 22    statement -> loop_statement
+Rule 23    statement -> return_statement
+Rule 24    statement -> try_catch_statement
+Rule 25    statement -> function_call
+Rule 26    statement -> enter_statement
+Rule 27    variable_declaration -> data_type IDENTIFIER ASSIGNMENT_OPERATOR expression
+Rule 28    assignment_statement -> IDENTIFIER ASSIGNMENT_OPERATOR expression
+Rule 29    show_statement -> SHOW OPEN_PARENTHESIS expression expression_list CLOSE_PARENTHESIS
+Rule 30    expression_list -> ELEMENT_SEPERATOR expression expression_list
+Rule 31    expression_list -> empty
+Rule 32    conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+Rule 33    conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHERWISE block
+Rule 34    conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+Rule 35    conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHERWISE block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+Rule 36    loop_statement -> ITER OPEN_PARENTHESIS expression SLICING_COLON expression SLICING_COLON expression CLOSE_PARENTHESIS block
+Rule 37    loop_statement -> WHILE OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+Rule 38    loop_statement -> REPEAT block WHILE OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+Rule 39    return_statement -> YIELD expression
+Rule 40    try_catch_statement -> TEST block POP STRING_LITERAL ARREST OPEN_PARENTHESIS STRING_LITERAL CLOSE_PARENTHESIS block
+Rule 41    function_call -> IDENTIFIER OPEN_PARENTHESIS argument_list CLOSE_PARENTHESIS
+Rule 42    argument_list -> expression ELEMENT_SEPERATOR argument_list
+Rule 43    argument_list -> expression
+Rule 44    argument_list -> empty
+Rule 45    enter_statement -> data_type IDENTIFIER ASSIGNMENT_OPERATOR ENTER OPEN_PARENTHESIS STRING_LITERAL CLOSE_PARENTHESIS
+Rule 46    expression -> term
+Rule 47    expression -> term BINARY_OPERATOR expression
+Rule 48    expression -> term COMPARISON_OPERATOR term
+Rule 49    term -> factor
+Rule 50    term -> factor BINARY_OPERATOR term
+Rule 51    term -> factor COMPARISON_OPERATOR factor
+Rule 52    factor -> IDENTIFIER
+Rule 53    factor -> NUM_LITERAL
+Rule 54    factor -> STRING_LITERAL
+Rule 55    factor -> BOOLEAN
+Rule 56    factor -> OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+Rule 57    factor -> UNARY_OPERATOR expression
+Rule 58    identifier -> IDENTIFIER
+Rule 59    number -> NUM_LITERAL
+Rule 60    string -> STRING_LITERAL
+Rule 61    boolean -> FLAG
+Rule 62    data_type -> NUM
+Rule 63    data_type -> STR
+Rule 64    data_type -> FLAG
+Rule 65    data_type -> LIST
+Rule 66    data_type -> TUP
+Rule 67    data_type -> VOID
+Rule 68    empty -> <empty>
+
+Terminals, with rules where they appear
+
+ARREST               : 40
+ASSIGNMENT_OPERATOR  : 27 28 45
+BINARY_OPERATOR      : 47 50
+BOOLEAN              : 55
+CLOSE_BRACES         : 13
+CLOSE_PARENTHESIS    : 1 4 29 32 33 34 34 35 35 36 37 38 40 41 45 56
+COMPARISON_OPERATOR  : 48 51
+DEFINE               : 1 4
+ELEMENT_SEPERATOR    : 9 30 42
+ENTER                : 45
+FLAG                 : 7 61 64
+GIVEN                : 32 33 34 35
+IDENTIFIER           : 4 12 27 28 41 45 52 58
+ITER                 : 36
+LIST                 : 65
+MAIN                 : 1
+NUM                  : 1 5 62
+NUM_LITERAL          : 1 53 59
+OPEN_BRACES          : 13
+OPEN_PARENTHESIS     : 1 4 29 32 33 34 34 35 35 36 37 38 40 41 45 56
+OTHER                : 34 35
+OTHERWISE            : 33 35
+POP                  : 40
+REPEAT               : 38
+SEMICOLON            : 1 14 15
+SHOW                 : 29
+SLICING_COLON        : 36 36
+STR                  : 6 63
+STRING_LITERAL       : 40 40 45 54 60
+TEST                 : 40
+TUP                  : 66
+UNARY_OPERATOR       : 57
+VOID                 : 8 67
+WHILE                : 37 38
+YIELD                : 1 39
+error                : 
+
+Nonterminals, with rules where they appear
+
+argument_list        : 41 42
+assignment_statement : 18
+block                : 1 4 19 32 33 33 34 34 35 35 35 36 37 38 40 40
+boolean              : 
+conditional_statement : 21
+data_type            : 12 27 45
+empty                : 3 11 16 31 44
+enter_statement      : 26
+expression           : 27 28 29 30 32 33 34 34 35 35 36 36 36 37 38 39 42 43 47 56 57
+expression_list      : 29 30
+factor               : 49 50 51 51
+function_call        : 25
+function_definition  : 2
+function_definition_list : 1 2
+function_type        : 4
+identifier           : 
+loop_statement       : 22
+number               : 
+parameter            : 9 10
+parameter_list       : 4 9
+program              : 0
+return_statement     : 23
+show_statement       : 20
+statement            : 14 15
+statement_list       : 13 14
+string               : 
+term                 : 46 47 48 48 50
+try_catch_statement  : 24
+variable_declaration : 17
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . program
+    (1) program -> . function_definition_list DEFINE NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS block YIELD NUM_LITERAL SEMICOLON
+    (2) function_definition_list -> . function_definition function_definition_list
+    (3) function_definition_list -> . empty
+    (4) function_definition -> . DEFINE function_type IDENTIFIER OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS block
+    (68) empty -> .
+
+  ! shift/reduce conflict for DEFINE resolved as shift
+    DEFINE          shift and go to state 3
+
+  ! DEFINE          [ reduce using rule 68 (empty -> .) ]
+
+    program                        shift and go to state 1
+    function_definition_list       shift and go to state 2
+    function_definition            shift and go to state 4
+    empty                          shift and go to state 5
+
+state 1
+
+    (0) S' -> program .
+
+
+
+state 2
+
+    (1) program -> function_definition_list . DEFINE NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS block YIELD NUM_LITERAL SEMICOLON
+
+    DEFINE          shift and go to state 6
+
+
+state 3
+
+    (4) function_definition -> DEFINE . function_type IDENTIFIER OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS block
+    (5) function_type -> . NUM
+    (6) function_type -> . STR
+    (7) function_type -> . FLAG
+    (8) function_type -> . VOID
+
+    NUM             shift and go to state 8
+    STR             shift and go to state 9
+    FLAG            shift and go to state 10
+    VOID            shift and go to state 11
+
+    function_type                  shift and go to state 7
+
+state 4
+
+    (2) function_definition_list -> function_definition . function_definition_list
+    (2) function_definition_list -> . function_definition function_definition_list
+    (3) function_definition_list -> . empty
+    (4) function_definition -> . DEFINE function_type IDENTIFIER OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS block
+    (68) empty -> .
+
+  ! shift/reduce conflict for DEFINE resolved as shift
+    DEFINE          shift and go to state 3
+
+  ! DEFINE          [ reduce using rule 68 (empty -> .) ]
+
+    function_definition            shift and go to state 4
+    function_definition_list       shift and go to state 12
+    empty                          shift and go to state 5
+
+state 5
+
+    (3) function_definition_list -> empty .
+
+    DEFINE          reduce using rule 3 (function_definition_list -> empty .)
+
+
+state 6
+
+    (1) program -> function_definition_list DEFINE . NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS block YIELD NUM_LITERAL SEMICOLON
+
+    NUM             shift and go to state 13
+
+
+state 7
+
+    (4) function_definition -> DEFINE function_type . IDENTIFIER OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS block
+
+    IDENTIFIER      shift and go to state 14
+
+
+state 8
+
+    (5) function_type -> NUM .
+
+    IDENTIFIER      reduce using rule 5 (function_type -> NUM .)
+
+
+state 9
+
+    (6) function_type -> STR .
+
+    IDENTIFIER      reduce using rule 6 (function_type -> STR .)
+
+
+state 10
+
+    (7) function_type -> FLAG .
+
+    IDENTIFIER      reduce using rule 7 (function_type -> FLAG .)
+
+
+state 11
+
+    (8) function_type -> VOID .
+
+    IDENTIFIER      reduce using rule 8 (function_type -> VOID .)
+
+
+state 12
+
+    (2) function_definition_list -> function_definition function_definition_list .
+
+    DEFINE          reduce using rule 2 (function_definition_list -> function_definition function_definition_list .)
+
+
+state 13
+
+    (1) program -> function_definition_list DEFINE NUM . MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS block YIELD NUM_LITERAL SEMICOLON
+
+    MAIN            shift and go to state 15
+
+
+state 14
+
+    (4) function_definition -> DEFINE function_type IDENTIFIER . OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS block
+
+    OPEN_PARENTHESIS shift and go to state 16
+
+
+state 15
+
+    (1) program -> function_definition_list DEFINE NUM MAIN . OPEN_PARENTHESIS CLOSE_PARENTHESIS block YIELD NUM_LITERAL SEMICOLON
+
+    OPEN_PARENTHESIS shift and go to state 17
+
+
+state 16
+
+    (4) function_definition -> DEFINE function_type IDENTIFIER OPEN_PARENTHESIS . parameter_list CLOSE_PARENTHESIS block
+    (9) parameter_list -> . parameter ELEMENT_SEPERATOR parameter_list
+    (10) parameter_list -> . parameter
+    (11) parameter_list -> . empty
+    (12) parameter -> . data_type IDENTIFIER
+    (68) empty -> .
+    (62) data_type -> . NUM
+    (63) data_type -> . STR
+    (64) data_type -> . FLAG
+    (65) data_type -> . LIST
+    (66) data_type -> . TUP
+    (67) data_type -> . VOID
+
+    CLOSE_PARENTHESIS reduce using rule 68 (empty -> .)
+    NUM             shift and go to state 22
+    STR             shift and go to state 23
+    FLAG            shift and go to state 24
+    LIST            shift and go to state 25
+    TUP             shift and go to state 26
+    VOID            shift and go to state 27
+
+    parameter_list                 shift and go to state 18
+    parameter                      shift and go to state 19
+    empty                          shift and go to state 20
+    data_type                      shift and go to state 21
+
+state 17
+
+    (1) program -> function_definition_list DEFINE NUM MAIN OPEN_PARENTHESIS . CLOSE_PARENTHESIS block YIELD NUM_LITERAL SEMICOLON
+
+    CLOSE_PARENTHESIS shift and go to state 28
+
+
+state 18
+
+    (4) function_definition -> DEFINE function_type IDENTIFIER OPEN_PARENTHESIS parameter_list . CLOSE_PARENTHESIS block
+
+    CLOSE_PARENTHESIS shift and go to state 29
+
+
+state 19
+
+    (9) parameter_list -> parameter . ELEMENT_SEPERATOR parameter_list
+    (10) parameter_list -> parameter .
+
+    ELEMENT_SEPERATOR shift and go to state 30
+    CLOSE_PARENTHESIS reduce using rule 10 (parameter_list -> parameter .)
+
+
+state 20
+
+    (11) parameter_list -> empty .
+
+    CLOSE_PARENTHESIS reduce using rule 11 (parameter_list -> empty .)
+
+
+state 21
+
+    (12) parameter -> data_type . IDENTIFIER
+
+    IDENTIFIER      shift and go to state 31
+
+
+state 22
+
+    (62) data_type -> NUM .
+
+    IDENTIFIER      reduce using rule 62 (data_type -> NUM .)
+
+
+state 23
+
+    (63) data_type -> STR .
+
+    IDENTIFIER      reduce using rule 63 (data_type -> STR .)
+
+
+state 24
+
+    (64) data_type -> FLAG .
+
+    IDENTIFIER      reduce using rule 64 (data_type -> FLAG .)
+
+
+state 25
+
+    (65) data_type -> LIST .
+
+    IDENTIFIER      reduce using rule 65 (data_type -> LIST .)
+
+
+state 26
+
+    (66) data_type -> TUP .
+
+    IDENTIFIER      reduce using rule 66 (data_type -> TUP .)
+
+
+state 27
+
+    (67) data_type -> VOID .
+
+    IDENTIFIER      reduce using rule 67 (data_type -> VOID .)
+
+
+state 28
+
+    (1) program -> function_definition_list DEFINE NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS . block YIELD NUM_LITERAL SEMICOLON
+    (13) block -> . OPEN_BRACES statement_list CLOSE_BRACES
+
+    OPEN_BRACES     shift and go to state 33
+
+    block                          shift and go to state 32
+
+state 29
+
+    (4) function_definition -> DEFINE function_type IDENTIFIER OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS . block
+    (13) block -> . OPEN_BRACES statement_list CLOSE_BRACES
+
+    OPEN_BRACES     shift and go to state 33
+
+    block                          shift and go to state 34
+
+state 30
+
+    (9) parameter_list -> parameter ELEMENT_SEPERATOR . parameter_list
+    (9) parameter_list -> . parameter ELEMENT_SEPERATOR parameter_list
+    (10) parameter_list -> . parameter
+    (11) parameter_list -> . empty
+    (12) parameter -> . data_type IDENTIFIER
+    (68) empty -> .
+    (62) data_type -> . NUM
+    (63) data_type -> . STR
+    (64) data_type -> . FLAG
+    (65) data_type -> . LIST
+    (66) data_type -> . TUP
+    (67) data_type -> . VOID
+
+    CLOSE_PARENTHESIS reduce using rule 68 (empty -> .)
+    NUM             shift and go to state 22
+    STR             shift and go to state 23
+    FLAG            shift and go to state 24
+    LIST            shift and go to state 25
+    TUP             shift and go to state 26
+    VOID            shift and go to state 27
+
+    parameter                      shift and go to state 19
+    parameter_list                 shift and go to state 35
+    empty                          shift and go to state 20
+    data_type                      shift and go to state 21
+
+state 31
+
+    (12) parameter -> data_type IDENTIFIER .
+
+    ELEMENT_SEPERATOR reduce using rule 12 (parameter -> data_type IDENTIFIER .)
+    CLOSE_PARENTHESIS reduce using rule 12 (parameter -> data_type IDENTIFIER .)
+
+
+state 32
+
+    (1) program -> function_definition_list DEFINE NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS block . YIELD NUM_LITERAL SEMICOLON
+
+    YIELD           shift and go to state 36
+
+
+state 33
+
+    (13) block -> OPEN_BRACES . statement_list CLOSE_BRACES
+    (14) statement_list -> . statement SEMICOLON statement_list
+    (15) statement_list -> . statement SEMICOLON
+    (16) statement_list -> . empty
+    (17) statement -> . variable_declaration
+    (18) statement -> . assignment_statement
+    (19) statement -> . block
+    (20) statement -> . show_statement
+    (21) statement -> . conditional_statement
+    (22) statement -> . loop_statement
+    (23) statement -> . return_statement
+    (24) statement -> . try_catch_statement
+    (25) statement -> . function_call
+    (26) statement -> . enter_statement
+    (68) empty -> .
+    (27) variable_declaration -> . data_type IDENTIFIER ASSIGNMENT_OPERATOR expression
+    (28) assignment_statement -> . IDENTIFIER ASSIGNMENT_OPERATOR expression
+    (13) block -> . OPEN_BRACES statement_list CLOSE_BRACES
+    (29) show_statement -> . SHOW OPEN_PARENTHESIS expression expression_list CLOSE_PARENTHESIS
+    (32) conditional_statement -> . GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+    (33) conditional_statement -> . GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHERWISE block
+    (34) conditional_statement -> . GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+    (35) conditional_statement -> . GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHERWISE block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+    (36) loop_statement -> . ITER OPEN_PARENTHESIS expression SLICING_COLON expression SLICING_COLON expression CLOSE_PARENTHESIS block
+    (37) loop_statement -> . WHILE OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+    (38) loop_statement -> . REPEAT block WHILE OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (39) return_statement -> . YIELD expression
+    (40) try_catch_statement -> . TEST block POP STRING_LITERAL ARREST OPEN_PARENTHESIS STRING_LITERAL CLOSE_PARENTHESIS block
+    (41) function_call -> . IDENTIFIER OPEN_PARENTHESIS argument_list CLOSE_PARENTHESIS
+    (45) enter_statement -> . data_type IDENTIFIER ASSIGNMENT_OPERATOR ENTER OPEN_PARENTHESIS STRING_LITERAL CLOSE_PARENTHESIS
+    (62) data_type -> . NUM
+    (63) data_type -> . STR
+    (64) data_type -> . FLAG
+    (65) data_type -> . LIST
+    (66) data_type -> . TUP
+    (67) data_type -> . VOID
+
+    CLOSE_BRACES    reduce using rule 68 (empty -> .)
+    IDENTIFIER      shift and go to state 51
+    OPEN_BRACES     shift and go to state 33
+    SHOW            shift and go to state 52
+    GIVEN           shift and go to state 53
+    ITER            shift and go to state 54
+    WHILE           shift and go to state 55
+    REPEAT          shift and go to state 56
+    YIELD           shift and go to state 57
+    TEST            shift and go to state 58
+    NUM             shift and go to state 22
+    STR             shift and go to state 23
+    FLAG            shift and go to state 24
+    LIST            shift and go to state 25
+    TUP             shift and go to state 26
+    VOID            shift and go to state 27
+
+    statement_list                 shift and go to state 37
+    statement                      shift and go to state 38
+    empty                          shift and go to state 39
+    variable_declaration           shift and go to state 40
+    assignment_statement           shift and go to state 41
+    block                          shift and go to state 42
+    show_statement                 shift and go to state 43
+    conditional_statement          shift and go to state 44
+    loop_statement                 shift and go to state 45
+    return_statement               shift and go to state 46
+    try_catch_statement            shift and go to state 47
+    function_call                  shift and go to state 48
+    enter_statement                shift and go to state 49
+    data_type                      shift and go to state 50
+
+state 34
+
+    (4) function_definition -> DEFINE function_type IDENTIFIER OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS block .
+
+    DEFINE          reduce using rule 4 (function_definition -> DEFINE function_type IDENTIFIER OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS block .)
+
+
+state 35
+
+    (9) parameter_list -> parameter ELEMENT_SEPERATOR parameter_list .
+
+    CLOSE_PARENTHESIS reduce using rule 9 (parameter_list -> parameter ELEMENT_SEPERATOR parameter_list .)
+
+
+state 36
+
+    (1) program -> function_definition_list DEFINE NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS block YIELD . NUM_LITERAL SEMICOLON
+
+    NUM_LITERAL     shift and go to state 59
+
+
+state 37
+
+    (13) block -> OPEN_BRACES statement_list . CLOSE_BRACES
+
+    CLOSE_BRACES    shift and go to state 60
+
+
+state 38
+
+    (14) statement_list -> statement . SEMICOLON statement_list
+    (15) statement_list -> statement . SEMICOLON
+
+    SEMICOLON       shift and go to state 61
+
+
+state 39
+
+    (16) statement_list -> empty .
+
+    CLOSE_BRACES    reduce using rule 16 (statement_list -> empty .)
+
+
+state 40
+
+    (17) statement -> variable_declaration .
+
+    SEMICOLON       reduce using rule 17 (statement -> variable_declaration .)
+
+
+state 41
+
+    (18) statement -> assignment_statement .
+
+    SEMICOLON       reduce using rule 18 (statement -> assignment_statement .)
+
+
+state 42
+
+    (19) statement -> block .
+
+    SEMICOLON       reduce using rule 19 (statement -> block .)
+
+
+state 43
+
+    (20) statement -> show_statement .
+
+    SEMICOLON       reduce using rule 20 (statement -> show_statement .)
+
+
+state 44
+
+    (21) statement -> conditional_statement .
+
+    SEMICOLON       reduce using rule 21 (statement -> conditional_statement .)
+
+
+state 45
+
+    (22) statement -> loop_statement .
+
+    SEMICOLON       reduce using rule 22 (statement -> loop_statement .)
+
+
+state 46
+
+    (23) statement -> return_statement .
+
+    SEMICOLON       reduce using rule 23 (statement -> return_statement .)
+
+
+state 47
+
+    (24) statement -> try_catch_statement .
+
+    SEMICOLON       reduce using rule 24 (statement -> try_catch_statement .)
+
+
+state 48
+
+    (25) statement -> function_call .
+
+    SEMICOLON       reduce using rule 25 (statement -> function_call .)
+
+
+state 49
+
+    (26) statement -> enter_statement .
+
+    SEMICOLON       reduce using rule 26 (statement -> enter_statement .)
+
+
+state 50
+
+    (27) variable_declaration -> data_type . IDENTIFIER ASSIGNMENT_OPERATOR expression
+    (45) enter_statement -> data_type . IDENTIFIER ASSIGNMENT_OPERATOR ENTER OPEN_PARENTHESIS STRING_LITERAL CLOSE_PARENTHESIS
+
+    IDENTIFIER      shift and go to state 62
+
+
+state 51
+
+    (28) assignment_statement -> IDENTIFIER . ASSIGNMENT_OPERATOR expression
+    (41) function_call -> IDENTIFIER . OPEN_PARENTHESIS argument_list CLOSE_PARENTHESIS
+
+    ASSIGNMENT_OPERATOR shift and go to state 63
+    OPEN_PARENTHESIS shift and go to state 64
+
+
+state 52
+
+    (29) show_statement -> SHOW . OPEN_PARENTHESIS expression expression_list CLOSE_PARENTHESIS
+
+    OPEN_PARENTHESIS shift and go to state 65
+
+
+state 53
+
+    (32) conditional_statement -> GIVEN . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+    (33) conditional_statement -> GIVEN . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHERWISE block
+    (34) conditional_statement -> GIVEN . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+    (35) conditional_statement -> GIVEN . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHERWISE block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+
+    OPEN_PARENTHESIS shift and go to state 66
+
+
+state 54
+
+    (36) loop_statement -> ITER . OPEN_PARENTHESIS expression SLICING_COLON expression SLICING_COLON expression CLOSE_PARENTHESIS block
+
+    OPEN_PARENTHESIS shift and go to state 67
+
+
+state 55
+
+    (37) loop_statement -> WHILE . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+
+    OPEN_PARENTHESIS shift and go to state 68
+
+
+state 56
+
+    (38) loop_statement -> REPEAT . block WHILE OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (13) block -> . OPEN_BRACES statement_list CLOSE_BRACES
+
+    OPEN_BRACES     shift and go to state 33
+
+    block                          shift and go to state 69
+
+state 57
+
+    (39) return_statement -> YIELD . expression
+    (46) expression -> . term
+    (47) expression -> . term BINARY_OPERATOR expression
+    (48) expression -> . term COMPARISON_OPERATOR term
+    (49) term -> . factor
+    (50) term -> . factor BINARY_OPERATOR term
+    (51) term -> . factor COMPARISON_OPERATOR factor
+    (52) factor -> . IDENTIFIER
+    (53) factor -> . NUM_LITERAL
+    (54) factor -> . STRING_LITERAL
+    (55) factor -> . BOOLEAN
+    (56) factor -> . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (57) factor -> . UNARY_OPERATOR expression
+
+    IDENTIFIER      shift and go to state 73
+    NUM_LITERAL     shift and go to state 74
+    STRING_LITERAL  shift and go to state 75
+    BOOLEAN         shift and go to state 76
+    OPEN_PARENTHESIS shift and go to state 77
+    UNARY_OPERATOR  shift and go to state 78
+
+    expression                     shift and go to state 70
+    term                           shift and go to state 71
+    factor                         shift and go to state 72
+
+state 58
+
+    (40) try_catch_statement -> TEST . block POP STRING_LITERAL ARREST OPEN_PARENTHESIS STRING_LITERAL CLOSE_PARENTHESIS block
+    (13) block -> . OPEN_BRACES statement_list CLOSE_BRACES
+
+    OPEN_BRACES     shift and go to state 33
+
+    block                          shift and go to state 79
+
+state 59
+
+    (1) program -> function_definition_list DEFINE NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS block YIELD NUM_LITERAL . SEMICOLON
+
+    SEMICOLON       shift and go to state 80
+
+
+state 60
+
+    (13) block -> OPEN_BRACES statement_list CLOSE_BRACES .
+
+    YIELD           reduce using rule 13 (block -> OPEN_BRACES statement_list CLOSE_BRACES .)
+    DEFINE          reduce using rule 13 (block -> OPEN_BRACES statement_list CLOSE_BRACES .)
+    SEMICOLON       reduce using rule 13 (block -> OPEN_BRACES statement_list CLOSE_BRACES .)
+    WHILE           reduce using rule 13 (block -> OPEN_BRACES statement_list CLOSE_BRACES .)
+    POP             reduce using rule 13 (block -> OPEN_BRACES statement_list CLOSE_BRACES .)
+    OTHERWISE       reduce using rule 13 (block -> OPEN_BRACES statement_list CLOSE_BRACES .)
+    OTHER           reduce using rule 13 (block -> OPEN_BRACES statement_list CLOSE_BRACES .)
+
+
+state 61
+
+    (14) statement_list -> statement SEMICOLON . statement_list
+    (15) statement_list -> statement SEMICOLON .
+    (14) statement_list -> . statement SEMICOLON statement_list
+    (15) statement_list -> . statement SEMICOLON
+    (16) statement_list -> . empty
+    (17) statement -> . variable_declaration
+    (18) statement -> . assignment_statement
+    (19) statement -> . block
+    (20) statement -> . show_statement
+    (21) statement -> . conditional_statement
+    (22) statement -> . loop_statement
+    (23) statement -> . return_statement
+    (24) statement -> . try_catch_statement
+    (25) statement -> . function_call
+    (26) statement -> . enter_statement
+    (68) empty -> .
+    (27) variable_declaration -> . data_type IDENTIFIER ASSIGNMENT_OPERATOR expression
+    (28) assignment_statement -> . IDENTIFIER ASSIGNMENT_OPERATOR expression
+    (13) block -> . OPEN_BRACES statement_list CLOSE_BRACES
+    (29) show_statement -> . SHOW OPEN_PARENTHESIS expression expression_list CLOSE_PARENTHESIS
+    (32) conditional_statement -> . GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+    (33) conditional_statement -> . GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHERWISE block
+    (34) conditional_statement -> . GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+    (35) conditional_statement -> . GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHERWISE block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+    (36) loop_statement -> . ITER OPEN_PARENTHESIS expression SLICING_COLON expression SLICING_COLON expression CLOSE_PARENTHESIS block
+    (37) loop_statement -> . WHILE OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+    (38) loop_statement -> . REPEAT block WHILE OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (39) return_statement -> . YIELD expression
+    (40) try_catch_statement -> . TEST block POP STRING_LITERAL ARREST OPEN_PARENTHESIS STRING_LITERAL CLOSE_PARENTHESIS block
+    (41) function_call -> . IDENTIFIER OPEN_PARENTHESIS argument_list CLOSE_PARENTHESIS
+    (45) enter_statement -> . data_type IDENTIFIER ASSIGNMENT_OPERATOR ENTER OPEN_PARENTHESIS STRING_LITERAL CLOSE_PARENTHESIS
+    (62) data_type -> . NUM
+    (63) data_type -> . STR
+    (64) data_type -> . FLAG
+    (65) data_type -> . LIST
+    (66) data_type -> . TUP
+    (67) data_type -> . VOID
+
+  ! reduce/reduce conflict for CLOSE_BRACES resolved using rule 15 (statement_list -> statement SEMICOLON .)
+    CLOSE_BRACES    reduce using rule 15 (statement_list -> statement SEMICOLON .)
+    IDENTIFIER      shift and go to state 51
+    OPEN_BRACES     shift and go to state 33
+    SHOW            shift and go to state 52
+    GIVEN           shift and go to state 53
+    ITER            shift and go to state 54
+    WHILE           shift and go to state 55
+    REPEAT          shift and go to state 56
+    YIELD           shift and go to state 57
+    TEST            shift and go to state 58
+    NUM             shift and go to state 22
+    STR             shift and go to state 23
+    FLAG            shift and go to state 24
+    LIST            shift and go to state 25
+    TUP             shift and go to state 26
+    VOID            shift and go to state 27
+
+  ! CLOSE_BRACES    [ reduce using rule 68 (empty -> .) ]
+
+    statement                      shift and go to state 38
+    statement_list                 shift and go to state 81
+    empty                          shift and go to state 39
+    variable_declaration           shift and go to state 40
+    assignment_statement           shift and go to state 41
+    block                          shift and go to state 42
+    show_statement                 shift and go to state 43
+    conditional_statement          shift and go to state 44
+    loop_statement                 shift and go to state 45
+    return_statement               shift and go to state 46
+    try_catch_statement            shift and go to state 47
+    function_call                  shift and go to state 48
+    enter_statement                shift and go to state 49
+    data_type                      shift and go to state 50
+
+state 62
+
+    (27) variable_declaration -> data_type IDENTIFIER . ASSIGNMENT_OPERATOR expression
+    (45) enter_statement -> data_type IDENTIFIER . ASSIGNMENT_OPERATOR ENTER OPEN_PARENTHESIS STRING_LITERAL CLOSE_PARENTHESIS
+
+    ASSIGNMENT_OPERATOR shift and go to state 82
+
+
+state 63
+
+    (28) assignment_statement -> IDENTIFIER ASSIGNMENT_OPERATOR . expression
+    (46) expression -> . term
+    (47) expression -> . term BINARY_OPERATOR expression
+    (48) expression -> . term COMPARISON_OPERATOR term
+    (49) term -> . factor
+    (50) term -> . factor BINARY_OPERATOR term
+    (51) term -> . factor COMPARISON_OPERATOR factor
+    (52) factor -> . IDENTIFIER
+    (53) factor -> . NUM_LITERAL
+    (54) factor -> . STRING_LITERAL
+    (55) factor -> . BOOLEAN
+    (56) factor -> . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (57) factor -> . UNARY_OPERATOR expression
+
+    IDENTIFIER      shift and go to state 73
+    NUM_LITERAL     shift and go to state 74
+    STRING_LITERAL  shift and go to state 75
+    BOOLEAN         shift and go to state 76
+    OPEN_PARENTHESIS shift and go to state 77
+    UNARY_OPERATOR  shift and go to state 78
+
+    expression                     shift and go to state 83
+    term                           shift and go to state 71
+    factor                         shift and go to state 72
+
+state 64
+
+    (41) function_call -> IDENTIFIER OPEN_PARENTHESIS . argument_list CLOSE_PARENTHESIS
+    (42) argument_list -> . expression ELEMENT_SEPERATOR argument_list
+    (43) argument_list -> . expression
+    (44) argument_list -> . empty
+    (46) expression -> . term
+    (47) expression -> . term BINARY_OPERATOR expression
+    (48) expression -> . term COMPARISON_OPERATOR term
+    (68) empty -> .
+    (49) term -> . factor
+    (50) term -> . factor BINARY_OPERATOR term
+    (51) term -> . factor COMPARISON_OPERATOR factor
+    (52) factor -> . IDENTIFIER
+    (53) factor -> . NUM_LITERAL
+    (54) factor -> . STRING_LITERAL
+    (55) factor -> . BOOLEAN
+    (56) factor -> . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (57) factor -> . UNARY_OPERATOR expression
+
+    CLOSE_PARENTHESIS reduce using rule 68 (empty -> .)
+    IDENTIFIER      shift and go to state 73
+    NUM_LITERAL     shift and go to state 74
+    STRING_LITERAL  shift and go to state 75
+    BOOLEAN         shift and go to state 76
+    OPEN_PARENTHESIS shift and go to state 77
+    UNARY_OPERATOR  shift and go to state 78
+
+    argument_list                  shift and go to state 84
+    expression                     shift and go to state 85
+    empty                          shift and go to state 86
+    term                           shift and go to state 71
+    factor                         shift and go to state 72
+
+state 65
+
+    (29) show_statement -> SHOW OPEN_PARENTHESIS . expression expression_list CLOSE_PARENTHESIS
+    (46) expression -> . term
+    (47) expression -> . term BINARY_OPERATOR expression
+    (48) expression -> . term COMPARISON_OPERATOR term
+    (49) term -> . factor
+    (50) term -> . factor BINARY_OPERATOR term
+    (51) term -> . factor COMPARISON_OPERATOR factor
+    (52) factor -> . IDENTIFIER
+    (53) factor -> . NUM_LITERAL
+    (54) factor -> . STRING_LITERAL
+    (55) factor -> . BOOLEAN
+    (56) factor -> . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (57) factor -> . UNARY_OPERATOR expression
+
+    IDENTIFIER      shift and go to state 73
+    NUM_LITERAL     shift and go to state 74
+    STRING_LITERAL  shift and go to state 75
+    BOOLEAN         shift and go to state 76
+    OPEN_PARENTHESIS shift and go to state 77
+    UNARY_OPERATOR  shift and go to state 78
+
+    expression                     shift and go to state 87
+    term                           shift and go to state 71
+    factor                         shift and go to state 72
+
+state 66
+
+    (32) conditional_statement -> GIVEN OPEN_PARENTHESIS . expression CLOSE_PARENTHESIS block
+    (33) conditional_statement -> GIVEN OPEN_PARENTHESIS . expression CLOSE_PARENTHESIS block OTHERWISE block
+    (34) conditional_statement -> GIVEN OPEN_PARENTHESIS . expression CLOSE_PARENTHESIS block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+    (35) conditional_statement -> GIVEN OPEN_PARENTHESIS . expression CLOSE_PARENTHESIS block OTHERWISE block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+    (46) expression -> . term
+    (47) expression -> . term BINARY_OPERATOR expression
+    (48) expression -> . term COMPARISON_OPERATOR term
+    (49) term -> . factor
+    (50) term -> . factor BINARY_OPERATOR term
+    (51) term -> . factor COMPARISON_OPERATOR factor
+    (52) factor -> . IDENTIFIER
+    (53) factor -> . NUM_LITERAL
+    (54) factor -> . STRING_LITERAL
+    (55) factor -> . BOOLEAN
+    (56) factor -> . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (57) factor -> . UNARY_OPERATOR expression
+
+    IDENTIFIER      shift and go to state 73
+    NUM_LITERAL     shift and go to state 74
+    STRING_LITERAL  shift and go to state 75
+    BOOLEAN         shift and go to state 76
+    OPEN_PARENTHESIS shift and go to state 77
+    UNARY_OPERATOR  shift and go to state 78
+
+    expression                     shift and go to state 88
+    term                           shift and go to state 71
+    factor                         shift and go to state 72
+
+state 67
+
+    (36) loop_statement -> ITER OPEN_PARENTHESIS . expression SLICING_COLON expression SLICING_COLON expression CLOSE_PARENTHESIS block
+    (46) expression -> . term
+    (47) expression -> . term BINARY_OPERATOR expression
+    (48) expression -> . term COMPARISON_OPERATOR term
+    (49) term -> . factor
+    (50) term -> . factor BINARY_OPERATOR term
+    (51) term -> . factor COMPARISON_OPERATOR factor
+    (52) factor -> . IDENTIFIER
+    (53) factor -> . NUM_LITERAL
+    (54) factor -> . STRING_LITERAL
+    (55) factor -> . BOOLEAN
+    (56) factor -> . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (57) factor -> . UNARY_OPERATOR expression
+
+    IDENTIFIER      shift and go to state 73
+    NUM_LITERAL     shift and go to state 74
+    STRING_LITERAL  shift and go to state 75
+    BOOLEAN         shift and go to state 76
+    OPEN_PARENTHESIS shift and go to state 77
+    UNARY_OPERATOR  shift and go to state 78
+
+    expression                     shift and go to state 89
+    term                           shift and go to state 71
+    factor                         shift and go to state 72
+
+state 68
+
+    (37) loop_statement -> WHILE OPEN_PARENTHESIS . expression CLOSE_PARENTHESIS block
+    (46) expression -> . term
+    (47) expression -> . term BINARY_OPERATOR expression
+    (48) expression -> . term COMPARISON_OPERATOR term
+    (49) term -> . factor
+    (50) term -> . factor BINARY_OPERATOR term
+    (51) term -> . factor COMPARISON_OPERATOR factor
+    (52) factor -> . IDENTIFIER
+    (53) factor -> . NUM_LITERAL
+    (54) factor -> . STRING_LITERAL
+    (55) factor -> . BOOLEAN
+    (56) factor -> . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (57) factor -> . UNARY_OPERATOR expression
+
+    IDENTIFIER      shift and go to state 73
+    NUM_LITERAL     shift and go to state 74
+    STRING_LITERAL  shift and go to state 75
+    BOOLEAN         shift and go to state 76
+    OPEN_PARENTHESIS shift and go to state 77
+    UNARY_OPERATOR  shift and go to state 78
+
+    expression                     shift and go to state 90
+    term                           shift and go to state 71
+    factor                         shift and go to state 72
+
+state 69
+
+    (38) loop_statement -> REPEAT block . WHILE OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+
+    WHILE           shift and go to state 91
+
+
+state 70
+
+    (39) return_statement -> YIELD expression .
+
+    SEMICOLON       reduce using rule 39 (return_statement -> YIELD expression .)
+
+
+state 71
+
+    (46) expression -> term .
+    (47) expression -> term . BINARY_OPERATOR expression
+    (48) expression -> term . COMPARISON_OPERATOR term
+
+  ! shift/reduce conflict for BINARY_OPERATOR resolved as shift
+  ! shift/reduce conflict for COMPARISON_OPERATOR resolved as shift
+    SEMICOLON       reduce using rule 46 (expression -> term .)
+    ELEMENT_SEPERATOR reduce using rule 46 (expression -> term .)
+    CLOSE_PARENTHESIS reduce using rule 46 (expression -> term .)
+    SLICING_COLON   reduce using rule 46 (expression -> term .)
+    BINARY_OPERATOR shift and go to state 92
+    COMPARISON_OPERATOR shift and go to state 93
+
+  ! BINARY_OPERATOR [ reduce using rule 46 (expression -> term .) ]
+  ! COMPARISON_OPERATOR [ reduce using rule 46 (expression -> term .) ]
+
+
+state 72
+
+    (49) term -> factor .
+    (50) term -> factor . BINARY_OPERATOR term
+    (51) term -> factor . COMPARISON_OPERATOR factor
+
+  ! shift/reduce conflict for BINARY_OPERATOR resolved as shift
+  ! shift/reduce conflict for COMPARISON_OPERATOR resolved as shift
+    SEMICOLON       reduce using rule 49 (term -> factor .)
+    ELEMENT_SEPERATOR reduce using rule 49 (term -> factor .)
+    CLOSE_PARENTHESIS reduce using rule 49 (term -> factor .)
+    SLICING_COLON   reduce using rule 49 (term -> factor .)
+    BINARY_OPERATOR shift and go to state 94
+    COMPARISON_OPERATOR shift and go to state 95
+
+  ! BINARY_OPERATOR [ reduce using rule 49 (term -> factor .) ]
+  ! COMPARISON_OPERATOR [ reduce using rule 49 (term -> factor .) ]
+
+
+state 73
+
+    (52) factor -> IDENTIFIER .
+
+    BINARY_OPERATOR reduce using rule 52 (factor -> IDENTIFIER .)
+    COMPARISON_OPERATOR reduce using rule 52 (factor -> IDENTIFIER .)
+    SEMICOLON       reduce using rule 52 (factor -> IDENTIFIER .)
+    ELEMENT_SEPERATOR reduce using rule 52 (factor -> IDENTIFIER .)
+    CLOSE_PARENTHESIS reduce using rule 52 (factor -> IDENTIFIER .)
+    SLICING_COLON   reduce using rule 52 (factor -> IDENTIFIER .)
+
+
+state 74
+
+    (53) factor -> NUM_LITERAL .
+
+    BINARY_OPERATOR reduce using rule 53 (factor -> NUM_LITERAL .)
+    COMPARISON_OPERATOR reduce using rule 53 (factor -> NUM_LITERAL .)
+    SEMICOLON       reduce using rule 53 (factor -> NUM_LITERAL .)
+    ELEMENT_SEPERATOR reduce using rule 53 (factor -> NUM_LITERAL .)
+    CLOSE_PARENTHESIS reduce using rule 53 (factor -> NUM_LITERAL .)
+    SLICING_COLON   reduce using rule 53 (factor -> NUM_LITERAL .)
+
+
+state 75
+
+    (54) factor -> STRING_LITERAL .
+
+    BINARY_OPERATOR reduce using rule 54 (factor -> STRING_LITERAL .)
+    COMPARISON_OPERATOR reduce using rule 54 (factor -> STRING_LITERAL .)
+    SEMICOLON       reduce using rule 54 (factor -> STRING_LITERAL .)
+    ELEMENT_SEPERATOR reduce using rule 54 (factor -> STRING_LITERAL .)
+    CLOSE_PARENTHESIS reduce using rule 54 (factor -> STRING_LITERAL .)
+    SLICING_COLON   reduce using rule 54 (factor -> STRING_LITERAL .)
+
+
+state 76
+
+    (55) factor -> BOOLEAN .
+
+    BINARY_OPERATOR reduce using rule 55 (factor -> BOOLEAN .)
+    COMPARISON_OPERATOR reduce using rule 55 (factor -> BOOLEAN .)
+    SEMICOLON       reduce using rule 55 (factor -> BOOLEAN .)
+    ELEMENT_SEPERATOR reduce using rule 55 (factor -> BOOLEAN .)
+    CLOSE_PARENTHESIS reduce using rule 55 (factor -> BOOLEAN .)
+    SLICING_COLON   reduce using rule 55 (factor -> BOOLEAN .)
+
+
+state 77
+
+    (56) factor -> OPEN_PARENTHESIS . expression CLOSE_PARENTHESIS
+    (46) expression -> . term
+    (47) expression -> . term BINARY_OPERATOR expression
+    (48) expression -> . term COMPARISON_OPERATOR term
+    (49) term -> . factor
+    (50) term -> . factor BINARY_OPERATOR term
+    (51) term -> . factor COMPARISON_OPERATOR factor
+    (52) factor -> . IDENTIFIER
+    (53) factor -> . NUM_LITERAL
+    (54) factor -> . STRING_LITERAL
+    (55) factor -> . BOOLEAN
+    (56) factor -> . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (57) factor -> . UNARY_OPERATOR expression
+
+    IDENTIFIER      shift and go to state 73
+    NUM_LITERAL     shift and go to state 74
+    STRING_LITERAL  shift and go to state 75
+    BOOLEAN         shift and go to state 76
+    OPEN_PARENTHESIS shift and go to state 77
+    UNARY_OPERATOR  shift and go to state 78
+
+    expression                     shift and go to state 96
+    term                           shift and go to state 71
+    factor                         shift and go to state 72
+
+state 78
+
+    (57) factor -> UNARY_OPERATOR . expression
+    (46) expression -> . term
+    (47) expression -> . term BINARY_OPERATOR expression
+    (48) expression -> . term COMPARISON_OPERATOR term
+    (49) term -> . factor
+    (50) term -> . factor BINARY_OPERATOR term
+    (51) term -> . factor COMPARISON_OPERATOR factor
+    (52) factor -> . IDENTIFIER
+    (53) factor -> . NUM_LITERAL
+    (54) factor -> . STRING_LITERAL
+    (55) factor -> . BOOLEAN
+    (56) factor -> . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (57) factor -> . UNARY_OPERATOR expression
+
+    IDENTIFIER      shift and go to state 73
+    NUM_LITERAL     shift and go to state 74
+    STRING_LITERAL  shift and go to state 75
+    BOOLEAN         shift and go to state 76
+    OPEN_PARENTHESIS shift and go to state 77
+    UNARY_OPERATOR  shift and go to state 78
+
+    expression                     shift and go to state 97
+    term                           shift and go to state 71
+    factor                         shift and go to state 72
+
+state 79
+
+    (40) try_catch_statement -> TEST block . POP STRING_LITERAL ARREST OPEN_PARENTHESIS STRING_LITERAL CLOSE_PARENTHESIS block
+
+    POP             shift and go to state 98
+
+
+state 80
+
+    (1) program -> function_definition_list DEFINE NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS block YIELD NUM_LITERAL SEMICOLON .
+
+    $end            reduce using rule 1 (program -> function_definition_list DEFINE NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS block YIELD NUM_LITERAL SEMICOLON .)
+
+
+state 81
+
+    (14) statement_list -> statement SEMICOLON statement_list .
+
+    CLOSE_BRACES    reduce using rule 14 (statement_list -> statement SEMICOLON statement_list .)
+
+
+state 82
+
+    (27) variable_declaration -> data_type IDENTIFIER ASSIGNMENT_OPERATOR . expression
+    (45) enter_statement -> data_type IDENTIFIER ASSIGNMENT_OPERATOR . ENTER OPEN_PARENTHESIS STRING_LITERAL CLOSE_PARENTHESIS
+    (46) expression -> . term
+    (47) expression -> . term BINARY_OPERATOR expression
+    (48) expression -> . term COMPARISON_OPERATOR term
+    (49) term -> . factor
+    (50) term -> . factor BINARY_OPERATOR term
+    (51) term -> . factor COMPARISON_OPERATOR factor
+    (52) factor -> . IDENTIFIER
+    (53) factor -> . NUM_LITERAL
+    (54) factor -> . STRING_LITERAL
+    (55) factor -> . BOOLEAN
+    (56) factor -> . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (57) factor -> . UNARY_OPERATOR expression
+
+    ENTER           shift and go to state 100
+    IDENTIFIER      shift and go to state 73
+    NUM_LITERAL     shift and go to state 74
+    STRING_LITERAL  shift and go to state 75
+    BOOLEAN         shift and go to state 76
+    OPEN_PARENTHESIS shift and go to state 77
+    UNARY_OPERATOR  shift and go to state 78
+
+    expression                     shift and go to state 99
+    term                           shift and go to state 71
+    factor                         shift and go to state 72
+
+state 83
+
+    (28) assignment_statement -> IDENTIFIER ASSIGNMENT_OPERATOR expression .
+
+    SEMICOLON       reduce using rule 28 (assignment_statement -> IDENTIFIER ASSIGNMENT_OPERATOR expression .)
+
+
+state 84
+
+    (41) function_call -> IDENTIFIER OPEN_PARENTHESIS argument_list . CLOSE_PARENTHESIS
+
+    CLOSE_PARENTHESIS shift and go to state 101
+
+
+state 85
+
+    (42) argument_list -> expression . ELEMENT_SEPERATOR argument_list
+    (43) argument_list -> expression .
+
+    ELEMENT_SEPERATOR shift and go to state 102
+    CLOSE_PARENTHESIS reduce using rule 43 (argument_list -> expression .)
+
+
+state 86
+
+    (44) argument_list -> empty .
+
+    CLOSE_PARENTHESIS reduce using rule 44 (argument_list -> empty .)
+
+
+state 87
+
+    (29) show_statement -> SHOW OPEN_PARENTHESIS expression . expression_list CLOSE_PARENTHESIS
+    (30) expression_list -> . ELEMENT_SEPERATOR expression expression_list
+    (31) expression_list -> . empty
+    (68) empty -> .
+
+    ELEMENT_SEPERATOR shift and go to state 104
+    CLOSE_PARENTHESIS reduce using rule 68 (empty -> .)
+
+    expression_list                shift and go to state 103
+    empty                          shift and go to state 105
+
+state 88
+
+    (32) conditional_statement -> GIVEN OPEN_PARENTHESIS expression . CLOSE_PARENTHESIS block
+    (33) conditional_statement -> GIVEN OPEN_PARENTHESIS expression . CLOSE_PARENTHESIS block OTHERWISE block
+    (34) conditional_statement -> GIVEN OPEN_PARENTHESIS expression . CLOSE_PARENTHESIS block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+    (35) conditional_statement -> GIVEN OPEN_PARENTHESIS expression . CLOSE_PARENTHESIS block OTHERWISE block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+
+    CLOSE_PARENTHESIS shift and go to state 106
+
+
+state 89
+
+    (36) loop_statement -> ITER OPEN_PARENTHESIS expression . SLICING_COLON expression SLICING_COLON expression CLOSE_PARENTHESIS block
+
+    SLICING_COLON   shift and go to state 107
+
+
+state 90
+
+    (37) loop_statement -> WHILE OPEN_PARENTHESIS expression . CLOSE_PARENTHESIS block
+
+    CLOSE_PARENTHESIS shift and go to state 108
+
+
+state 91
+
+    (38) loop_statement -> REPEAT block WHILE . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+
+    OPEN_PARENTHESIS shift and go to state 109
+
+
+state 92
+
+    (47) expression -> term BINARY_OPERATOR . expression
+    (46) expression -> . term
+    (47) expression -> . term BINARY_OPERATOR expression
+    (48) expression -> . term COMPARISON_OPERATOR term
+    (49) term -> . factor
+    (50) term -> . factor BINARY_OPERATOR term
+    (51) term -> . factor COMPARISON_OPERATOR factor
+    (52) factor -> . IDENTIFIER
+    (53) factor -> . NUM_LITERAL
+    (54) factor -> . STRING_LITERAL
+    (55) factor -> . BOOLEAN
+    (56) factor -> . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (57) factor -> . UNARY_OPERATOR expression
+
+    IDENTIFIER      shift and go to state 73
+    NUM_LITERAL     shift and go to state 74
+    STRING_LITERAL  shift and go to state 75
+    BOOLEAN         shift and go to state 76
+    OPEN_PARENTHESIS shift and go to state 77
+    UNARY_OPERATOR  shift and go to state 78
+
+    term                           shift and go to state 71
+    expression                     shift and go to state 110
+    factor                         shift and go to state 72
+
+state 93
+
+    (48) expression -> term COMPARISON_OPERATOR . term
+    (49) term -> . factor
+    (50) term -> . factor BINARY_OPERATOR term
+    (51) term -> . factor COMPARISON_OPERATOR factor
+    (52) factor -> . IDENTIFIER
+    (53) factor -> . NUM_LITERAL
+    (54) factor -> . STRING_LITERAL
+    (55) factor -> . BOOLEAN
+    (56) factor -> . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (57) factor -> . UNARY_OPERATOR expression
+
+    IDENTIFIER      shift and go to state 73
+    NUM_LITERAL     shift and go to state 74
+    STRING_LITERAL  shift and go to state 75
+    BOOLEAN         shift and go to state 76
+    OPEN_PARENTHESIS shift and go to state 77
+    UNARY_OPERATOR  shift and go to state 78
+
+    term                           shift and go to state 111
+    factor                         shift and go to state 72
+
+state 94
+
+    (50) term -> factor BINARY_OPERATOR . term
+    (49) term -> . factor
+    (50) term -> . factor BINARY_OPERATOR term
+    (51) term -> . factor COMPARISON_OPERATOR factor
+    (52) factor -> . IDENTIFIER
+    (53) factor -> . NUM_LITERAL
+    (54) factor -> . STRING_LITERAL
+    (55) factor -> . BOOLEAN
+    (56) factor -> . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (57) factor -> . UNARY_OPERATOR expression
+
+    IDENTIFIER      shift and go to state 73
+    NUM_LITERAL     shift and go to state 74
+    STRING_LITERAL  shift and go to state 75
+    BOOLEAN         shift and go to state 76
+    OPEN_PARENTHESIS shift and go to state 77
+    UNARY_OPERATOR  shift and go to state 78
+
+    factor                         shift and go to state 72
+    term                           shift and go to state 112
+
+state 95
+
+    (51) term -> factor COMPARISON_OPERATOR . factor
+    (52) factor -> . IDENTIFIER
+    (53) factor -> . NUM_LITERAL
+    (54) factor -> . STRING_LITERAL
+    (55) factor -> . BOOLEAN
+    (56) factor -> . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (57) factor -> . UNARY_OPERATOR expression
+
+    IDENTIFIER      shift and go to state 73
+    NUM_LITERAL     shift and go to state 74
+    STRING_LITERAL  shift and go to state 75
+    BOOLEAN         shift and go to state 76
+    OPEN_PARENTHESIS shift and go to state 77
+    UNARY_OPERATOR  shift and go to state 78
+
+    factor                         shift and go to state 113
+
+state 96
+
+    (56) factor -> OPEN_PARENTHESIS expression . CLOSE_PARENTHESIS
+
+    CLOSE_PARENTHESIS shift and go to state 114
+
+
+state 97
+
+    (57) factor -> UNARY_OPERATOR expression .
+
+    BINARY_OPERATOR reduce using rule 57 (factor -> UNARY_OPERATOR expression .)
+    COMPARISON_OPERATOR reduce using rule 57 (factor -> UNARY_OPERATOR expression .)
+    SEMICOLON       reduce using rule 57 (factor -> UNARY_OPERATOR expression .)
+    ELEMENT_SEPERATOR reduce using rule 57 (factor -> UNARY_OPERATOR expression .)
+    CLOSE_PARENTHESIS reduce using rule 57 (factor -> UNARY_OPERATOR expression .)
+    SLICING_COLON   reduce using rule 57 (factor -> UNARY_OPERATOR expression .)
+
+
+state 98
+
+    (40) try_catch_statement -> TEST block POP . STRING_LITERAL ARREST OPEN_PARENTHESIS STRING_LITERAL CLOSE_PARENTHESIS block
+
+    STRING_LITERAL  shift and go to state 115
+
+
+state 99
+
+    (27) variable_declaration -> data_type IDENTIFIER ASSIGNMENT_OPERATOR expression .
+
+    SEMICOLON       reduce using rule 27 (variable_declaration -> data_type IDENTIFIER ASSIGNMENT_OPERATOR expression .)
+
+
+state 100
+
+    (45) enter_statement -> data_type IDENTIFIER ASSIGNMENT_OPERATOR ENTER . OPEN_PARENTHESIS STRING_LITERAL CLOSE_PARENTHESIS
+
+    OPEN_PARENTHESIS shift and go to state 116
+
+
+state 101
+
+    (41) function_call -> IDENTIFIER OPEN_PARENTHESIS argument_list CLOSE_PARENTHESIS .
+
+    SEMICOLON       reduce using rule 41 (function_call -> IDENTIFIER OPEN_PARENTHESIS argument_list CLOSE_PARENTHESIS .)
+
+
+state 102
+
+    (42) argument_list -> expression ELEMENT_SEPERATOR . argument_list
+    (42) argument_list -> . expression ELEMENT_SEPERATOR argument_list
+    (43) argument_list -> . expression
+    (44) argument_list -> . empty
+    (46) expression -> . term
+    (47) expression -> . term BINARY_OPERATOR expression
+    (48) expression -> . term COMPARISON_OPERATOR term
+    (68) empty -> .
+    (49) term -> . factor
+    (50) term -> . factor BINARY_OPERATOR term
+    (51) term -> . factor COMPARISON_OPERATOR factor
+    (52) factor -> . IDENTIFIER
+    (53) factor -> . NUM_LITERAL
+    (54) factor -> . STRING_LITERAL
+    (55) factor -> . BOOLEAN
+    (56) factor -> . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (57) factor -> . UNARY_OPERATOR expression
+
+    CLOSE_PARENTHESIS reduce using rule 68 (empty -> .)
+    IDENTIFIER      shift and go to state 73
+    NUM_LITERAL     shift and go to state 74
+    STRING_LITERAL  shift and go to state 75
+    BOOLEAN         shift and go to state 76
+    OPEN_PARENTHESIS shift and go to state 77
+    UNARY_OPERATOR  shift and go to state 78
+
+    expression                     shift and go to state 85
+    argument_list                  shift and go to state 117
+    empty                          shift and go to state 86
+    term                           shift and go to state 71
+    factor                         shift and go to state 72
+
+state 103
+
+    (29) show_statement -> SHOW OPEN_PARENTHESIS expression expression_list . CLOSE_PARENTHESIS
+
+    CLOSE_PARENTHESIS shift and go to state 118
+
+
+state 104
+
+    (30) expression_list -> ELEMENT_SEPERATOR . expression expression_list
+    (46) expression -> . term
+    (47) expression -> . term BINARY_OPERATOR expression
+    (48) expression -> . term COMPARISON_OPERATOR term
+    (49) term -> . factor
+    (50) term -> . factor BINARY_OPERATOR term
+    (51) term -> . factor COMPARISON_OPERATOR factor
+    (52) factor -> . IDENTIFIER
+    (53) factor -> . NUM_LITERAL
+    (54) factor -> . STRING_LITERAL
+    (55) factor -> . BOOLEAN
+    (56) factor -> . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (57) factor -> . UNARY_OPERATOR expression
+
+    IDENTIFIER      shift and go to state 73
+    NUM_LITERAL     shift and go to state 74
+    STRING_LITERAL  shift and go to state 75
+    BOOLEAN         shift and go to state 76
+    OPEN_PARENTHESIS shift and go to state 77
+    UNARY_OPERATOR  shift and go to state 78
+
+    expression                     shift and go to state 119
+    term                           shift and go to state 71
+    factor                         shift and go to state 72
+
+state 105
+
+    (31) expression_list -> empty .
+
+    CLOSE_PARENTHESIS reduce using rule 31 (expression_list -> empty .)
+
+
+state 106
+
+    (32) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS . block
+    (33) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS . block OTHERWISE block
+    (34) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS . block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+    (35) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS . block OTHERWISE block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+    (13) block -> . OPEN_BRACES statement_list CLOSE_BRACES
+
+    OPEN_BRACES     shift and go to state 33
+
+    block                          shift and go to state 120
+
+state 107
+
+    (36) loop_statement -> ITER OPEN_PARENTHESIS expression SLICING_COLON . expression SLICING_COLON expression CLOSE_PARENTHESIS block
+    (46) expression -> . term
+    (47) expression -> . term BINARY_OPERATOR expression
+    (48) expression -> . term COMPARISON_OPERATOR term
+    (49) term -> . factor
+    (50) term -> . factor BINARY_OPERATOR term
+    (51) term -> . factor COMPARISON_OPERATOR factor
+    (52) factor -> . IDENTIFIER
+    (53) factor -> . NUM_LITERAL
+    (54) factor -> . STRING_LITERAL
+    (55) factor -> . BOOLEAN
+    (56) factor -> . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (57) factor -> . UNARY_OPERATOR expression
+
+    IDENTIFIER      shift and go to state 73
+    NUM_LITERAL     shift and go to state 74
+    STRING_LITERAL  shift and go to state 75
+    BOOLEAN         shift and go to state 76
+    OPEN_PARENTHESIS shift and go to state 77
+    UNARY_OPERATOR  shift and go to state 78
+
+    expression                     shift and go to state 121
+    term                           shift and go to state 71
+    factor                         shift and go to state 72
+
+state 108
+
+    (37) loop_statement -> WHILE OPEN_PARENTHESIS expression CLOSE_PARENTHESIS . block
+    (13) block -> . OPEN_BRACES statement_list CLOSE_BRACES
+
+    OPEN_BRACES     shift and go to state 33
+
+    block                          shift and go to state 122
+
+state 109
+
+    (38) loop_statement -> REPEAT block WHILE OPEN_PARENTHESIS . expression CLOSE_PARENTHESIS
+    (46) expression -> . term
+    (47) expression -> . term BINARY_OPERATOR expression
+    (48) expression -> . term COMPARISON_OPERATOR term
+    (49) term -> . factor
+    (50) term -> . factor BINARY_OPERATOR term
+    (51) term -> . factor COMPARISON_OPERATOR factor
+    (52) factor -> . IDENTIFIER
+    (53) factor -> . NUM_LITERAL
+    (54) factor -> . STRING_LITERAL
+    (55) factor -> . BOOLEAN
+    (56) factor -> . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (57) factor -> . UNARY_OPERATOR expression
+
+    IDENTIFIER      shift and go to state 73
+    NUM_LITERAL     shift and go to state 74
+    STRING_LITERAL  shift and go to state 75
+    BOOLEAN         shift and go to state 76
+    OPEN_PARENTHESIS shift and go to state 77
+    UNARY_OPERATOR  shift and go to state 78
+
+    expression                     shift and go to state 123
+    term                           shift and go to state 71
+    factor                         shift and go to state 72
+
+state 110
+
+    (47) expression -> term BINARY_OPERATOR expression .
+
+    SEMICOLON       reduce using rule 47 (expression -> term BINARY_OPERATOR expression .)
+    ELEMENT_SEPERATOR reduce using rule 47 (expression -> term BINARY_OPERATOR expression .)
+    CLOSE_PARENTHESIS reduce using rule 47 (expression -> term BINARY_OPERATOR expression .)
+    SLICING_COLON   reduce using rule 47 (expression -> term BINARY_OPERATOR expression .)
+    BINARY_OPERATOR reduce using rule 47 (expression -> term BINARY_OPERATOR expression .)
+    COMPARISON_OPERATOR reduce using rule 47 (expression -> term BINARY_OPERATOR expression .)
+
+
+state 111
+
+    (48) expression -> term COMPARISON_OPERATOR term .
+
+    SEMICOLON       reduce using rule 48 (expression -> term COMPARISON_OPERATOR term .)
+    ELEMENT_SEPERATOR reduce using rule 48 (expression -> term COMPARISON_OPERATOR term .)
+    CLOSE_PARENTHESIS reduce using rule 48 (expression -> term COMPARISON_OPERATOR term .)
+    SLICING_COLON   reduce using rule 48 (expression -> term COMPARISON_OPERATOR term .)
+    BINARY_OPERATOR reduce using rule 48 (expression -> term COMPARISON_OPERATOR term .)
+    COMPARISON_OPERATOR reduce using rule 48 (expression -> term COMPARISON_OPERATOR term .)
+
+
+state 112
+
+    (50) term -> factor BINARY_OPERATOR term .
+
+    BINARY_OPERATOR reduce using rule 50 (term -> factor BINARY_OPERATOR term .)
+    COMPARISON_OPERATOR reduce using rule 50 (term -> factor BINARY_OPERATOR term .)
+    SEMICOLON       reduce using rule 50 (term -> factor BINARY_OPERATOR term .)
+    ELEMENT_SEPERATOR reduce using rule 50 (term -> factor BINARY_OPERATOR term .)
+    CLOSE_PARENTHESIS reduce using rule 50 (term -> factor BINARY_OPERATOR term .)
+    SLICING_COLON   reduce using rule 50 (term -> factor BINARY_OPERATOR term .)
+
+
+state 113
+
+    (51) term -> factor COMPARISON_OPERATOR factor .
+
+    BINARY_OPERATOR reduce using rule 51 (term -> factor COMPARISON_OPERATOR factor .)
+    COMPARISON_OPERATOR reduce using rule 51 (term -> factor COMPARISON_OPERATOR factor .)
+    SEMICOLON       reduce using rule 51 (term -> factor COMPARISON_OPERATOR factor .)
+    ELEMENT_SEPERATOR reduce using rule 51 (term -> factor COMPARISON_OPERATOR factor .)
+    CLOSE_PARENTHESIS reduce using rule 51 (term -> factor COMPARISON_OPERATOR factor .)
+    SLICING_COLON   reduce using rule 51 (term -> factor COMPARISON_OPERATOR factor .)
+
+
+state 114
+
+    (56) factor -> OPEN_PARENTHESIS expression CLOSE_PARENTHESIS .
+
+    BINARY_OPERATOR reduce using rule 56 (factor -> OPEN_PARENTHESIS expression CLOSE_PARENTHESIS .)
+    COMPARISON_OPERATOR reduce using rule 56 (factor -> OPEN_PARENTHESIS expression CLOSE_PARENTHESIS .)
+    SEMICOLON       reduce using rule 56 (factor -> OPEN_PARENTHESIS expression CLOSE_PARENTHESIS .)
+    ELEMENT_SEPERATOR reduce using rule 56 (factor -> OPEN_PARENTHESIS expression CLOSE_PARENTHESIS .)
+    CLOSE_PARENTHESIS reduce using rule 56 (factor -> OPEN_PARENTHESIS expression CLOSE_PARENTHESIS .)
+    SLICING_COLON   reduce using rule 56 (factor -> OPEN_PARENTHESIS expression CLOSE_PARENTHESIS .)
+
+
+state 115
+
+    (40) try_catch_statement -> TEST block POP STRING_LITERAL . ARREST OPEN_PARENTHESIS STRING_LITERAL CLOSE_PARENTHESIS block
+
+    ARREST          shift and go to state 124
+
+
+state 116
+
+    (45) enter_statement -> data_type IDENTIFIER ASSIGNMENT_OPERATOR ENTER OPEN_PARENTHESIS . STRING_LITERAL CLOSE_PARENTHESIS
+
+    STRING_LITERAL  shift and go to state 125
+
+
+state 117
+
+    (42) argument_list -> expression ELEMENT_SEPERATOR argument_list .
+
+    CLOSE_PARENTHESIS reduce using rule 42 (argument_list -> expression ELEMENT_SEPERATOR argument_list .)
+
+
+state 118
+
+    (29) show_statement -> SHOW OPEN_PARENTHESIS expression expression_list CLOSE_PARENTHESIS .
+
+    SEMICOLON       reduce using rule 29 (show_statement -> SHOW OPEN_PARENTHESIS expression expression_list CLOSE_PARENTHESIS .)
+
+
+state 119
+
+    (30) expression_list -> ELEMENT_SEPERATOR expression . expression_list
+    (30) expression_list -> . ELEMENT_SEPERATOR expression expression_list
+    (31) expression_list -> . empty
+    (68) empty -> .
+
+    ELEMENT_SEPERATOR shift and go to state 104
+    CLOSE_PARENTHESIS reduce using rule 68 (empty -> .)
+
+    expression_list                shift and go to state 126
+    empty                          shift and go to state 105
+
+state 120
+
+    (32) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block .
+    (33) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block . OTHERWISE block
+    (34) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block . OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+    (35) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block . OTHERWISE block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+
+    SEMICOLON       reduce using rule 32 (conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block .)
+    OTHERWISE       shift and go to state 127
+    OTHER           shift and go to state 128
+
+
+state 121
+
+    (36) loop_statement -> ITER OPEN_PARENTHESIS expression SLICING_COLON expression . SLICING_COLON expression CLOSE_PARENTHESIS block
+
+    SLICING_COLON   shift and go to state 129
+
+
+state 122
+
+    (37) loop_statement -> WHILE OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block .
+
+    SEMICOLON       reduce using rule 37 (loop_statement -> WHILE OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block .)
+
+
+state 123
+
+    (38) loop_statement -> REPEAT block WHILE OPEN_PARENTHESIS expression . CLOSE_PARENTHESIS
+
+    CLOSE_PARENTHESIS shift and go to state 130
+
+
+state 124
+
+    (40) try_catch_statement -> TEST block POP STRING_LITERAL ARREST . OPEN_PARENTHESIS STRING_LITERAL CLOSE_PARENTHESIS block
+
+    OPEN_PARENTHESIS shift and go to state 131
+
+
+state 125
+
+    (45) enter_statement -> data_type IDENTIFIER ASSIGNMENT_OPERATOR ENTER OPEN_PARENTHESIS STRING_LITERAL . CLOSE_PARENTHESIS
+
+    CLOSE_PARENTHESIS shift and go to state 132
+
+
+state 126
+
+    (30) expression_list -> ELEMENT_SEPERATOR expression expression_list .
+
+    CLOSE_PARENTHESIS reduce using rule 30 (expression_list -> ELEMENT_SEPERATOR expression expression_list .)
+
+
+state 127
+
+    (33) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHERWISE . block
+    (35) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHERWISE . block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+    (13) block -> . OPEN_BRACES statement_list CLOSE_BRACES
+
+    OPEN_BRACES     shift and go to state 33
+
+    block                          shift and go to state 133
+
+state 128
+
+    (34) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHER . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+
+    OPEN_PARENTHESIS shift and go to state 134
+
+
+state 129
+
+    (36) loop_statement -> ITER OPEN_PARENTHESIS expression SLICING_COLON expression SLICING_COLON . expression CLOSE_PARENTHESIS block
+    (46) expression -> . term
+    (47) expression -> . term BINARY_OPERATOR expression
+    (48) expression -> . term COMPARISON_OPERATOR term
+    (49) term -> . factor
+    (50) term -> . factor BINARY_OPERATOR term
+    (51) term -> . factor COMPARISON_OPERATOR factor
+    (52) factor -> . IDENTIFIER
+    (53) factor -> . NUM_LITERAL
+    (54) factor -> . STRING_LITERAL
+    (55) factor -> . BOOLEAN
+    (56) factor -> . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (57) factor -> . UNARY_OPERATOR expression
+
+    IDENTIFIER      shift and go to state 73
+    NUM_LITERAL     shift and go to state 74
+    STRING_LITERAL  shift and go to state 75
+    BOOLEAN         shift and go to state 76
+    OPEN_PARENTHESIS shift and go to state 77
+    UNARY_OPERATOR  shift and go to state 78
+
+    expression                     shift and go to state 135
+    term                           shift and go to state 71
+    factor                         shift and go to state 72
+
+state 130
+
+    (38) loop_statement -> REPEAT block WHILE OPEN_PARENTHESIS expression CLOSE_PARENTHESIS .
+
+    SEMICOLON       reduce using rule 38 (loop_statement -> REPEAT block WHILE OPEN_PARENTHESIS expression CLOSE_PARENTHESIS .)
+
+
+state 131
+
+    (40) try_catch_statement -> TEST block POP STRING_LITERAL ARREST OPEN_PARENTHESIS . STRING_LITERAL CLOSE_PARENTHESIS block
+
+    STRING_LITERAL  shift and go to state 136
+
+
+state 132
+
+    (45) enter_statement -> data_type IDENTIFIER ASSIGNMENT_OPERATOR ENTER OPEN_PARENTHESIS STRING_LITERAL CLOSE_PARENTHESIS .
+
+    SEMICOLON       reduce using rule 45 (enter_statement -> data_type IDENTIFIER ASSIGNMENT_OPERATOR ENTER OPEN_PARENTHESIS STRING_LITERAL CLOSE_PARENTHESIS .)
+
+
+state 133
+
+    (33) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHERWISE block .
+    (35) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHERWISE block . OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+
+    SEMICOLON       reduce using rule 33 (conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHERWISE block .)
+    OTHER           shift and go to state 137
+
+
+state 134
+
+    (34) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHER OPEN_PARENTHESIS . expression CLOSE_PARENTHESIS block
+    (46) expression -> . term
+    (47) expression -> . term BINARY_OPERATOR expression
+    (48) expression -> . term COMPARISON_OPERATOR term
+    (49) term -> . factor
+    (50) term -> . factor BINARY_OPERATOR term
+    (51) term -> . factor COMPARISON_OPERATOR factor
+    (52) factor -> . IDENTIFIER
+    (53) factor -> . NUM_LITERAL
+    (54) factor -> . STRING_LITERAL
+    (55) factor -> . BOOLEAN
+    (56) factor -> . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (57) factor -> . UNARY_OPERATOR expression
+
+    IDENTIFIER      shift and go to state 73
+    NUM_LITERAL     shift and go to state 74
+    STRING_LITERAL  shift and go to state 75
+    BOOLEAN         shift and go to state 76
+    OPEN_PARENTHESIS shift and go to state 77
+    UNARY_OPERATOR  shift and go to state 78
+
+    expression                     shift and go to state 138
+    term                           shift and go to state 71
+    factor                         shift and go to state 72
+
+state 135
+
+    (36) loop_statement -> ITER OPEN_PARENTHESIS expression SLICING_COLON expression SLICING_COLON expression . CLOSE_PARENTHESIS block
+
+    CLOSE_PARENTHESIS shift and go to state 139
+
+
+state 136
+
+    (40) try_catch_statement -> TEST block POP STRING_LITERAL ARREST OPEN_PARENTHESIS STRING_LITERAL . CLOSE_PARENTHESIS block
+
+    CLOSE_PARENTHESIS shift and go to state 140
+
+
+state 137
+
+    (35) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHERWISE block OTHER . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+
+    OPEN_PARENTHESIS shift and go to state 141
+
+
+state 138
+
+    (34) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHER OPEN_PARENTHESIS expression . CLOSE_PARENTHESIS block
+
+    CLOSE_PARENTHESIS shift and go to state 142
+
+
+state 139
+
+    (36) loop_statement -> ITER OPEN_PARENTHESIS expression SLICING_COLON expression SLICING_COLON expression CLOSE_PARENTHESIS . block
+    (13) block -> . OPEN_BRACES statement_list CLOSE_BRACES
+
+    OPEN_BRACES     shift and go to state 33
+
+    block                          shift and go to state 143
+
+state 140
+
+    (40) try_catch_statement -> TEST block POP STRING_LITERAL ARREST OPEN_PARENTHESIS STRING_LITERAL CLOSE_PARENTHESIS . block
+    (13) block -> . OPEN_BRACES statement_list CLOSE_BRACES
+
+    OPEN_BRACES     shift and go to state 33
+
+    block                          shift and go to state 144
+
+state 141
+
+    (35) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHERWISE block OTHER OPEN_PARENTHESIS . expression CLOSE_PARENTHESIS block
+    (46) expression -> . term
+    (47) expression -> . term BINARY_OPERATOR expression
+    (48) expression -> . term COMPARISON_OPERATOR term
+    (49) term -> . factor
+    (50) term -> . factor BINARY_OPERATOR term
+    (51) term -> . factor COMPARISON_OPERATOR factor
+    (52) factor -> . IDENTIFIER
+    (53) factor -> . NUM_LITERAL
+    (54) factor -> . STRING_LITERAL
+    (55) factor -> . BOOLEAN
+    (56) factor -> . OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+    (57) factor -> . UNARY_OPERATOR expression
+
+    IDENTIFIER      shift and go to state 73
+    NUM_LITERAL     shift and go to state 74
+    STRING_LITERAL  shift and go to state 75
+    BOOLEAN         shift and go to state 76
+    OPEN_PARENTHESIS shift and go to state 77
+    UNARY_OPERATOR  shift and go to state 78
+
+    expression                     shift and go to state 145
+    term                           shift and go to state 71
+    factor                         shift and go to state 72
+
+state 142
+
+    (34) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS . block
+    (13) block -> . OPEN_BRACES statement_list CLOSE_BRACES
+
+    OPEN_BRACES     shift and go to state 33
+
+    block                          shift and go to state 146
+
+state 143
+
+    (36) loop_statement -> ITER OPEN_PARENTHESIS expression SLICING_COLON expression SLICING_COLON expression CLOSE_PARENTHESIS block .
+
+    SEMICOLON       reduce using rule 36 (loop_statement -> ITER OPEN_PARENTHESIS expression SLICING_COLON expression SLICING_COLON expression CLOSE_PARENTHESIS block .)
+
+
+state 144
+
+    (40) try_catch_statement -> TEST block POP STRING_LITERAL ARREST OPEN_PARENTHESIS STRING_LITERAL CLOSE_PARENTHESIS block .
+
+    SEMICOLON       reduce using rule 40 (try_catch_statement -> TEST block POP STRING_LITERAL ARREST OPEN_PARENTHESIS STRING_LITERAL CLOSE_PARENTHESIS block .)
+
+
+state 145
+
+    (35) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHERWISE block OTHER OPEN_PARENTHESIS expression . CLOSE_PARENTHESIS block
+
+    CLOSE_PARENTHESIS shift and go to state 147
+
+
+state 146
+
+    (34) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block .
+
+    SEMICOLON       reduce using rule 34 (conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block .)
+
+
+state 147
+
+    (35) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHERWISE block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS . block
+    (13) block -> . OPEN_BRACES statement_list CLOSE_BRACES
+
+    OPEN_BRACES     shift and go to state 33
+
+    block                          shift and go to state 148
+
+state 148
+
+    (35) conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHERWISE block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block .
+
+    SEMICOLON       reduce using rule 35 (conditional_statement -> GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block OTHERWISE block OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block .)
+
+WARNING: 
+WARNING: Conflicts:
+WARNING: 
+WARNING: shift/reduce conflict for DEFINE in state 0 resolved as shift
+WARNING: shift/reduce conflict for DEFINE in state 4 resolved as shift
+WARNING: shift/reduce conflict for BINARY_OPERATOR in state 71 resolved as shift
+WARNING: shift/reduce conflict for COMPARISON_OPERATOR in state 71 resolved as shift
+WARNING: shift/reduce conflict for BINARY_OPERATOR in state 72 resolved as shift
+WARNING: shift/reduce conflict for COMPARISON_OPERATOR in state 72 resolved as shift
+WARNING: reduce/reduce conflict in state 61 resolved using rule (statement_list -> statement SEMICOLON)
+WARNING: rejected rule (empty -> <empty>) in state 61
