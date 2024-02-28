@@ -1,5 +1,7 @@
 # geko_parser.py
 
+import geko_lexer 
+
 # Tokens
 tokens = [
     'DEFINE', 'NUM', 'STR', 'FLAG', 'VOID', 'MAIN', 'OPEN_PARENTHESIS', 'CLOSE_PARENTHESIS', 'OPEN_BRACES', 'CLOSE_BRACES',
