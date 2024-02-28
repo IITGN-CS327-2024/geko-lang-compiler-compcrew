@@ -1,10 +1,10 @@
 # geko_parser.py
 
-import geko_lexer 
+# import geko_lexer 
 
 # Tokens
 tokens = [
-    'DEFINE', 'NUM', 'STR', 'FLAG', 'VOID', 'MAIN', 'OPEN_PARENTHESIS', 'CLOSE_PARENTHESIS', 'OPEN_BRACES', 'CLOSE_BRACES',
+    'DEFINE', 'NUM', 'MAIN', 'OPEN_PARENTHESIS', 'CLOSE_PARENTHESIS', 'OPEN_BRACES', 'CLOSE_BRACES',
     'YIELD', 'SEMICOLON', 'ELEMENT_SEPERATOR', 'ASSIGNMENT_OPERATOR', 'SHOW', 'STRING_LITERAL',
     'GIVEN', 'OTHER', 'OTHERWISE', 'ITER', 'SLICING_COLON', 'WHILE', 'REPEAT', 'TEST', 'POP',
     'ARREST', 'ENTER', 'IDENTIFIER', 'NUM_LITERAL', 'BINARY_OPERATOR', 'COMPARISON_OPERATOR', 'UNARY_OPERATOR',
@@ -254,8 +254,11 @@ def p_error(p):
 
 # Build the parser
 # !pip install ply
+# import geko_lexer
 import ply.yacc as yacc
+import ply.lex as lex
 parser = yacc.yacc()
+# lexer = geko_lexer
 
 # Test the parser
 input_string = '''
@@ -263,5 +266,6 @@ define num main() {
     yield 0;
 }
 '''
+lexer = lex.lex()
 result = parser.parse(input_string)
 print(result)
