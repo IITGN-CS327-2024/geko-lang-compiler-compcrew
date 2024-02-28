@@ -31,5 +31,5 @@ def p_expression(p):
 parser = yacc.yacc()
 
 # Parse input string
-result = parser.parse('2 + 3')
+result = parser.parse('7 + 3')
 print(result)  # Output: 5
