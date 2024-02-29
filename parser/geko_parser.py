@@ -251,13 +251,23 @@ def p_empty(p):
 def p_error(p):
     print("Syntax error in input!")
 
-
+#-------------------------------------------------------------------------------------------#
+def t_error(t):
+    print("Illegal character '%s'" % t.value[0])
+    t.lexer.skip(1)
+#-------------------------------------------------------------------------------------------#
+    
 # Build the parser
 # !pip install ply
 # import geko_lexer
+from geko_lexer import GekoLexer
 import ply.yacc as yacc
 import ply.lex as lex
+
+geko_lexer = GekoLexer()
 parser = yacc.yacc()
+lexer = lex.lex()
+# lexer = geko_lexer.GekoLexer()
 # lexer = geko_lexer
 
 # Test the parser
@@ -266,6 +276,6 @@ define num main() {
     yield 0;
 }
 '''
-lexer = lex.lex()
+# lexer = lex.lex()
 result = parser.parse(input_string)
 print(result)
