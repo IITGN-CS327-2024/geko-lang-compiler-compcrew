@@ -1,6 +1,4 @@
 import re
-import sys
-# imported Regular Expressions(re) module
 
 # Define token patterns using regular expressions
 patterns = [
@@ -119,68 +117,3 @@ def lexer(code):
     # Return the list of tokens
     return tokens
 
-# def read_geko_file(file_path):
-#     with open(file_path, 'r') as file:
-#         return file.read()
-
-# file_path = r'C:/Users/Darshi Doshi/Desktop/Geko Lang/testcase1.geko'  # Replace the string with the actual path to  .geko file
-# geko_code = read_geko_file(file_path)
-# def read_geko_file(file_path):
-#     with open(file_path, 'r') as file:
-#         return file.read()
-
-# if len(sys.argv) != 2:
-#     print("Usage: python3 lexer.py <geko_file>")
-#     sys.exit(1)
-
-# file_path = sys.argv[1]
-# geko_code = read_geko_file(file_path)
-
-# tokens = lexer(geko_code)
-
-example_code = '''
-num main() {
-    ## num x = 5;
-    ## num y = 8;
-    ## y = x + 5;
-    x+=9;
-    flag oneEx = yay;
-    fix flag twoEx = nay;
-    num testVar = 0;
-    ##num tVar = 4;
-    ##num tVarTwo;
-    ##let tVar = 5 in tVarTwo = tVar**2;
-    y +=++x++--;
-    show(~mwoe mowe meow \~ heeh \~ \\ eememem ~)
-    ##given(oneEx || twoEx){show(~oror_op.~);}
-    ##given(oneEx && twoEx){show(~andand_op~);}
-    ##given(oneEx  twoEx){show(~andand_op~);}
-    ##given(oneEx && twoEx){show(~andand_op~);}
-    ##given(++y >= x){show(~negate_op~);}
-    ##given(oneEx < twoEx){show(~less_op~);}
-    ##given(oneEx <= twoEx){show(~lesseq_op~);}
-    ##testVar += y1;
-    ##testVar -= y2;
-    ##testVar *= y3;
-    ##testVar /= y4;
-    ##testVar %= y5;
-    show(~ me \~ me ~)
-    yield 0;
-
-'''
-
-def print_table(nested_tuple):
-    # Find the maximum length of each column
-    max_len_col1 = max(len(item[0]) for item in nested_tuple)
-    max_len_col2 = max(len(item[1]) for item in nested_tuple)
-
-    # Print the table header
-    print(f"{ 'TokenName':<{max_len_col1}} {'TokenValue':<{max_len_col2}}")
-    print('-' * (max_len_col1 + max_len_col2 + 3))
-
-    # Print the table content
-    for token_name, token_value in nested_tuple:
-        print(f"{token_name:<{max_len_col1}} {token_value:<{max_len_col2}}")
-
-# Call the function to print the table
-# print_table(tokens)
