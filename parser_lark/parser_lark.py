@@ -20,7 +20,9 @@ parameter	            :	data_type IDENTIFIER | array
 # --------------------------------------
 statements	            :	statement statements
                         |   epsilon
-equal_to                :   EQUAL_TO expression | epsilon
+equal_to                :   EQUAL_TO post_equal_to | epsilon
+post_equal_to           :   ENTER OPEN_PARENTHESIS string CLOSE_PARENTHESIS 
+                        |   expression
 
 data_type	            :  	basic_data_type 
                         |   compound_data_type 
@@ -89,7 +91,8 @@ loop_statement	        :	ITER OPEN_PARENTHESIS statement expression END_OF_LINE 
 #---------------------------------------
 
 yield_block             :   OPEN_BRACES statements YIELD expression END_OF_LINE CLOSE_BRACES
-                        
+
+               
 statement	            :	block
                         |   variable_declaration END_OF_LINE
                         |   assignment_statement END_OF_LINE
@@ -97,6 +100,8 @@ statement	            :	block
                         |   conditional_statement
                         |   loop_statement
                         |   skip_stop END_OF_LINE
+                        |   
+                        
 
 
 
@@ -355,6 +360,8 @@ define num main() {
         three = three - 1;
     }while(three > 0);
     
+    ## num test_enter = enter(~hello~);
+    ## str test_slice = four[1:2];
     yield 0;
 
 }
