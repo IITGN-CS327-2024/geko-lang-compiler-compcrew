@@ -22,6 +22,11 @@ statements	            :	statement statements
                         |   epsilon
 equal_to                :   EQUAL_TO post_equal_to | epsilon
 post_equal_to           :   ENTER OPEN_PARENTHESIS string CLOSE_PARENTHESIS 
+                        |   IDENTIFIER OPEN_BRACKET NUM_LITERAL SLICING_COLON NUM_LITERAL CLOSE_BRACKET
+                        |   LENGTH OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS
+                        |   IDENTIFIER OPEN_BRACKET NUM_LITERAL CLOSE_BRACKET
+                        |   HEAD OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS
+                        |   TAIL OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS
                         |   expression
 
 data_type	            :  	basic_data_type 
@@ -41,13 +46,16 @@ array	                :	data_type IDENTIFIER OPEN_BRACKET NUM_LITERAL CLOSE_BRAC
 variable_declaration	:	data_type IDENTIFIER equal_to
                         |   compound_array compound_var
 
-compound_array          :   compound_data_type IDENTIFIER
-                        |   array
-compound_var            :   EQUAL_TO OPEN_BRACKET expression expressions CLOSE_BRACKET
+compound_array          :   compound_data_type IDENTIFIER compound_equal_to
+                        |   array compound_equal_to
+compound_equal_to       :   EQUAL_TO compound_var
                         |   epsilon
-assignment_statement	:	IDENTIFIER assignment_operators expression
+compound_var            :   OPEN_BRACKET expression expressions CLOSE_BRACKET
+                        |   TAIL OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS
+assignment_statement	:	IDENTIFIER assignment_operators post_equal_to
 show_statement	        :	SHOW OPEN_PARENTHESIS expression expressions CLOSE_PARENTHESIS
 block	                :	OPEN_BRACES statements CLOSE_BRACES
+value_change_array	    :	IDENTIFIER OPEN_BRACKET NUM_LITERAL CLOSE_BRACKET assignment_operators expression
 #---------------------------------------
 
 expressions             :   ELEMENT_SEPERATOR expression expressions
@@ -92,7 +100,6 @@ loop_statement	        :	ITER OPEN_PARENTHESIS statement expression END_OF_LINE 
 
 yield_block             :   OPEN_BRACES statements YIELD expression END_OF_LINE CLOSE_BRACES
 
-               
 statement	            :	block
                         |   variable_declaration END_OF_LINE
                         |   assignment_statement END_OF_LINE
@@ -100,7 +107,7 @@ statement	            :	block
                         |   conditional_statement
                         |   loop_statement
                         |   skip_stop END_OF_LINE
-                        |   
+                        |   value_change_array END_OF_LINE
                         
 
 
@@ -360,8 +367,15 @@ define num main() {
         three = three - 1;
     }while(three > 0);
     
-    ## num test_enter = enter(~hello~);
-    ## str test_slice = four[1:2];
+    num a = 2;
+    a += length(five);
+    a %= five[1];
+    five[1] = 5;
+    num b = head(five);
+    ## list c = tail(five);
+    num test_enter;
+    test_enter = enter(~hello~);
+    str test_slice = four[1:2];
     yield 0;
 
 }
