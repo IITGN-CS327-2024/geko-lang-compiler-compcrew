@@ -82,7 +82,8 @@ patterns = [
     # due to precedence, assignment operator is kept above unary/binary (*,/,+,- versus *=, /=, += and -=), but below comparison (== versus =)
     ('UNARY_OPERATOR' , r'\+\+|--|`'),
     ('BINARY_OPERATOR', r'\*\*|/|\*|\+|-|%'),
-    ('LOGICAL_OPERATOR', r'&&|\|\||&|\||!|\^')
+    ('BINARY_LOGICAL_OPERATOR', r'&&|\|\||&|\||\^'),
+    ('UNARY_LOGICAL_OPERATOR', r'!')
 ]
 # Combine patterns into a single regular expression through join()
 pattern = '|'.join('(?P<%s>%s)' % pair for pair in patterns)
