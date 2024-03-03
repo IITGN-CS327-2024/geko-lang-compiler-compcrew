@@ -3,137 +3,116 @@ from lark.lexer import Lexer, Token
 from lark.exceptions import UnexpectedToken
 import re
 
-class CustomLexer(Lexer):
-    def __init__(self, lexer_conf):
-        pass
-    def lex(self, data):
-        # Define token patterns using regular expressions
-        patterns = [
-            ('STR', r'\bstr\b'),
-            ('FLAG', r'\bflag\b'),
-            ('FIX', r'\bfix\b'),
-            ('SHOW', r'\bshow\b'),
-            ('ITER', r'\biter\b'),
-            ('LIST', r'\blist\b'),
-            ('TUP', r'\btup\b'),
-            ('ENTER', r'\benter\b'),
-            ('YIELD', r'\byield\b'),
-            ('LET', r'\blet\b'),
-            ('IN', r'\bin\b'),
-            ('VOID', r'\bvoid\b'),
-            ('WHILE', r'\bwhile\b'),
-            ('REPEAT', r'\brepeat\b'),
-            ('GIVEN', r'\bgiven\b'),
-            ('OTHER', r'\bother\b'),
-            ('OTHERWISE', r'\botherwise\b'),
-            ('DEFINE', r'\bdefine\b'),
-            ('TEST', r'\btest\b'),
-            ('POP', r'\bpop\b'),
-            ('ARREST', r'\barrest\b'),
-            ('LENGTH', r'\blength\b'),
-            ('HEAD', r'\bhead\b'),
-            ('TAIL', r'\btail\b'),
-            ('ISEMPTY', r'\bisEmpty\b'),
-            ('APPEND', r'\bappend\b'),
-            ('SKIP', r'\bskip\b'),
-            ('STOP', r'\bstop\b'),
-            ('YAY', r'\byay\b'),
-            ('NAY', r'\bnay\b'),
-            ('MAIN' , r'\bmain\b'),
-            ('IDENTIFIER', r'[a-zA-Z_][a-zA-Z0-9_]*'),
-            ('OPEN_PARENTHESIS', r'\('),
-            ('CLOSE_PARENTHESIS', r'\)'),
-            ('OPEN_BRACES', r'\{'),
-            ('CLOSE_BRACES', r'\}'),
-            ('OPEN_BRACKET', r'\['),
-            ('CLOSE_BRACKET', r'\]'),
-            ('NUM_LITERAL', r'-?\b\d+\b'),
-            ('COMMENT', r'##.*'),
-            ('STRING_LITERAL', r'~(?:[^~\\]|\\.)*~'),
-            ('END_OF_LINE', r';'),
-            ('SLICING_COLON', r':'),
-            ('ELEMENT_SEPERATOR', r','),
-            ('COMPARISON_OPERATOR', r'==|!=|<=|>=|>|<'),
-            ('ASSIGNMENT_OPERATOR', r'=|/=|\*=|\+=|-=|%='),
-            ('UNARY_OPERATOR' , r'\+\+|--|`'),
-            ('BINARY_OPERATOR', r'\*\*|/|\*|\+|-|%'),
-            ('BINARY_LOGICAL_OPERATOR', r'&&|\|\||&|\||\^'),
-            ('UNARY_LOGICAL_OPERATOR', r'!')
-        ]
+# class CustomLexer(Lexer):
+#     def __init__(self, lexer_conf):
+#         pass
+#     def lex(self, data):
+#         # Define token patterns using regular expressions
+#         patterns = [
+#             ('STR', r'\bstr\b'),
+#             ('FLAG', r'\bflag\b'),
+#             ('FIX', r'\bfix\b'),
+#             ('SHOW', r'\bshow\b'),
+#             ('ITER', r'\biter\b'),
+#             ('LIST', r'\blist\b'),
+#             ('TUP', r'\btup\b'),
+#             ('ENTER', r'\benter\b'),
+#             ('YIELD', r'\byield\b'),
+#             ('LET', r'\blet\b'),
+#             ('IN', r'\bin\b'),
+#             ('VOID', r'\bvoid\b'),
+#             ('WHILE', r'\bwhile\b'),
+#             ('REPEAT', r'\brepeat\b'),
+#             ('GIVEN', r'\bgiven\b'),
+#             ('OTHER', r'\bother\b'),
+#             ('OTHERWISE', r'\botherwise\b'),
+#             ('DEFINE', r'\bdefine\b'),
+#             ('TEST', r'\btest\b'),
+#             ('POP', r'\bpop\b'),
+#             ('ARREST', r'\barrest\b'),
+#             ('LENGTH', r'\blength\b'),
+#             ('HEAD', r'\bhead\b'),
+#             ('TAIL', r'\btail\b'),
+#             ('ISEMPTY', r'\bisEmpty\b'),
+#             ('APPEND', r'\bappend\b'),
+#             ('SKIP', r'\bskip\b'),
+#             ('STOP', r'\bstop\b'),
+#             ('YAY', r'\byay\b'),
+#             ('NAY', r'\bnay\b'),
+#             ('MAIN' , r'\bmain\b'),
+#             ('IDENTIFIER', r'[a-zA-Z_][a-zA-Z0-9_]*'),
+#             ('OPEN_PARENTHESIS', r'\('),
+#             ('CLOSE_PARENTHESIS', r'\)'),
+#             ('OPEN_BRACES', r'\{'),
+#             ('CLOSE_BRACES', r'\}'),
+#             ('OPEN_BRACKET', r'\['),
+#             ('CLOSE_BRACKET', r'\]'),
+#             ('NUM_LITERAL', r'-?\b\d+\b'),
+#             ('COMMENT', r'##.*'),
+#             ('STRING_LITERAL', r'~(?:[^~\\]|\\.)*~'),
+#             ('END_OF_LINE', r';'),
+#             ('SLICING_COLON', r':'),
+#             ('ELEMENT_SEPERATOR', r','),
+#             ('COMPARISON_OPERATOR', r'==|!=|<=|>=|>|<'),
+#             ('ASSIGNMENT_OPERATOR', r'=|/=|\*=|\+=|-=|%='),
+#             ('UNARY_OPERATOR' , r'\+\+|--|`'),
+#             ('BINARY_OPERATOR', r'\*\*|/|\*|\+|-|%'),
+#             ('BINARY_LOGICAL_OPERATOR', r'&&|\|\||&|\||\^'),
+#             ('UNARY_LOGICAL_OPERATOR', r'!')
+#         ]
 
-        # Combine patterns into a single regular expression through join()
-        pattern = '|'.join('(?P<%s>%s)' % pair for pair in patterns)
+#         # Combine patterns into a single regular expression through join()
+#         pattern = '|'.join('(?P<%s>%s)' % pair for pair in patterns)
 
-        # Empty list to store tokens
-        tokens = []
+#         # Empty list to store tokens
+#         tokens = []
 
-        # Loop over matches found in the code using the specified pattern
-        for match in re.finditer(pattern, data):
-            # Extract the kind (token type) and value from the match
-            kind = match.lastgroup
-            value = match.group()
+#         # Loop over matches found in the code using the specified pattern
+#         for match in re.finditer(pattern, data):
+#             # Extract the kind (token type) and value from the match
+#             kind = match.lastgroup
+#             value = match.group()
 
-            # Handle special case for STRING_LITERAL where ~, <string>, ~ will be treated separately
-            if kind == 'STRING_LITERAL':
-                # String value without quotes
-                string_val = value[1:-1]
+#             # Handle special case for STRING_LITERAL where ~, <string>, ~ will be treated separately
+#             if kind == 'STRING_LITERAL':
+#                 # String value without quotes
+#                 string_val = value[1:-1]
 
-                # Add tokens for string delimiters (~) and the string value
-                tokens.append(('TILDE', '~'))
-                tokens.append((kind, string_val))
-                tokens.append(('TILDE', '~'))
-            else:
-                # For other token types, simply add the kind and value to the tokens list
-                tokens.append((kind, value))
+#                 # Add tokens for string delimiters (~) and the string value
+#                 tokens.append(('TILDE', '~'))
+#                 tokens.append((kind, string_val))
+#                 tokens.append(('TILDE', '~'))
+#             elif kind == 'COMMENT':
+#                 continue
+#             else:
+#                 # For other token types, simply add the kind and value to the tokens list
+#                 tokens.append((kind, value))
 
-        # Return the list of tokens
-        # return tokens
-        lark_tokens = [Token(type_, value) for type_, value in tokens]
+#         # Return the list of tokens
+#         # return tokens
+#         lark_tokens = [Token(type_, value) for type_, value in tokens]
 
-        return lark_tokens
+#         return lark_tokens
     
-
-# Define your custom grammar
-# grammar = """
-# start: statement+
-
-# statement: assignment
-#          | expression END_OF_LINE
-
-# assignment: IDENTIFIER ASSIGNMENT_OPERATOR expression
-
-# expression: primary_expression
-#           | expression BINARY_OPERATOR expression
-
-# primary_expression: IDENTIFIER
-#                    | NUM_LITERAL
-#                    | OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
-
-# END_OF_LINE: "END_OF_LINE"
-# IDENTIFIER: "IDENTIFIER"
-# ASSIGNMENT_OPERATOR: "ASSIGNMENT_OPERATOR"
-# BINARY_OPERATOR: "BINARY_OPERATOR"
-# NUM_LITERAL: "NUM_LITERAL"
-# OPEN_PARENTHESIS: "OPEN_PARENTHESIS"
-# CLOSE_PARENTHESIS: "CLOSE_PARENTHESIS"
-
-# %import common.NUMBER
-# %import common.WS
-# %ignore WS"""
-    
-
 grammar = """
 start                   :   program
 program	                :	DEFINE NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_BRACES statements YIELD NUM_LITERAL END_OF_LINE CLOSE_BRACES
                         |   DEFINE function_type IDENTIFIER OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS function_block program
 
-function_definitions	:	function_definition function_definitions 
-                        |   epsilon
-function_definition	    :	DEFINE function_type IDENTIFIER OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS function_block
+# --------------------------------------
+
+function_block	        :	OPEN_BRACES statements YIELD return_value END_OF_LINE CLOSE_BRACES
+function_type	        :	NUM | STR | FLAG | VOID
+parameter_list	        :	parameter parameters | epsilon
+return_value	        :	NUM_LITERAL | string | YAY | NAY | epsilon
+parameters	            :	ELEMENT_SEPERATOR parameter parameters | epsilon
+parameter	            :	data_type IDENTIFIER | array
+                        
+# --------------------------------------
 statements	            :	statement statements
                         |   epsilon
-statement	            :	variable_declaration END_OF_LINE
-variable_declaration	:	data_type IDENTIFIER EQUAL_TO expression
+equal_to                :   EQUAL_TO expression | epsilon
+
 data_type	            :  	basic_data_type 
                         |   compound_data_type 
                         |   epsilon
@@ -142,22 +121,49 @@ basic_data_type	        :	fix num_str_flag
 fix	                    :	FIX | epsilon
 compound_data_type	    :	LIST | TUP
 
-expression	            :	term terms | epsilon
+
+string	                :	TILDE STRING_LITERAL TILDE
+array	                :	data_type IDENTIFIER OPEN_BRACKET NUM_LITERAL CLOSE_BRACKET
+# --------------------------------------
+
+
+variable_declaration	:	data_type IDENTIFIER equal_to
+                        |   compound_array compound_var
+
+compound_array          :   compound_data_type IDENTIFIER
+                        |   array
+compound_var            :   EQUAL_TO OPEN_BRACKET expression expressions CLOSE_BRACKET
+                        |   epsilon
+#---------------------------------------
+
+expressions             :   ELEMENT_SEPERATOR expression expressions
+                        |   epsilon
+expression	            :   term terms | epsilon
 terms	                :	binary_operators term terms 
                         |   epsilon
+#---------------------------------------
 term	                :   IDENTIFIER
+                        |   NUM_LITERAL
+                        |   string
+                        |   FLAG
+                        |   OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
+                        |   unary_operators IDENTIFIER
+                        |   IDENTIFIER UNARY_OPERATOR
+#---------------------------------------
 binary_operators	    :	BINARY_OPERATOR 
                         |   COMPARISON_OPERATOR 
                         |   BINARY_LOGICAL_OPERATOR
+unary_operators	        :	UNARY_OPERATOR
+                        |   UNARY_LOGICAL_OPERATOR
+#---------------------------------------
 
-function_block	        :	OPEN_BRACES statements YIELD return_value END_OF_LINE CLOSE_BRACES
-function_type	        :	NUM | STR | FLAG | VOID
-parameter_list	        :	parameter parameters | epsilon
-return_value	        :	NUM_LITERAL | string | YAY | NAY | epsilon
-parameters	            :	ELEMENT_SEPERATOR parameter parameters | epsilon
-parameter	            :	data_type IDENTIFIER | array
-string	                :	TILDE STRING_LITERAL TILDE
-array	                :	data_type IDENTIFIER OPEN_BRACKET NUM_LITERAL CLOSE_BRACKET
+
+
+statement	            :	variable_declaration END_OF_LINE
+
+
+
+
 
 
 epsilon :
@@ -363,7 +369,20 @@ EQUAL_TO: "EQUAL_TO"
 %ignore WS"""
 # Create the Lark parser
 parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = CustomLexer)
-code = """define void meow(num testing){yield;} define num main() {yield 0;}"""
+code = """define void meow(num test_num, flag test_bool){yield;} 
+define num main() {
+    fix num one = 3;
+    num two = 4;
+    num three;
+    three = one + two;
+    ## this is a comment
+    str four = ~hello~;
+    list five = [1,2,Yay,~meow~,5];
+
+
+    yield 0;
+    }
+    """
 
 import lexer_lark
 

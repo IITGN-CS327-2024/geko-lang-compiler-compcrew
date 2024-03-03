@@ -114,6 +114,9 @@ def lexer(code):
             tokens.append(('TILDE', '~'))
             tokens.append((kind, string_val))
             tokens.append(('TILDE', '~'))
+        elif kind == 'COMMENT':
+            # Ignore comments
+            pass
         else:
             # For other token types, simply add the kind and value to the tokens list
             tokens.append((kind, value))
