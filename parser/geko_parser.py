@@ -260,13 +260,13 @@ def t_error(t):
 # Build the parser
 # !pip install ply
 # import geko_lexer
-from geko_lexer import GekoLexer
 import ply.yacc as yacc
 import ply.lex as lex
 
-geko_lexer = GekoLexer()
 parser = yacc.yacc()
+# lexer = 
 lexer = lex.lex()
+# lexer = lex
 # lexer = geko_lexer.GekoLexer()
 # lexer = geko_lexer
 

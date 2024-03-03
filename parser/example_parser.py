@@ -22,6 +22,10 @@ def t_error(t):
 # Build the lexer
 lexer = lex.lex()
 
+from geko_lexer import GekoLexer
+
+lexer = GekoLexer.lex()
+
 # Define parser rules
 def p_expression(p):
     '''expression : NUM PLUS NUM'''
