@@ -125,8 +125,27 @@ class CustomLexer(Lexer):
 grammar = """
 start                   :   program
 program	                :	function_definitions DEFINE NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_BRACES statements YIELD NUM_LITERAL END_OF_LINE CLOSE_BRACES
-statements	            :	statement #statements
-statement               :   epsilon
+statements	            :	statement statements
+                        |   epsilon
+statement	            :	variable_declaration END_OF_LINE
+                        |   epsilon
+variable_declaration	:	data_type IDENTIFIER EQUAL_TO expression
+data_type	            :  	basic_data_type 
+                        |   compound_data_type 
+                        |   epsilon
+num_str_flag	        :	NUM | STR | FLAG
+basic_data_type	        :	fix num_str_flag
+fix	                    :	FIX | epsilon
+compound_data_type	    :	LIST | TUP
+
+expression	            :	term terms | epsilon
+terms	                :	binary_operators term terms 
+                        |   epsilon
+term	                :   IDENTIFIER
+binary_operators	    :	BINARY_OPERATOR 
+                        |   COMPARISON_OPERATOR 
+                        |   BINARY_LOGICAL_OPERATOR
+
 function_definitions    :   epsilon
 epsilon :
 NUM: "NUM"
@@ -184,6 +203,8 @@ EQUAL_TO: "EQUAL_TO"
 %import common.NUMBER
 %import common.WS
 %ignore WS"""
+
+#----------------------------------------------------------------------------------------------------------------------------
 
 """
 function_definitions	:	function_definiton function_definitions | epsilon
