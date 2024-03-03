@@ -124,11 +124,11 @@ class CustomLexer(Lexer):
 
 grammar = """
 start                   :   program
-program	                :	function_definitions DEFINE NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_BRACES statements YIELD NUM_LITERAL END_OF_LINE CLOSE_BRACES
+program	                :	NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_BRACES statements YIELD NUM_LITERAL END_OF_LINE CLOSE_BRACES
+                        |   function_definitions NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_BRACES statements YIELD NUM_LITERAL END_OF_LINE CLOSE_BRACES
 statements	            :	statement statements
                         |   epsilon
 statement	            :	variable_declaration END_OF_LINE
-                        |   epsilon
 variable_declaration	:	data_type IDENTIFIER EQUAL_TO expression
 data_type	            :  	basic_data_type 
                         |   compound_data_type 
@@ -146,7 +146,19 @@ binary_operators	    :	BINARY_OPERATOR
                         |   COMPARISON_OPERATOR 
                         |   BINARY_LOGICAL_OPERATOR
 
-function_definitions    :   epsilon
+function_definitions	:	function_definition function_definitions 
+                        |   epsilon
+function_definition	    :	DEFINE function_type IDENTIFIER OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS function_block 
+function_block	        :	OPEN_BRACES statements YIELD return_value END_OF_LINE CLOSE_BRACES
+function_type	        :	NUM | STR | FLAG | VOID
+parameter_list	        :	parameter parameters | epsilon
+return_value	        :	NUM_LITERAL | string | YAY | NAY | epsilon
+parameters	            :	ELEMENT_SEPERATOR parameter parameters | epsilon
+parameter	            :	data_type IDENTIFIER | array
+string	                :	TILDE STRING_LITERAL TILDE
+array	                :	data_type IDENTIFIER OPEN_BRACKET NUM_LITERAL CLOSE_BRACKET
+
+
 epsilon :
 NUM: "NUM"
 STR: "STR"
@@ -350,7 +362,7 @@ EQUAL_TO: "EQUAL_TO"
 %ignore WS"""
 # Create the Lark parser
 parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = CustomLexer)
-code = """define num main() {yield 0;}"""
+code = """define void meow(num testing){yield;} num main() {yield 0;}"""
 
 import lexer_lark
 
@@ -363,7 +375,7 @@ tokenised_code = ""
 
 for token in tokens:
     # print(type(token[0]))
-    tokenised_code += token[0]
+    tokenised_code += token[0] + " "
 # print(type(tokenised_code), "-->" , tokenised_code)
 # tree = parser.parse(code)
 tree = parser.parse(tokenised_code)
