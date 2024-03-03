@@ -263,7 +263,7 @@ EQUAL_TO: "EQUAL_TO"
 
 # Create the Lark parser
 parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = CustomLexer)
-code = """a / b * 1;"""
+code = """define num main() {yield 0;} """
 
 import lexer_lark
 
