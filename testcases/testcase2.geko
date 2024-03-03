@@ -1,6 +1,6 @@
 ##This is the test code for loops, conditionals statements, enter, & ##void keywords
 
-num main() {
+define num main() {
     
      num y = 2;
      while (y>=8){

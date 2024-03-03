@@ -22,7 +22,7 @@ arrest(~Zeroerror~){
 }
 
 
-num main(){
+define num main(){
 	show(~Calculator program~);
 num firstNum = enter(~Enter first number:~);
 num secondNum = enter(~Enter second number:~);

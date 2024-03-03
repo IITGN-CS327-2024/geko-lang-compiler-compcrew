@@ -1,4 +1,4 @@
-num main() {
+define num main() {
 ## entry point of program
 
 ## Array definition:
