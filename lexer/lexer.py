@@ -78,7 +78,8 @@ patterns = [
     ('ELEMENT_SEPERATOR', r','),
 
     ('COMPARISON_OPERATOR', r'==|!=|<=|>=|>|<'),
-    ('ASSIGNMENT_OPERATOR', r'=|/=|\*=|\+=|-=|%='),
+    ('EQUAL_TO', r'='),
+    ('ASSIGNMENT_OPERATOR', r'/=|\*=|\+=|-=|%='),
     # due to precedence, assignment operator is kept above unary/binary (*,/,+,- versus *=, /=, += and -=), but below comparison (== versus =)
     ('UNARY_OPERATOR' , r'\+\+|--|`'),
     ('BINARY_OPERATOR', r'\*\*|/|\*|\+|-|%'),
