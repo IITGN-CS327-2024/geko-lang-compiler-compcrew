@@ -14,9 +14,10 @@ function_block	        :	OPEN_BRACES statements YIELD return_value END_OF_LINE C
 function_type	        :	NUM | STR | FLAG | VOID
 parameter_list	        :	parameter parameters | epsilon
 return_value	        :	NUM_LITERAL | string | YAY | NAY | epsilon
-parameters	            :	ELEMENT_SEPERATOR parameter parameters | epsilon
-parameter	            :	data_type IDENTIFIER | array
-                        
+parameters	            :	ELEMENT_SEPERATOR parameter parameters 
+                        |   epsilon
+parameter	            :	compound_data_type IDENTIFIER | basic_data_type IDENTIFIER choose_array
+choose_array            :   OPEN_BRACKET NUM_LITERAL CLOSE_BRACKET | epsilon                        
 # --------------------------------------
 statements	            :	statement statements
                         |   epsilon
@@ -26,8 +27,10 @@ post_equal_to           :   ENTER OPEN_PARENTHESIS string CLOSE_PARENTHESIS
                         |   LENGTH OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS
                         |   IDENTIFIER OPEN_BRACKET NUM_LITERAL CLOSE_BRACKET
                         |   HEAD OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS
-                        |   TAIL OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS
+                        |   ISEMPTY OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS
+                        |   function_call
                         |   expression
+
 
 data_type	            :  	basic_data_type 
                         |   compound_data_type 
@@ -39,19 +42,21 @@ compound_data_type	    :	LIST | TUP
 
 
 string	                :	TILDE STRING_LITERAL TILDE
-array	                :	data_type IDENTIFIER OPEN_BRACKET NUM_LITERAL CLOSE_BRACKET
+array	                :	basic_data_type IDENTIFIER OPEN_BRACKET NUM_LITERAL CLOSE_BRACKET
 
 # --------------------------------------
 
-variable_declaration	:	data_type IDENTIFIER equal_to
+variable_declaration	:	basic_data_type IDENTIFIER equal_to
                         |   compound_array compound_var
 
-compound_array          :   compound_data_type IDENTIFIER compound_equal_to
-                        |   array compound_equal_to
-compound_equal_to       :   EQUAL_TO compound_var
-                        |   epsilon
-compound_var            :   OPEN_BRACKET expression expressions CLOSE_BRACKET
-                        |   TAIL OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS
+compound_array          :   compound_data_type IDENTIFIER
+                        |   array 
+
+compound_var            :   EQUAL_TO list_and_tail | epsilon
+
+list_and_tail           : OPEN_BRACKET expression expressions CLOSE_BRACKET
+                        | TAIL OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS
+
 assignment_statement	:	IDENTIFIER assignment_operators post_equal_to
 show_statement	        :	SHOW OPEN_PARENTHESIS expression expressions CLOSE_PARENTHESIS
 block	                :	OPEN_BRACES statements CLOSE_BRACES
@@ -67,7 +72,8 @@ terms	                :	binary_operators term terms
 term	                :   IDENTIFIER
                         |   NUM_LITERAL
                         |   string
-                        |   FLAG
+                        |   YAY
+                        |   NAY
                         |   OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
                         |   unary_operators IDENTIFIER
                         |   IDENTIFIER UNARY_OPERATOR
@@ -98,7 +104,17 @@ loop_statement	        :	ITER OPEN_PARENTHESIS statement expression END_OF_LINE 
 
 #---------------------------------------
 
+pop_statement           :   POP OPEN_PARENTHESIS string CLOSE_PARENTHESIS
+
+try_catch_statement	    :	TEST block ARREST OPEN_PARENTHESIS string CLOSE_PARENTHESIS block
+
 yield_block             :   OPEN_BRACES statements YIELD expression END_OF_LINE CLOSE_BRACES
+
+#---------------------------------------
+
+function_call	        :	IDENTIFIER OPEN_PARENTHESIS argument_list CLOSE_PARENTHESIS
+
+argument_list	        :	expression expressions
 
 statement	            :	block
                         |   variable_declaration END_OF_LINE
@@ -108,8 +124,9 @@ statement	            :	block
                         |   loop_statement
                         |   skip_stop END_OF_LINE
                         |   value_change_array END_OF_LINE
-                        
-
+                        |   pop_statement END_OF_LINE
+                        |   try_catch_statement
+                        |   function_call END_OF_LINE
 
 
 epsilon :
@@ -336,11 +353,13 @@ define num main() {
     three = one + two;
     ## this is a comment
     str four = ~hello~;
-    two = 5;
+    ## two = 5;
     list five = [1,2,Yay,~meow~,5];
     show(five[2+3]);
-
+    flag test_empty = isEmpty(five);
+    ## num test_declaration = foo(three, four);
     given(1==1){
+        pop(~pop testing~);
         show(1);
     }
     other(three > four){
@@ -350,6 +369,21 @@ define num main() {
         show(2);
     }
 
+    test{
+        num a = 2;
+        num b = 0;
+        given(b == 0){
+            pop(~pop testing~);
+            }
+    }
+    arrest(~pop testing~){
+        show(~error aayi hai!~);
+    }
+
+    add();
+
+    num test_func = meow(3, Yay);
+    list test_list_tail = tail(five);
     iter(num i = 0; i < three; i++){
         show(~meow~, i);
         skip;
@@ -388,6 +422,14 @@ tokens = lexer_lark.lexer(code)
 # for token in tokens:
 #     print(type(token), "-->", token)
 
+# small_tokens = []
+# small_code = "list five = [1,2,yay,~meow~,5];"
+# small_tokens = lexer_lark.lexer(small_code)
+# for token in small_tokens:
+#     print(type(token), "-->", token)
+
+for token in tokens:
+    print(type(token), "-->", token)
 tokenised_code = ""
 
 for token in tokens:
