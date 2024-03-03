@@ -108,22 +108,38 @@ expression: primary_expression
 primary_expression: IDENTIFIER
                    | NUM_LITERAL
                    | OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
-IDENTIFIER: /[a-zA-Z_][a-zA-Z0-9_]*/
-ASSIGNMENT_OPERATOR: "="
-BINARY_OPERATOR: "+" | "-" | "*" | "/" 
-NUM_LITERAL: /-?\d+/
-OPEN_PARENTHESIS: "("
-CLOSE_PARENTHESIS: ")"
-END_OF_LINE: ";"
+
+END_OF_LINE: "END_OF_LINE"
+IDENTIFIER: "IDENTIFIER"
+ASSIGNMENT_OPERATOR: "ASSIGNMENT_OPERATOR"
+BINARY_OPERATOR: "BINARY_OPERATOR"
+NUM_LITERAL: "NUM_LITERAL"
+OPEN_PARENTHESIS: "OPEN_PARENTHESIS"
+CLOSE_PARENTHESIS: "CLOSE_PARENTHESIS"
 
 %import common.NUMBER
 %import common.WS
 %ignore WS"""
 
 # Create the Lark parser
-parser = Lark(grammar, start='start', parser = 'lalr', lexer = CustomLexer)
+parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = CustomLexer)
 code = """a + b;"""
-tree = parser.parse(code)
+
+import lexer_lark
+
+tokens = lexer_lark.lexer(code)
+# print(type(tokens))
+# for token in tokens:
+#     print(type(token), "-->", token)
+
+tokenised_code = ""
+
+for token in tokens:
+    # print(type(token[0]))
+    tokenised_code += token[0]
+# print(type(tokenised_code), "-->" , tokenised_code)
+# tree = parser.parse(code)
+tree = parser.parse(tokenised_code)
 print("Parsed tree:\n", tree.pretty())
 # try:
 #     # Parse the input code
@@ -133,3 +149,13 @@ print("Parsed tree:\n", tree.pretty())
 # except UnexpectedToken as e:
 #     # If parsing fails, print the error
 #     print("Parsing error:", e)
+
+# --------------------------------------
+# IDENTIFIER: /[a-zA-Z_][a-zA-Z0-9_]*/
+# ASSIGNMENT_OPERATOR: "="
+# BINARY_OPERATOR: "+" | "-" | "*" | "/" 
+# NUM_LITERAL: /-?\d+/
+# OPEN_PARENTHESIS: "("
+# CLOSE_PARENTHESIS: ")"
+# END_OF_LINE: ";"
+# --------------------------------------
