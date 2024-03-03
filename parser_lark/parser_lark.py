@@ -2,97 +2,6 @@ from lark import Lark
 from lark.lexer import Lexer, Token
 from lark.exceptions import UnexpectedToken
 import re
-
-# class CustomLexer(Lexer):
-#     def __init__(self, lexer_conf):
-#         pass
-#     def lex(self, data):
-#         # Define token patterns using regular expressions
-#         patterns = [
-#             ('STR', r'\bstr\b'),
-#             ('FLAG', r'\bflag\b'),
-#             ('FIX', r'\bfix\b'),
-#             ('SHOW', r'\bshow\b'),
-#             ('ITER', r'\biter\b'),
-#             ('LIST', r'\blist\b'),
-#             ('TUP', r'\btup\b'),
-#             ('ENTER', r'\benter\b'),
-#             ('YIELD', r'\byield\b'),
-#             ('LET', r'\blet\b'),
-#             ('IN', r'\bin\b'),
-#             ('VOID', r'\bvoid\b'),
-#             ('WHILE', r'\bwhile\b'),
-#             ('REPEAT', r'\brepeat\b'),
-#             ('GIVEN', r'\bgiven\b'),
-#             ('OTHER', r'\bother\b'),
-#             ('OTHERWISE', r'\botherwise\b'),
-#             ('DEFINE', r'\bdefine\b'),
-#             ('TEST', r'\btest\b'),
-#             ('POP', r'\bpop\b'),
-#             ('ARREST', r'\barrest\b'),
-#             ('LENGTH', r'\blength\b'),
-#             ('HEAD', r'\bhead\b'),
-#             ('TAIL', r'\btail\b'),
-#             ('ISEMPTY', r'\bisEmpty\b'),
-#             ('APPEND', r'\bappend\b'),
-#             ('SKIP', r'\bskip\b'),
-#             ('STOP', r'\bstop\b'),
-#             ('YAY', r'\byay\b'),
-#             ('NAY', r'\bnay\b'),
-#             ('MAIN' , r'\bmain\b'),
-#             ('IDENTIFIER', r'[a-zA-Z_][a-zA-Z0-9_]*'),
-#             ('OPEN_PARENTHESIS', r'\('),
-#             ('CLOSE_PARENTHESIS', r'\)'),
-#             ('OPEN_BRACES', r'\{'),
-#             ('CLOSE_BRACES', r'\}'),
-#             ('OPEN_BRACKET', r'\['),
-#             ('CLOSE_BRACKET', r'\]'),
-#             ('NUM_LITERAL', r'-?\b\d+\b'),
-#             ('COMMENT', r'##.*'),
-#             ('STRING_LITERAL', r'~(?:[^~\\]|\\.)*~'),
-#             ('END_OF_LINE', r';'),
-#             ('SLICING_COLON', r':'),
-#             ('ELEMENT_SEPERATOR', r','),
-#             ('COMPARISON_OPERATOR', r'==|!=|<=|>=|>|<'),
-#             ('ASSIGNMENT_OPERATOR', r'=|/=|\*=|\+=|-=|%='),
-#             ('UNARY_OPERATOR' , r'\+\+|--|`'),
-#             ('BINARY_OPERATOR', r'\*\*|/|\*|\+|-|%'),
-#             ('BINARY_LOGICAL_OPERATOR', r'&&|\|\||&|\||\^'),
-#             ('UNARY_LOGICAL_OPERATOR', r'!')
-#         ]
-
-#         # Combine patterns into a single regular expression through join()
-#         pattern = '|'.join('(?P<%s>%s)' % pair for pair in patterns)
-
-#         # Empty list to store tokens
-#         tokens = []
-
-#         # Loop over matches found in the code using the specified pattern
-#         for match in re.finditer(pattern, data):
-#             # Extract the kind (token type) and value from the match
-#             kind = match.lastgroup
-#             value = match.group()
-
-#             # Handle special case for STRING_LITERAL where ~, <string>, ~ will be treated separately
-#             if kind == 'STRING_LITERAL':
-#                 # String value without quotes
-#                 string_val = value[1:-1]
-
-#                 # Add tokens for string delimiters (~) and the string value
-#                 tokens.append(('TILDE', '~'))
-#                 tokens.append((kind, string_val))
-#                 tokens.append(('TILDE', '~'))
-#             elif kind == 'COMMENT':
-#                 continue
-#             else:
-#                 # For other token types, simply add the kind and value to the tokens list
-#                 tokens.append((kind, value))
-
-#         # Return the list of tokens
-#         # return tokens
-#         lark_tokens = [Token(type_, value) for type_, value in tokens]
-
-#         return lark_tokens
     
 grammar = """
 start                   :   program
@@ -124,8 +33,8 @@ compound_data_type	    :	LIST | TUP
 
 string	                :	TILDE STRING_LITERAL TILDE
 array	                :	data_type IDENTIFIER OPEN_BRACKET NUM_LITERAL CLOSE_BRACKET
-# --------------------------------------
 
+# --------------------------------------
 
 variable_declaration	:	data_type IDENTIFIER equal_to
                         |   compound_array compound_var
@@ -134,6 +43,9 @@ compound_array          :   compound_data_type IDENTIFIER
                         |   array
 compound_var            :   EQUAL_TO OPEN_BRACKET expression expressions CLOSE_BRACKET
                         |   epsilon
+assignment_statement	:	IDENTIFIER assignment_operators expression
+show_statement	        :	SHOW OPEN_PARENTHESIS expression expressions CLOSE_PARENTHESIS
+block	                :	OPEN_BRACES statements CLOSE_BRACES
 #---------------------------------------
 
 expressions             :   ELEMENT_SEPERATOR expression expressions
@@ -149,20 +61,42 @@ term	                :   IDENTIFIER
                         |   OPEN_PARENTHESIS expression CLOSE_PARENTHESIS
                         |   unary_operators IDENTIFIER
                         |   IDENTIFIER UNARY_OPERATOR
+                        |   IDENTIFIER OPEN_BRACKET expression CLOSE_BRACKET
 #---------------------------------------
 binary_operators	    :	BINARY_OPERATOR 
                         |   COMPARISON_OPERATOR 
                         |   BINARY_LOGICAL_OPERATOR
 unary_operators	        :	UNARY_OPERATOR
                         |   UNARY_LOGICAL_OPERATOR
+assignment_operators	:	EQUAL_TO
+                        |   ASSIGNMENT_OPERATOR
+#---------------------------------------
+conditional_block       : yield_block 
+                        | block
+conditional_statement	:	GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS conditional_block other_block otherwise_block
+other_block	            :	OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS conditional_block other_block
+                        |   epsilon 
+otherwise_block	        :	OTHERWISE conditional_block
+                        |   epsilon
+skip_stop               :   SKIP
+                        |   STOP
 #---------------------------------------
 
+loop_statement	        :	ITER OPEN_PARENTHESIS statement expression END_OF_LINE expression CLOSE_PARENTHESIS block
+                        |   WHILE OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
+                        |   REPEAT block WHILE OPEN_PARENTHESIS expression CLOSE_PARENTHESIS END_OF_LINE
 
+#---------------------------------------
 
-statement	            :	variable_declaration END_OF_LINE
-
-
-
+yield_block             :   OPEN_BRACES statements YIELD expression END_OF_LINE CLOSE_BRACES
+                        
+statement	            :	block
+                        |   variable_declaration END_OF_LINE
+                        |   assignment_statement END_OF_LINE
+                        |   show_statement END_OF_LINE
+                        |   conditional_statement
+                        |   loop_statement
+                        |   skip_stop END_OF_LINE
 
 
 
@@ -369,7 +303,20 @@ EQUAL_TO: "EQUAL_TO"
 %ignore WS"""
 # Create the Lark parser
 parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = CustomLexer)
-code = """define void meow(num test_num, flag test_bool){yield;} 
+code = """
+define void meow(num test_num, flag test_bool){
+    given(test_num == 3){
+        yield;
+        }
+    while(test_num > 0){
+        show(test_num);
+        test_num = test_num - 1;
+        given(test_num == 2){
+            yield;
+            }
+    }
+    yield;
+    } 
 define num main() {
     fix num one = 3;
     num two = 4;
@@ -377,11 +324,40 @@ define num main() {
     three = one + two;
     ## this is a comment
     str four = ~hello~;
+    two = 5;
     list five = [1,2,Yay,~meow~,5];
+    show(five[2+3]);
 
-
-    yield 0;
+    given(1==1){
+        show(1);
     }
+    other(three > four){
+        show(2);
+    }
+    otherwise{
+        show(2);
+    }
+
+    iter(num i = 0; i < three; i++){
+        show(~meow~, i);
+        skip;
+    }
+
+    while(three > 0){
+        show(three);
+        three = three - 1;
+        stop;
+        show(three);
+    }
+
+    repeat{
+        show(three);
+        three = three - 1;
+    }while(three > 0);
+    
+    yield 0;
+
+}
     """
 
 import lexer_lark
