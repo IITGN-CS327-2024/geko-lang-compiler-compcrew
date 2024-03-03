@@ -2,7 +2,14 @@ from lark import Lark
 from lark.lexer import Lexer, Token
 from lark.exceptions import UnexpectedToken
 import re
-    
+import lexer_lark
+import sys
+import os
+
+def read_geko_file(file_path):
+    with open(file_path, 'r') as file:
+        return file.read()
+
 grammar = """
 start                   :   program
 program	                :	DEFINE NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_BRACES statements YIELD NUM_LITERAL END_OF_LINE CLOSE_BRACES
@@ -293,13 +300,19 @@ define num main() {
     yield 0;
 }
     """
+parser_lark_dir = os.path.dirname(__file__)
+    
+testcase_folder_path = os.path.join(parser_lark_dir,"..", "testcases")
+sys.path.append(testcase_folder_path)
+for p in sys.path:
+    print(p)
 
-import lexer_lark
+code = read_geko_file(os.path.join(testcase_folder_path, "testcase1.geko"))
 
 tokens = lexer_lark.lexer(code)
 # print(type(tokens))
-# for token in tokens:
-#     print(type(token), "-->", token)
+for token in tokens:
+    print(type(token), "-->", token)
 
 # small_tokens = []
 # small_code = "list five = [1,2,yay,~meow~,5];"
@@ -307,8 +320,8 @@ tokens = lexer_lark.lexer(code)
 # for token in small_tokens:
 #     print(type(token), "-->", token)
 
-for token in tokens:
-    print(type(token), "-->", token)
+# for token in tokens:
+#     print(type(token), "-->", token)
 tokenised_code = ""
 
 for token in tokens:
@@ -317,7 +330,7 @@ for token in tokens:
 # print(type(tokenised_code), "-->" , tokenised_code)
 # tree = parser.parse(code)
 tree = parser.parse(tokenised_code)
-print("Parsed tree:\n", tree.pretty())
+# print("Parsed tree:\n", tree.pretty())
 # try:
 #     # Parse the input code
 #     parser.parse(code)
