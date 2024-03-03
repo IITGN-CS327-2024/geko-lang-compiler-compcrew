@@ -1,4 +1,4 @@
-num main(){
+define num main(){
 	## This is a comment;
 	show(~Calculator program~);
 	yield 0;

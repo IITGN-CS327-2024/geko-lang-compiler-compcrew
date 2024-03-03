@@ -1,5 +1,5 @@
 ## This is the test code for strings and exceptional handling
-num main () {
+define num main () {
 	str name1 = ~Adam1~;
 	str name2 = ~Eve2~;
 	str name = name1 + name2;

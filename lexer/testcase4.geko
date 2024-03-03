@@ -1,4 +1,4 @@
-num main() {
+define num main() {
     ## defining integral values:
     num numOne = 4;
     num numTwo = 3;
