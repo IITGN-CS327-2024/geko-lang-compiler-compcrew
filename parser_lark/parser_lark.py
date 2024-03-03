@@ -137,6 +137,7 @@ statement	            :	block
                         |   pop_statement END_OF_LINE
                         |   try_catch_statement
                         |   function_call END_OF_LINE
+                        |   expression END_OF_LINE
 
 
 epsilon :
@@ -447,6 +448,8 @@ define num main() {
     num test_num_let_recurse = let test_num = 3 in { let test_num_2 = 4 in test_num + test_num_2};
 
     let num test_let_assgn = 5;
+    num test_num = 0;
+    test_num++;
     yield 0;
 }
     """
