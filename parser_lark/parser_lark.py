@@ -124,8 +124,12 @@ class CustomLexer(Lexer):
 
 grammar = """
 start                   :   program
-program	                :	NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_BRACES statements YIELD NUM_LITERAL END_OF_LINE CLOSE_BRACES
-                        |   function_definitions NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_BRACES statements YIELD NUM_LITERAL END_OF_LINE CLOSE_BRACES
+program	                :	DEFINE NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_BRACES statements YIELD NUM_LITERAL END_OF_LINE CLOSE_BRACES
+                        |   DEFINE function_type IDENTIFIER OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS function_block program
+
+function_definitions	:	function_definition function_definitions 
+                        |   epsilon
+function_definition	    :	DEFINE function_type IDENTIFIER OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS function_block
 statements	            :	statement statements
                         |   epsilon
 statement	            :	variable_declaration END_OF_LINE
@@ -146,9 +150,6 @@ binary_operators	    :	BINARY_OPERATOR
                         |   COMPARISON_OPERATOR 
                         |   BINARY_LOGICAL_OPERATOR
 
-function_definitions	:	function_definition function_definitions 
-                        |   epsilon
-function_definition	    :	DEFINE function_type IDENTIFIER OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS function_block 
 function_block	        :	OPEN_BRACES statements YIELD return_value END_OF_LINE CLOSE_BRACES
 function_type	        :	NUM | STR | FLAG | VOID
 parameter_list	        :	parameter parameters | epsilon
@@ -362,7 +363,7 @@ EQUAL_TO: "EQUAL_TO"
 %ignore WS"""
 # Create the Lark parser
 parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = CustomLexer)
-code = """define void meow(num testing){yield;} num main() {yield 0;}"""
+code = """define void meow(num testing){yield;} define num main() {yield 0;}"""
 
 import lexer_lark
 
