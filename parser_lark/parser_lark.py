@@ -137,7 +137,8 @@ statement	            :	block
                         |   pop_statement END_OF_LINE
                         |   try_catch_statement
                         |   function_call END_OF_LINE
-                        |   expression END_OF_LINE
+                        |   unary_operators IDENTIFIER END_OF_LINE
+                        |   IDENTIFIER UNARY_OPERATOR END_OF_LINE
 
 
 epsilon :
@@ -450,6 +451,10 @@ define num main() {
     let num test_let_assgn = 5;
     num test_num = 0;
     test_num++;
+    test_num--;
+    ## --test_num++;
+    given(three){
+    }
     yield 0;
 }
     """
