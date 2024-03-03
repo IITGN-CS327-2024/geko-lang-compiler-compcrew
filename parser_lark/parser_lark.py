@@ -29,6 +29,7 @@ post_equal_to           :   ENTER OPEN_PARENTHESIS string CLOSE_PARENTHESIS
                         |   HEAD OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS
                         |   ISEMPTY OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS
                         |   function_call
+                        |   let_in_statement 
                         |   expression
 
 
@@ -36,8 +37,8 @@ data_type	            :  	basic_data_type
                         |   compound_data_type 
                         |   epsilon
 num_str_flag	        :	NUM | STR | FLAG
-basic_data_type	        :	fix num_str_flag
-fix	                    :	FIX | epsilon
+basic_data_type	        :	fix_let num_str_flag
+fix_let	                :	FIX | LET | epsilon
 compound_data_type	    :	LIST | TUP
 
 
@@ -52,10 +53,12 @@ variable_declaration	:	basic_data_type IDENTIFIER equal_to
 compound_array          :   compound_data_type IDENTIFIER
                         |   array 
 
-compound_var            :   EQUAL_TO list_and_tail | epsilon
+compound_var            :   EQUAL_TO list_append_tail 
+                        |   epsilon
 
-list_and_tail           : OPEN_BRACKET expression expressions CLOSE_BRACKET
-                        | TAIL OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS
+list_append_tail        :   OPEN_BRACKET expression expressions CLOSE_BRACKET
+                        |   TAIL OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS
+                        |   APPEND OPEN_PARENTHESIS expression ELEMENT_SEPERATOR IDENTIFIER CLOSE_PARENTHESIS
 
 assignment_statement	:	IDENTIFIER assignment_operators post_equal_to
 show_statement	        :	SHOW OPEN_PARENTHESIS expression expressions CLOSE_PARENTHESIS
@@ -87,8 +90,8 @@ unary_operators	        :	UNARY_OPERATOR
 assignment_operators	:	EQUAL_TO
                         |   ASSIGNMENT_OPERATOR
 #---------------------------------------
-conditional_block       : yield_block 
-                        | block
+conditional_block       :   yield_block 
+                        |   block
 conditional_statement	:	GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS conditional_block other_block otherwise_block
 other_block	            :	OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS conditional_block other_block
                         |   epsilon 
@@ -115,6 +118,13 @@ yield_block             :   OPEN_BRACES statements YIELD expression END_OF_LINE 
 function_call	        :	IDENTIFIER OPEN_PARENTHESIS argument_list CLOSE_PARENTHESIS
 
 argument_list	        :	expression expressions
+
+#---------------------------------------
+let_in_braces           :   let_in CLOSE_BRACES
+let_in                  :   let_in_statement | expression
+let_in_statement	    :   LET data_type IDENTIFIER EQUAL_TO OPEN_BRACES let_in_braces
+                        |   LET data_type IDENTIFIER EQUAL_TO term IN OPEN_BRACES let_in_braces
+                        |   LET data_type IDENTIFIER EQUAL_TO term IN let_in
 
 statement	            :	block
                         |   variable_declaration END_OF_LINE
@@ -189,17 +199,32 @@ EQUAL_TO: "EQUAL_TO"
 #----------------------------------------------------------------------------------------------------------------------------
 
 """
-function_definitions	:	function_definiton function_definitions | epsilon
+function_definitions	:	function_definiton function_definitions     
+                        |   epsilon
 function_definition	    :	DEFINE function_type IDENTIFIER OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS function_block
 function_block	        :	OPEN_BRACES statements YIELD return_value END_OF_LINE CLOSE_BRACES
 
 
-statements	            :	statement statements | epsilon
-return_value	        :	NUM_LITERAL | string | YAY | NAY | epsilon
-function_type	        :	NUM | STR | FLAG | VOID
-parameter_list	        :	parameter parameters | epsilon
-parameters	            :	ELEMENT_SEPERATOR parameter parameters | epsilon
-parameter	            :	data_type IDENTIFIER | array
+statements	            :	statement statements 
+                        |   epsilon
+
+return_value	        :	NUM_LITERAL 
+                        |   string 
+                        |   YAY 
+                        |   NAY                    
+                        |   epsilon
+
+function_type	        :	NUM 
+                        |   STR 
+                        |   FLAG 
+                        |   VOID
+
+parameter_list	        :	parameter parameters 
+                        |   epsilon
+parameters	            :	ELEMENT_SEPERATOR parameter parameters 
+                        |   epsilon
+parameter	            :	data_type IDENTIFIER 
+                        | array
 array	                :	data_type IDENTIFIER OPEN_BRACKET NUM_LITERAL CLOSE_BRACKET
 statement	            :	variable_declaration END_OF_LINE
                         |   assignment_statement END_OF_LINE
@@ -223,12 +248,20 @@ statement	            :	variable_declaration END_OF_LINE
                         |   isEmpty_list
                         |   skip_stop END_OF_LINE
                         |   epsilon
-string	            :	TILDE STRING_LITERAL TILDE | epsilon
-fix	                :	FIX | epsilon
-num_str_flag	    :	NUM | STR | FLAG
-basic_data_type	    :	fix num_str_flag
-compound_data_type	:	LIST | TUP
-data_type	        :  	basic_data_type | compound_data_type | epsilon
+string	            :	TILDE STRING_LITERAL TILDE 
+                    |   epsilon
+fix_let	            :	FIX 
+                    |   LET
+                    |   epsilon
+num_str_flag	    :	NUM 
+                    |   STR 
+                    |   FLAG
+basic_data_type	    :	fix_let num_str_flag
+compound_data_type	:	LIST 
+                    |   TUP
+data_type	        :  	basic_data_type 
+                    |   compound_data_type 
+                    |   epsilon
 expressions	        :	ELEMENT_SEPERATOR expression expressions | epsilon
 expression	        :	term terms | epsilon
 binary_operators	:	BINARY_OPERATOR | COMPARISON_OPERATOR | BINARY_LOGICAL_OPERATOR
@@ -408,10 +441,13 @@ define num main() {
     num b = head(five);
     ## list c = tail(five);
     num test_enter;
+    list test_append = append(~append test~, five);
     test_enter = enter(~hello~);
     str test_slice = four[1:2];
-    yield 0;
+    num test_num_let_recurse = let test_num = 3 in { let test_num_2 = 4 in test_num + test_num_2};
 
+    let num test_let_assgn = 5;
+    yield 0;
 }
     """
 
