@@ -1,6 +1,6 @@
-from parsing.grammar import *
+from parse_table_generator import *
 
-def get_sample_1():
+def grammar_1():
     return Grammar([
         NonTerminal('start', [
             "program"
