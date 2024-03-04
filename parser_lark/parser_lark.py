@@ -13,14 +13,16 @@ def read_geko_file(file_path):
 grammar = """
 start                   :   program
 program	                :	DEFINE NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_BRACES statements YIELD NUM_LITERAL END_OF_LINE CLOSE_BRACES
-                        |   DEFINE function_type IDENTIFIER OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS function_block program
+                        |   func_def program
+
+func_def                :   DEFINE function_type IDENTIFIER OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS function_block
 
 # --------------------------------------
 
 function_block	        :	OPEN_BRACES statements YIELD return_value END_OF_LINE CLOSE_BRACES
 function_type	        :	NUM | STR | FLAG | VOID
 parameter_list	        :	parameter parameters | epsilon
-return_value	        :	NUM_LITERAL | string | YAY | NAY | epsilon
+return_value	        :	expression | function_call
 parameters	            :	ELEMENT_SEPERATOR parameter parameters 
                         |   epsilon
 parameter	            :	compound_data_type IDENTIFIER | basic_data_type IDENTIFIER choose_array
@@ -30,15 +32,15 @@ statements	            :	statement statements
                         |   epsilon
 equal_to                :   EQUAL_TO post_equal_to | epsilon
 post_equal_to           :   ENTER OPEN_PARENTHESIS string CLOSE_PARENTHESIS 
-                        |   IDENTIFIER OPEN_BRACKET NUM_LITERAL SLICING_COLON NUM_LITERAL CLOSE_BRACKET
+                        |   special_function
+                        |   let_in_statement 
+                        |   expression
+special_function        :   IDENTIFIER OPEN_BRACKET NUM_LITERAL SLICING_COLON NUM_LITERAL CLOSE_BRACKET
                         |   LENGTH OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS
                         |   IDENTIFIER OPEN_BRACKET NUM_LITERAL CLOSE_BRACKET
                         |   HEAD OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS
                         |   ISEMPTY OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS
                         |   function_call
-                        |   let_in_statement 
-                        |   expression
-
 
 data_type	            :  	basic_data_type 
                         |   compound_data_type 
@@ -88,6 +90,7 @@ term	                :   IDENTIFIER
                         |   unary_operators IDENTIFIER
                         |   IDENTIFIER UNARY_OPERATOR
                         |   IDENTIFIER OPEN_BRACKET expression CLOSE_BRACKET
+                        |   LENGTH
 #---------------------------------------
 binary_operators	    :	BINARY_OPERATOR 
                         |   COMPARISON_OPERATOR 
@@ -99,8 +102,10 @@ assignment_operators	:	EQUAL_TO
 #---------------------------------------
 conditional_block       :   yield_block 
                         |   block
-conditional_statement	:	GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS conditional_block other_block otherwise_block
-other_block	            :	OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS conditional_block other_block
+conditional_argument    :   special_function COMPARISON_OPERATOR expression
+                        |   expression
+conditional_statement	:	GIVEN OPEN_PARENTHESIS conditional_argument CLOSE_PARENTHESIS conditional_block other_block otherwise_block
+other_block	            :	OTHER OPEN_PARENTHESIS conditional_argument CLOSE_PARENTHESIS conditional_block other_block
                         |   epsilon 
 otherwise_block	        :	OTHERWISE conditional_block
                         |   epsilon
@@ -109,8 +114,8 @@ skip_stop               :   SKIP
 #---------------------------------------
 
 loop_statement	        :	ITER OPEN_PARENTHESIS statement expression END_OF_LINE expression CLOSE_PARENTHESIS block
-                        |   WHILE OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block
-                        |   REPEAT block WHILE OPEN_PARENTHESIS expression CLOSE_PARENTHESIS END_OF_LINE
+                        |   WHILE OPEN_PARENTHESIS conditional_argument CLOSE_PARENTHESIS block
+                        |   REPEAT block WHILE OPEN_PARENTHESIS conditional_argument CLOSE_PARENTHESIS END_OF_LINE
 
 #---------------------------------------
 
@@ -146,6 +151,7 @@ statement	            :	block
                         |   function_call END_OF_LINE
                         |   unary_operators IDENTIFIER END_OF_LINE
                         |   IDENTIFIER UNARY_OPERATOR END_OF_LINE
+                        |   func_def
 
 
 epsilon :
@@ -220,7 +226,7 @@ define void meow(num test_num, flag test_bool){
             yield;
             }
     }
-    yield;
+    yield foo(3);
     } 
 define num main() {
     fix num one = 3;
@@ -283,7 +289,8 @@ define num main() {
     five[1] = 5;
     num b = head(five);
     ## list c = tail(five);
-    num test_enter;
+    num test_enter = 9;
+    num sum = a + test_enter;
     list test_append = append(~append test~, five);
     test_enter = enter(~hello~);
     str test_slice = four[1:2];
@@ -307,12 +314,13 @@ sys.path.append(testcase_folder_path)
 for p in sys.path:
     print(p)
 
-code = read_geko_file(os.path.join(testcase_folder_path, "testcase1.geko"))
+# code = read_geko_file(os.path.join(testcase_folder_path, "testcase5.geko"))
 
 tokens = lexer_lark.lexer(code)
 # print(type(tokens))
-for token in tokens:
-    print(type(token), "-->", token)
+# for token in tokens:
+#     print(type(token), "-->", token)
+lexer_lark.print_table(tokens)
 
 # small_tokens = []
 # small_code = "list five = [1,2,yay,~meow~,5];"
@@ -330,7 +338,7 @@ for token in tokens:
 # print(type(tokenised_code), "-->" , tokenised_code)
 # tree = parser.parse(code)
 tree = parser.parse(tokenised_code)
-# print("Parsed tree:\n", tree.pretty())
+print("Parsed tree:\n", tree.pretty())
 # try:
 #     # Parse the input code
 #     parser.parse(code)
