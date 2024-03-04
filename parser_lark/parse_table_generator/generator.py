@@ -1,9 +1,9 @@
 from parsing import *
-import samples
+import CFG
 
 
 def get_grammar():
-    return samples.get_sample_10()
+    return CFG.grammar_1()
 
 
 def describe_grammar(gr):
