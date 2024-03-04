@@ -27,7 +27,7 @@ define num main() {
     fix flag boolTen = nay;
 
     ## usage of 'let' keyboard:
-    let numOne = 4 in numSix = numOne**2;
+    numSix = let numOne = 4 in numOne**2;
     
     ## Testing various comparison operators:
     given(numOne == numTwo){show(~equalto_operator~);}
@@ -60,6 +60,6 @@ define num main() {
 
     ##sample wrong testcase, to check the precedence of operators:
     num a = 32;
-    num b = --a+++--; ##wrong syntax, but the precedence of "++" over "+" is seen over here.
+    ## num b = --a+++--; ##wrong syntax, but the precedence of "++" over "+" is seen over here.
     yield 0;
 }
