@@ -308,8 +308,7 @@ define num main() {
     ## --test_num++;
     given(three){
     }
-    flag five = (five_nine <= 1);
-    show(~~);
+    show(~);
     yield 0;
 }
     """
@@ -346,14 +345,14 @@ for token in tokens:
 # tree = parser.parse(code)
 tree = parser.parse(tokenised_code)
 print("Parsed tree:\n", tree.pretty())
-try:
-    # Parse the input code
-    parser.parse(tokenised_code)
-    # If parsing is successful, print success message
-    print("Parsing successful!")
-except UnexpectedToken as e:
-    # If parsing fails, print the error
-    print("Parsing error:", e)
+# try:
+#     # Parse the input code
+#     parser.parse(code)
+#     # If parsing is successful, print success message
+#     print("Parsing successful!")
+# except UnexpectedToken as e:
+#     # If parsing fails, print the error
+#     print("Parsing error:", e)
 
 # --------------------------------------
 # IDENTIFIER: /[a-zA-Z_][a-zA-Z0-9_]*/

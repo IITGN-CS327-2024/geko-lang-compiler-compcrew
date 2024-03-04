@@ -35,10 +35,10 @@ def describe_parsing_table(table):
 
 
 def main():
-    print('Working on it...')
+    print('Executing:')
     gr = get_grammar()
     table = lalr_one.ParsingTable(gr)
-    print("I'm done.")
+    print("Parse Table Generated!")
 
     output_filename = 'parsing-table'
 
