@@ -17,7 +17,7 @@ program	                :	DEFINE NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS OPE
 
 func_def                :   DEFINE function_type IDENTIFIER OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS function_block
 
-# --------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 
 function_block	        :	OPEN_BRACES statements YIELD return_value END_OF_LINE CLOSE_BRACES
 function_type	        :	NUM | STR | FLAG | VOID
@@ -27,7 +27,7 @@ parameters	            :	ELEMENT_SEPERATOR parameter parameters
                         |   epsilon
 parameter	            :	compound_data_type IDENTIFIER | basic_data_type IDENTIFIER choose_array
 choose_array            :   OPEN_BRACKET NUM_LITERAL CLOSE_BRACKET | epsilon                        
-# --------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 statements	            :	statement statements
                         |   epsilon
 equal_to                :   EQUAL_TO post_equal_to | epsilon
@@ -54,7 +54,7 @@ compound_data_type	    :	LIST | TUP
 string	                :	TILDE STRING_LITERAL TILDE
 array	                :	basic_data_type IDENTIFIER OPEN_BRACKET NUM_LITERAL CLOSE_BRACKET
 
-# --------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 
 variable_declaration	:	basic_data_type IDENTIFIER equal_to
                         |   compound_array compound_var
@@ -73,14 +73,14 @@ assignment_statement	:	IDENTIFIER assignment_operators post_equal_to
 show_statement	        :	SHOW OPEN_PARENTHESIS expression expressions CLOSE_PARENTHESIS
 block	                :	OPEN_BRACES statements CLOSE_BRACES
 value_change_array	    :	IDENTIFIER OPEN_BRACKET NUM_LITERAL CLOSE_BRACKET assignment_operators expression
-#---------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 
 expressions             :   ELEMENT_SEPERATOR expression expressions
                         |   epsilon
 expression	            :   term terms | epsilon
 terms	                :	binary_operators term terms 
                         |   epsilon
-#---------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 term	                :   IDENTIFIER
                         |   NUM_LITERAL
                         |   string
@@ -91,7 +91,7 @@ term	                :   IDENTIFIER
                         |   IDENTIFIER UNARY_OPERATOR
                         |   IDENTIFIER OPEN_BRACKET expression CLOSE_BRACKET
                         |   LENGTH
-#---------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 binary_operators	    :	BINARY_OPERATOR 
                         |   COMPARISON_OPERATOR 
                         |   BINARY_LOGICAL_OPERATOR
@@ -99,7 +99,7 @@ unary_operators	        :	UNARY_OPERATOR
                         |   UNARY_LOGICAL_OPERATOR
 assignment_operators	:	EQUAL_TO
                         |   ASSIGNMENT_OPERATOR
-#---------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 conditional_block       :   yield_block 
                         |   block
 conditional_argument    :   special_function COMPARISON_OPERATOR expression
@@ -111,13 +111,13 @@ otherwise_block	        :	OTHERWISE conditional_block
                         |   epsilon
 skip_stop               :   SKIP
                         |   STOP
-#---------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 
 loop_statement	        :	ITER OPEN_PARENTHESIS statement expression END_OF_LINE expression CLOSE_PARENTHESIS block
                         |   WHILE OPEN_PARENTHESIS conditional_argument CLOSE_PARENTHESIS block
                         |   REPEAT block WHILE OPEN_PARENTHESIS conditional_argument CLOSE_PARENTHESIS END_OF_LINE
 
-#---------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 
 pop_statement           :   POP OPEN_PARENTHESIS string CLOSE_PARENTHESIS
 
@@ -125,13 +125,13 @@ try_catch_statement	    :	TEST block ARREST OPEN_PARENTHESIS string CLOSE_PARENT
 
 yield_block             :   OPEN_BRACES statements YIELD expression END_OF_LINE CLOSE_BRACES
 
-#---------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 
 function_call	        :	IDENTIFIER OPEN_PARENTHESIS argument_list CLOSE_PARENTHESIS
 
 argument_list	        :	expression expressions
 
-#---------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 let_in_braces           :   let_in CLOSE_BRACES
 let_in                  :   let_in_statement | expression
 let_in_statement	    :   LET data_type IDENTIFIER EQUAL_TO OPEN_BRACES let_in_braces
@@ -152,8 +152,7 @@ statement	            :	block
                         |   unary_operators IDENTIFIER END_OF_LINE
                         |   IDENTIFIER UNARY_OPERATOR END_OF_LINE
                         |   func_def
-
-
+# ---------------------------------------------------------------------------------------------------------------------
 epsilon :
 NUM: "NUM"
 STR: "STR"
@@ -207,6 +206,7 @@ BINARY_LOGICAL_OPERATOR: "BINARY_LOGICAL_OPERATOR"
 UNARY_LOGICAL_OPERATOR: "UNARY_LOGICAL_OPERATOR"
 TILDE: "TILDE"
 EQUAL_TO: "EQUAL_TO"
+# ---------------------------------------------------------------------------------------------------------------------
 %import common.NUMBER
 %import common.WS
 %ignore WS"""
@@ -303,7 +303,7 @@ define num main() {
     ## --test_num++;
     given(three){
     }
-    show(~);
+    show(~~);
     yield 0;
 }
     """
@@ -311,12 +311,13 @@ parser_lark_dir = os.path.dirname(__file__)
     
 testcase_folder_path = os.path.join(parser_lark_dir,"..", "testcases")
 sys.path.append(testcase_folder_path)
-for p in sys.path:
-    print(p)
+# for p in sys.path:
+#     print(p)
 
 # code = read_geko_file(os.path.join(testcase_folder_path, "testcase5.geko"))
 
 tokens = lexer_lark.lexer(code)
+    
 # print(type(tokens))
 # for token in tokens:
 #     print(type(token), "-->", token)
@@ -338,15 +339,15 @@ for token in tokens:
 # print(type(tokenised_code), "-->" , tokenised_code)
 # tree = parser.parse(code)
 tree = parser.parse(tokenised_code)
-print("Parsed tree:\n", tree.pretty())
-# try:
-#     # Parse the input code
-#     parser.parse(code)
-#     # If parsing is successful, print success message
-#     print("Parsing successful!")
-# except UnexpectedToken as e:
-#     # If parsing fails, print the error
-#     print("Parsing error:", e)
+# print("Parsed tree:\n", tree.pretty())
+try:
+    # Parse the input code
+    parser.parse(tokenised_code)
+    # If parsing is successful, print success message
+    print("Parsing successful!")
+except UnexpectedToken as e:
+    # If parsing fails, print the error
+    print("Parsing error:", e)
 
 # --------------------------------------
 # IDENTIFIER: /[a-zA-Z_][a-zA-Z0-9_]*/

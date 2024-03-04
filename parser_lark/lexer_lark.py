@@ -68,6 +68,7 @@ patterns = [
     #.* matches any sequence of characters until the end of the line
 
     ('STRING_LITERAL', r'~(?:[^~\\]|\\.)*~'),
+    ('TILDE', r'~'),
     #matches strings enclosed within tilde (~) characters while allowing for the presence of escaped tildes and other characters
     #[^~\\] matches any character that is not a tilde (~) or a backslash (\)
     #\\. matches an escaped character (any character preceded by a backslash)
