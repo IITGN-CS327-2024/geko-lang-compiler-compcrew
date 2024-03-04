@@ -7,7 +7,10 @@ def grammar_1():
         ]),
         NonTerminal('program', [
             "DEFINE NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_BRACES statements YIELD NUM_LITERAL END_OF_LINE CLOSE_BRACES",
-            "DEFINE function_type IDENTIFIER OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS function_block program"
+            " func_def program"
+        ]),
+        NonTerminal('func_def', [
+            "DEFINE function_type IDENTIFIER OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS function_block"
         ]),
 #-------------------------------------------------------
         NonTerminal('function_block', [
@@ -20,7 +23,7 @@ def grammar_1():
             "parameter parameters", "epsilon"
         ]),
         NonTerminal('return_value', [
-            "NUM_LITERAL", "string", "YAY", "NAY", "epsilon"
+            "expression","function_call"
         ]),
         NonTerminal('parameters', [
             "ELEMENT_SEPERATOR parameter parameters", "epsilon"
@@ -39,12 +42,17 @@ def grammar_1():
         ]),
         NonTerminal('post_equal_to', [
             "ENTER OPEN_PARENTHESIS string CLOSE_PARENTHESIS",
+            "special_function",
+            "let_in_statement",
+            "expression"
+        ]),
+        NonTerminal('special_function', [
             "IDENTIFIER OPEN_BRACKET NUM_LITERAL SLICING_COLON NUM_LITERAL CLOSE_BRACKET",
-            "LENGTH OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS",
-            "IDENTIFIER OPEN_BRACKET NUM_LITERAL CLOSE_BRACKET",
-            "HEAD OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS",
-            "ISEMPTY OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS",
-            "function_call","let_in_statement", "expression"
+                        "LENGTH OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS",
+                        "IDENTIFIER OPEN_BRACKET NUM_LITERAL CLOSE_BRACKET",
+                        "HEAD OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS",
+                        "ISEMPTY OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS",
+                        "function_call"
         ]),
         NonTerminal('data_type', [
             "basic_data_type", "compound_data_type", "epsilon"
@@ -103,14 +111,14 @@ def grammar_1():
 #---------------------------------------
         NonTerminal('expressions', [
             " ELEMENT_SEPERATOR expression expressions"
-                , "epsilon"
+            , "epsilon"
         ]),
         NonTerminal('expression', [
             "term terms" , "epsilon"
         ]),
         NonTerminal('terms', [
             "binary_operators term terms" 
-                ,   "epsilon"
+            ,   "epsilon"
         ]),
 #---------------------------------------
         NonTerminal('term', [
@@ -123,6 +131,7 @@ def grammar_1():
             ,   "unary_operators IDENTIFIER"
             ,   "IDENTIFIER UNARY_OPERATOR"
             ,   "IDENTIFIER OPEN_BRACKET expression CLOSE_BRACKET"
+            ,   "LENGTH"
         ]),
 #-----------------------------------------------------------------------
         NonTerminal('binary_operators', [
@@ -138,11 +147,15 @@ def grammar_1():
         NonTerminal('conditional_block',[
             "yield_block", "block"
         ]),
+        NonTerminal('conditional_argument',[
+        "special_function COMPARISON_OPERATOR expression"
+        ,"expression"
+        ]),
         NonTerminal('conditional_statement',[
-            "GIVEN OPEN_PARENTHESIS expression CLOSE_PARENTHESIS conditional_block other_block otherwise_block"
+            "GIVEN OPEN_PARENTHESIS conditional_argument CLOSE_PARENTHESIS conditional_block other_block otherwise_block"
         ]),
         NonTerminal('other_block',[
-            "OTHER OPEN_PARENTHESIS expression CLOSE_PARENTHESIS conditional_block other_block","epsilon"
+            "OTHER OPEN_PARENTHESIS conditional_argument CLOSE_PARENTHESIS conditional_block other_block","epsilon"
         ]),
         NonTerminal('otherwise_block',[
             "OTHERWISE conditional_block","epsilon"
@@ -153,8 +166,8 @@ def grammar_1():
 #---------------------------------------------------------------
         NonTerminal('loop_statement',[
             "ITER OPEN_PARENTHESIS statement expression END_OF_LINE expression CLOSE_PARENTHESIS block",
-            "WHILE OPEN_PARENTHESIS expression CLOSE_PARENTHESIS block",
-            "REPEAT block WHILE OPEN_PARENTHESIS expression CLOSE_PARENTHESIS END_OF_LINE"
+            "WHILE OPEN_PARENTHESIS conditional_argument CLOSE_PARENTHESIS block",
+            "REPEAT block WHILE OPEN_PARENTHESIS conditional_argument CLOSE_PARENTHESIS END_OF_LINE"
         ]),
 #-------------------------------------------------------------------
         NonTerminal('pop_statement',[
@@ -200,7 +213,8 @@ def grammar_1():
             "try_catch_statement",
             "function_call END_OF_LINE",
             "unary_operators IDENTIFIER END_OF_LINE",
-            "IDENTIFIER UNARY_OPERATOR END_OF_LINE"
+            "IDENTIFIER UNARY_OPERATOR END_OF_LINE",
+            "func_def"
         ]),
 #---------------------------------------------------------------
         NonTerminal('epsilon',['']),
