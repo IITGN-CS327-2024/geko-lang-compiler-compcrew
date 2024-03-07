@@ -1,8 +1,0 @@
-define num main(){
-	## This is a comment;
-    num digits [6] = [1,2,3,4,5,7];
-    a = 2+digit[3];
-    a = 2+ digit[3];
-	show(Calculator program~);
-	yield 0;
-}
