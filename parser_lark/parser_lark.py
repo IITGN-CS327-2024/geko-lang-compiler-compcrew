@@ -319,7 +319,12 @@ sys.path.append(testcase_folder_path)
 # for p in sys.path:
 #     print(p)
 
-code = read_geko_file(os.path.join(testcase_folder_path, "testcase6.geko"))
+# code = read_geko_file(os.path.join(testcase_folder_path, "testcase6.geko"))
+if len(sys.argv) != 2:
+    print("Usage: python parser_lark.py <path to geko file>")
+    sys.exit(1)
+geko_file_path = sys.argv[-1]
+code = read_geko_file(geko_file_path)
 
 tokens = lexer_lark.lexer(code)
     
