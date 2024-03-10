@@ -5,6 +5,10 @@ import re
 import lexer_lark
 import sys
 import os
+#---------------------------------------
+import lark
+import pydot
+from IPython.display import display
 
 def read_geko_file(file_path):
     with open(file_path, 'r') as file:
@@ -206,7 +210,7 @@ EQUAL_TO: "EQUAL_TO"
 
 #----------------------------------------------------------------------------------------------------------------------------
 # Create the Lark parser
-parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = CustomLexer)
+parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 code = """
 define void meow(num test_num, flag test_bool){
     given(test_num == 3){
@@ -342,6 +346,18 @@ for token in tokens:
 # tree = parser.parse(code)
 tree = parser.parse(tokenised_code)
 print("Parsed tree:\n", tree.pretty())
+# --------------------------------------
+graph_of_tree = lark.tree.pydot__tree_to_graph(tree)
+# graph_of_tree.write_png("tree.png")
+graph = pydot.graph_from_dot_data(lark.tree.pydot__tree_to_graph(tree).to_string())
+# display(graph[0])
+png_name = "parse_tree.png"
+graph[0].write_png(png_name)
+
+# function toh chal gaya
+#---------------------------------------
+# print(type(graph_of_tree))
+#---------------------------------------
 # try:
 #     # Parse the input code
 #     parser.parse(code)
