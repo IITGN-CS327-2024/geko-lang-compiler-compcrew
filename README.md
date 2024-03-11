@@ -12,8 +12,17 @@
 
 ## LEXER:
 
-- The lexer file is named as lexer.py, and all the tescases are also nested under the testcases folder.
+- The lexer file is named lexer.py, and all the tescases are also nested under the testcases folder.
 - Each test file has the .geko extension, unique to our Geko language.
 - Peek into lexer.py for more information on how lexer.py works.
 
 NOTE: For viewing the updated version, please go into the "lexer" folder, and have a look at the README file for instructions on how to run our lexer.
+
+## PARSER:
+
+- The final parser we are using is ./parser_lark/parser_lark.py
+- All the test cases (correct and incorrect) are also nested under the respective testcases folder (inside ./parser_lark).
+- Similar to lexer.py, peek into ./parser_lark and have a read of the README.md file, to understand the workings of our parser.
+
+NOTE: Similar to the lexer, the updated instructions on how to run our parser are posted under ./parser_lark inside the readme file.
+
