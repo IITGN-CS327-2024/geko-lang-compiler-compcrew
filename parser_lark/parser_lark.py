@@ -5,7 +5,7 @@ import re
 import lexer_lark
 import sys
 import os
-#---------------------------------------
+#----------------------------------------------------------------------------------------------------------------------------
 import lark
 import pydot
 from IPython.display import display
@@ -13,7 +13,186 @@ from IPython.display import display
 def read_geko_file(file_path):
     with open(file_path, 'r') as file:
         return file.read()
+    
+# --------------------------------------------------------------------------------------------
+    
+# we have to perform dfs on the tree to get the leaf nodes and then we can append the value
+def dfs(tree_node, leaf_nodes):
+    if isinstance(tree_node, Token):
+        leaf_nodes.append(tree_node)
+    else:
+        for child in tree_node.children:
+            dfs(child, leaf_nodes)
 
+# --------------------------------------------------------------------------------------------
+
+# DO NOT USE THIS FUNCTION
+def iterate_tree_1(tree_node, tokens):
+    if isinstance(tree_node, lark.Tree):
+        for child in tree_node.children:
+            iterate_tree_1(child, tokens)
+    else:
+        # Handle leaf nodes (tokens)
+        if isinstance(tree_node, Token):
+            print("Token value:", tree_node.value)
+            new_token = tokens.pop(0)
+            new_node = Token(new_token[0], new_token[1])
+            index = parent.children.index(tree_node)
+            
+            parent.children[index+1] = new_node
+            
+            print("New token value:", new_token[1])
+
+        else:
+            print("Unknown leaf node type:", tree_node)
+
+# -------------------------------------------------------------------------------------------- 
+
+# DO NOT USE THIS FUNCTION
+def iterate_tree_2(tree_node):
+    if isinstance(tree_node, lark.Tree):
+        for child in tree_node.children:
+            yield from iterate_tree_2(child)
+    else:
+        # Handle leaf nodes (tokens)
+        if isinstance(tree_node, lark.Token):
+            print("Token value:", tree_node.value)
+            
+            # Add a new node after the leaf node
+            new_node = lark.Token("example_type", "example")
+            yield tree_node  # Yield the current leaf node
+            yield new_node   # Yield the new node after the leaf node
+        else:
+            print("Unknown leaf node type:", tree_node)
+
+# --------------------------------------------------------------------------------------------
+
+# DO NOT USE THIS FUNCTION            
+def iterate_tree_3(tree_node, path=None):
+    i = 0
+    if path is None:
+        path = []  # Initialize the path list
+
+    if isinstance(tree_node, lark.Tree):
+        for i, child in enumerate(tree_node.children):
+            iterate_tree_3(child, path=path+[i])  # Append the index to the path
+            i += 1
+            if i == 100:
+                return
+    else:
+        i += 1
+        if i == 100:
+            return
+        # Handle leaf nodes (tokens)
+        if isinstance(tree_node, lark.Token):
+            print("Token value:", tree_node.value)
+            
+            # Find the parent node based on the path
+            parent = tree
+            for index in path[:-1]:
+                parent = parent.children[index]
+                i += 1
+                if i == 100:
+                    return
+
+            # Add a new node after the leaf node
+            new_node = lark.Token("example_type", "example")
+            index = path[-1]  # Last index in the path corresponds to the leaf node
+            parent.children.insert(index + 1, new_node)
+            print("New node added after the leaf node:", new_node)
+            i += 1
+            if i == 100:
+                return
+        else:
+            print("Unknown leaf node type:", tree_node)
+            i += 1
+            if i == 100:
+                return
+            
+# --------------------------------------------------------------------------------------------
+# DO NOT USE THESE FUNCTIONS
+            
+def traverse_tree(tree_node, path=None):
+    i = 0
+    if path is None:
+        path = []  # Initialize the path list
+
+    if isinstance(tree_node, lark.Tree):
+        for i, child in enumerate(tree_node.children):
+            traverse_tree(child, path=path+[i])  # Append the index to the path
+            i += 1
+            if i == 100:
+                return
+
+    else:
+        i += 1
+        if i == 100:
+            return
+        # Handle leaf nodes (tokens)
+        if isinstance(tree_node, lark.Token):
+            print("Token value:", tree_node.value)
+            add_new_node(tree, path)
+            i += 1
+            if i == 100:
+                return
+
+def add_new_node(tree_node, path):
+    # Find the parent node based on the path
+    parent = tree_node
+    for index in path[:-1]:
+        parent = parent.children[index]
+
+    # Add a new node after the leaf node
+    new_node = lark.Token("example_type", "example")
+    index = path[-1]  # Last index in the path corresponds to the leaf node
+    parent.children.insert(index + 1, new_node)
+    print("New node added after the leaf node:", new_node)
+
+# --------------------------------------------------------------------------------------------
+
+# DO NOT USE THIS FUNCTION
+def get_parent(graph, leaf_node):
+    for edge in graph.get_edges():
+        if edge.get_destination() == leaf_node.get_name():
+            return edge.get_source()
+    return None
+
+# --------------------------------------------------------------------------------------------
+
+# USE THIS FUNCTION, THIS WORKS:
+def final_iteration(tree_node, tokens,graph, parent_node=None):
+    if isinstance(tree_node, lark.Tree):
+        for child in tree_node.children:
+            final_iteration(child, tokens,graph, parent_node=tree_node)
+            # ye to ho gaya childs ka
+    else:
+        # Handle leaf nodes (tokens)
+        if isinstance(tree_node, lark.Token):
+            # print("Token type & value:",tree_node.type,' ', tree_node.value)
+            new_token = tokens.pop(0)
+            # print(new_token)
+            # print(type(new_token))
+            new_node = (new_token[0], new_token[1])
+            tree_node.value = new_node[1]
+            # print(type(new_node))
+            # new_node = pydot.Node(type=new_token[0], label=new_token[1])
+            # print(new_node)
+            # print(type(new_node))
+            # if parent_node:
+            # edge = pydot.Edge(parent_node, new_node)
+                # print(type(parent_node))
+            # graph.add_edge(edge)
+                
+            # parent.children[index+1] = new_node
+            
+            # print("New token type and value:", tree_node.type, ' ', tree_node.value)
+
+        else:
+            print("Unknown leaf node type:", tree_node)
+    # return graph
+# --------------------------------------------------------------------------------------------
+            
+# Grammar for the parser
 grammar = """
 start                   :   program
 program	                :	DEFINE NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_BRACES statements YIELD NUM_LITERAL END_OF_LINE CLOSE_BRACES
@@ -209,6 +388,7 @@ EQUAL_TO: "EQUAL_TO"
 %ignore WS"""
 
 #----------------------------------------------------------------------------------------------------------------------------
+
 # Create the Lark parser
 parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 code = """
@@ -308,14 +488,14 @@ define num main() {
     yield 0;
 }
     """
+
+# ----------------------------------------------------------------------------------------------------------------------------
+
 parser_lark_dir = os.path.dirname(__file__)
     
 testcase_folder_path = os.path.join(parser_lark_dir,"..", "testcases")
 sys.path.append(testcase_folder_path)
-# for p in sys.path:
-#     print(p)
 
-# code = read_geko_file(os.path.join(testcase_folder_path, "testcase6.geko"))
 if len(sys.argv) != 2:
     print("Usage: python parser_lark.py <path to geko file>")
     sys.exit(1)
@@ -324,6 +504,7 @@ code = read_geko_file(geko_file_path)
 
 tokens = lexer_lark.lexer(code)
     
+# ----------------------------------------------------------------------------------------------------------------------------
 # print(type(tokens))
 # for token in tokens:
 #     print(type(token), "-->", token)
@@ -337,42 +518,84 @@ tokens = lexer_lark.lexer(code)
 
 # for token in tokens:
 #     print(type(token), "-->", token)
+# ----------------------------------------------------------------------------------------------------------------------------
+
 tokenised_code = ""
 
 for token in tokens:
     # print(type(token[0]))
     tokenised_code += token[0] + " "
+
+#---------------------------------------
 # print(type(tokenised_code), "-->" , tokenised_code)
 # tree = parser.parse(code)
 tree = parser.parse(tokenised_code)
-print("Parsed tree:\n", tree.pretty())
+# print("Parsed tree:\n", tree.pretty())
+
 # --------------------------------------
+
 graph_of_tree = lark.tree.pydot__tree_to_graph(tree)
+
+#---------------------------------------
 # graph_of_tree.write_png("tree.png")
+
 graph = pydot.graph_from_dot_data(lark.tree.pydot__tree_to_graph(tree).to_string())
+# function toh chal gaya
+print(type(graph[0]))
+#----------------------------------------------------------------------------------------------------------------------------
+
 # display(graph[0])
 png_name = "parse_tree.png"
 graph[0].write_png(png_name)
 
-# function toh chal gaya
-#---------------------------------------
-# print(type(graph_of_tree))
-#---------------------------------------
-# try:
-#     # Parse the input code
-#     parser.parse(code)
-#     # If parsing is successful, print success message
-#     print("Parsing successful!")
-# except UnexpectedToken as e:
-#     # If parsing fails, print the error
-#     print("Parsing error:", e)
+# graph bhi chal gaya!
+#----------------------------------------------------------------------------------------------------------------------------
 
-# --------------------------------------
-# IDENTIFIER: /[a-zA-Z_][a-zA-Z0-9_]*/
-# ASSIGNMENT_OPERATOR: "="
-# BINARY_OPERATOR: "+" | "-" | "*" | "/" 
-# NUM_LITERAL: /-?\d+/
-# OPEN_PARENTHESIS: "("
-# CLOSE_PARENTHESIS: ")"
-# END_OF_LINE: ";"
-# --------------------------------------
+leaf_nodes = []
+
+dfs(tree, leaf_nodes)
+# print("Old tree:\n",leaf_nodes)
+
+#----------------------------------------------------------------------------------------------------------------------------
+# iterating over tree to add new leaf nodes:
+# iterate_tree_1(tree,tokens)
+
+# for node in iterate_tree_2(tree):
+    # print(node)
+
+# iterate_tree_3(tree)
+# traverse_tree(tree)
+# ----------------------------------------------------------------------------------------------------------------------------
+
+
+# Final function to be used: 
+final_iteration(tree, tokens, graph=graph[0])
+
+# ----------------------------------------------------------------------------------------------------------------------------
+
+leaf_nodes_new = []
+dfs(tree, leaf_nodes_new)
+
+# ----------------------------------------------------------------------------------------------------------------------------
+
+# print("----------------------------------------------------------------------------------------------------------------------------")
+# DEBUGGING:
+# print("New tree:\n",leaf_nodes_new)
+# print("----------------------------------------------------------------------------------------------------------------------------")
+# for node in tree.children:
+    # print(node)
+# print(tree.pretty())
+# print("----------------------------------------------------------------------------------------------------------------------------")
+# for node in tree.children:
+    # print(node)
+# print(type(tree))
+
+# --------------------------------------------------------------------------------------------
+
+# FINAL GRAPH:
+graph_of_tree_modified = pydot.graph_from_dot_data(lark.tree.pydot__tree_to_graph(tree).to_string())
+
+# Writing the graph to a PNG file
+png_name = "modified_parse_tree.png"
+graph_of_tree_modified[0].write_png(png_name)
+print("The modified parse tree has been written to", png_name, "inside ./correct_testcases")
