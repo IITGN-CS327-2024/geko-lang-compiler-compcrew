@@ -1,3 +1,10 @@
+### SOME CONSTRAINTS THAT GEKO LANGUAGE FOLLOWS
+1. Geko does not have global variable declaration outside main function
+2. For functions in Geko, they MUST return some value according to the data_type defined for a function
+3. Geko does not return array, list, or tuple directly
+4. By default, the outputs to the show statements will be shown in different lines
+5. No default values can be given in the parameter_list in function
+
 ### GENERAL POINTS
 The file **parser_lark.py** has to be run to parse the original code after tokeninzing it. It will generate the parse tree (in the format of lark) if the code is parsed successfully and gives the respective error.
 
