@@ -168,9 +168,10 @@ num main() {
     ##testVar %= y5;
     show(~ me \~ me ~)
     yield 0;
+    }
 
 '''
-
+# tokens = lexer(example_code)
 def print_table(nested_tuple):
     # Find the maximum length of each column
     max_len_col1 = max(len(item[0]) for item in nested_tuple)
@@ -186,3 +187,5 @@ def print_table(nested_tuple):
 
 # Call the function to print the table
 # print_table(tokens)
+for token in tokens:
+    print(token)
