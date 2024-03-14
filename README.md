@@ -22,6 +22,7 @@ NOTE: For viewing the updated version, please go into the "lexer" folder, and ha
 
 - The final parser we are using is ./parser_lark/parser_lark.py
 - All the test cases (correct and incorrect) are also nested under the respective testcases folder (inside ./parser_lark).
+- To get the graph of our obtained parse tree, you need to have graphwiz installed in your system. Please do so by visiting [here](https://gitlab.com/api/v4/projects/4207231/packages/generic/graphviz-releases/10.0.1/windows_10_cmake_Release_graphviz-install-10.0.1-win64.exe)
 - Similar to lexer.py, peek into ./parser_lark and have a read of the README.md file, to understand the workings of our parser.
 
 NOTE: Similar to the lexer, the updated instructions on how to run our parser are posted under ./parser_lark inside the readme file.
