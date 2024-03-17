@@ -14,11 +14,13 @@ from lark import Transformer, v_args
 from dataclasses import dataclass
 # ----------------------------------------------------------------------------------------------------------------------------
 
+from dataclasses import dataclass
+
+# ----------------------------------------------------------------------------------------------------------------------------
 # Dataclasses for the AST
 @dataclass
 class Program:
     statements: list
-    line: int
 
 @dataclass
 class FunctionDefinition:
@@ -26,114 +28,101 @@ class FunctionDefinition:
     identifier: str
     parameters: list
     function_block: list
-    line: int
 
 @dataclass
 class StatementBlock:
     statements: list
-    line: int
 
 @dataclass
 class Statement:
     statement: object
-    line: int
 
 @dataclass
 class Assignment:
     variable: str
     expression: object
-    line: int
 
 @dataclass
 class IfStatement:
     condition: object
     body: object
-    line: int
 
 @dataclass
 class FunctionCall:
     function_name: str
     arguments: list
-    line: int
 
 @dataclass
 class ShowStatement:
     expression: object
-    line: int
 
 @dataclass
 class ValueChangeArray:
     identifier: str
     index: int
     expression: object
-    line: int
 
 @dataclass
 class PopStatement:
     identifier: str
-    line: int
 
 @dataclass
 class TryCatchStatement:
     test_block: object
     exception_name: str
     arrest_block: object
-    line: int
 
 @dataclass
 class YieldBlock:
     statements: list
     expression: object
-    line: int
 
 @dataclass
 class ArgumentList:
     arguments: list
-    line: int
 
 @dataclass
 class LetInBraces:
     statement: object
-    line: int
 
 @dataclass
 class LetIn:
     data_type: str
     identifier: str
     expression: object
-    line: int
 
 @dataclass
 class LetInStatement:
     let_ins: list
-    line: int
 
 @dataclass
 class LoopStatement:
     loop_type: str
     statement: object
     condition: object
-    line: int
 
 @dataclass
 class SkipStop:
     command: str
-    line: int
 
+# ----------------------------------------------------------------------------------------------------------------------------
+
+# Transformer class
+@v_args(inline=True)
 # Transformer class
 @v_args(inline=True)
 class MyTransformer(Transformer):
     def start(self, *args):
-        return Program(args[0], args[0].line)
+        return Program(args[0])
 
     def func_def(self, *args):
         return FunctionDefinition(*args)
 
     def statements(self, *args):
-        return StatementBlock(args, args[0].line)
+        return StatementBlock(args)
 
     def statement(self, *args):
-        return Statement(args[0], args[0].line)
+        return Statement(args[0])
 
     def assignment_statement(self, *args):
         return Assignment(*args)
@@ -160,7 +149,7 @@ class MyTransformer(Transformer):
         return YieldBlock(*args)
 
     def argument_list(self, *args):
-        return ArgumentList(args, args[0].line)
+        return ArgumentList(args)
 
     def let_in_braces(self, *args):
         return LetInBraces(*args)
@@ -171,68 +160,13 @@ class MyTransformer(Transformer):
     def let_in_statement(self, *args):
         return LetInStatement(*args)
 
-    def expression(self, *args):
-        if args:
-            return args[0]
-
-    def term(self, *args):
-        if args:
-            return args[0]
-
-    def expressions(self, *args):
-        return args if args else []
-
-    def terms(self, *args):
-        return args if args else []
-
-    def parameters(self, *args):
-        return args if args else []
-
-    def parameter_list(self, *args):
-        return args if args else []
-
-    def return_value(self, *args):
-        return args[0] if args else None
-
-    def choose_array(self, *args):
-        return args[0] if args else None
-
-    def compound_element(self, *args):
-        return args[0] if args else None
-
-    def compound_var(self, *args):
-        return args[0] if args else None
-
-    def compound_array(self, *args):
-        return args[0] if args else None
-
-    def binary_operators(self, *args):
-        return args[0] if args else None
-
-    def unary_operators(self, *args):
-        return args[0] if args else None
-
-    def assignment_operators(self, *args):
-        return args[0] if args else None
-
-    def conditional_argument(self, *args):
-        return args[0] if args else None
-
-    def conditional_block(self, *args):
-        return args[0] if args else None
-
-    def other_block(self, *args):
-        return args[0] if args else None
-
-    def otherwise_block(self, *args):
-        return args[0] if args else None
-
     def loop_statement(self, *args):
         return LoopStatement(*args)
 
     def skip_stop(self, *args):
         return SkipStop(*args)
 
+    # Other methods...
 # ----------------------------------------------------------------------------------------------------------------------------
 
 def read_geko_file(file_path):
@@ -468,6 +402,102 @@ EQUAL_TO: "EQUAL_TO"
 
 # Create the Lark parser
 parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
+
+code = """
+define num main(){
+    given(meow){
+        num x = 4;
+    }
+	yield 0;
+}
+"""
+
+# ----------------------------------------------------------------------------------------------------------------------------
+
+parser_lark_dir = os.path.dirname(__file__)
+tokens = lexer_lark.lexer(code)
+
+# ----------------------------------------------------------------------------------------------------------------------------
+
+tokenised_code = ""
+
+for token in tokens:
+    # print(type(token[0]))
+    tokenised_code += token[0] + " "
+
+#---------------------------------------
+
+tree = parser.parse(tokenised_code)
+
+# parser = Lark(grammar)
+tree = parser.parse(tokenised_code)
+transformer = MyTransformer()
+ast = transformer.transform(tree)
+print(ast)
+print(type(ast))
+
+# --------------------------------------
+
+# graph_of_tree = lark.tree.pydot__tree_to_graph(tree)
+
+#---------------------------------------
+
+# graph = pydot.graph_from_dot_data(lark.tree.pydot__tree_to_graph(tree).to_string())
+# function toh chal gaya
+# print(type(graph[0]))
+
+#----------------------------------------------------------------------------------------------------------------------------
+
+# png_name = "parse_tree.png"
+# graph[0].write_png(png_name)
+
+# graph bhi chal gaya!
+#----------------------------------------------------------------------------------------------------------------------------
+
+# leaf_nodes = []
+# dfs(tree, leaf_nodes)
+
+# ----------------------------------------------------------------------------------------------------------------------------
+
+# Final function to be used: 
+# final_iteration(tree, tokens, graph=graph[0])
+
+# ----------------------------------------------------------------------------------------------------------------------------
+
+# leaf_nodes_new = []
+# dfs(tree, leaf_nodes_new)
+
+# ----------------------------------------------------------------------------------------------------------------------------
+
+# FINAL GRAPH:
+# graph_of_tree_modified = pydot.graph_from_dot_data(lark.tree.pydot__tree_to_graph(tree).to_string())
+# # Writing the graph to a PNG file
+# png_name = "modified_parse_tree.png"
+# graph_of_tree_modified[0].write_png(png_name)
+# print("The modified parse tree has been written to", png_name, "inside ./correct_testcases")
+
+# ----------------------------------------------------------------------------------------------------------------------------
+# ast ke liye code: 
+# printing the AST:
+
+def print_ast(node, indent=0):
+    print("  " * indent + str(node))
+    if isinstance(node, list):
+        for child in node:
+            print_ast(child, indent + 1)
+    elif isinstance(node, tuple) and len(node) > 1:
+        for child in node[1:]:
+            print_ast(child, indent + 1)
+    elif isinstance(node, dict):
+        for key, value in node.items():
+            print("  " * (indent + 1) + str(key) + ":")
+            print_ast(value, indent + 2)
+
+# Assuming 'ast' is the variable holding the AST
+# print_ast(ast, indent=2)
+
+
+# bas reference ke liye, abhi iska kuch nahi karna   
 code = """
 define void meow(num test_num, flag test_bool){
     given(test_num == 3){
@@ -565,72 +595,3 @@ define num main() {
     yield 0;
 }
     """
-
-code = """
-define num main(){
-	yield 0;
-}
-"""
-
-# ----------------------------------------------------------------------------------------------------------------------------
-
-parser_lark_dir = os.path.dirname(__file__)
-tokens = lexer_lark.lexer(code)
-
-# ----------------------------------------------------------------------------------------------------------------------------
-
-tokenised_code = ""
-
-for token in tokens:
-    # print(type(token[0]))
-    tokenised_code += token[0] + " "
-
-#---------------------------------------
-
-tree = parser.parse(tokenised_code)
-
-# parser = Lark(grammar)
-tree = parser.parse(tokenised_code)
-transformer = MyTransformer()
-ast = transformer.transform(tree)
-print(ast)
-
-# --------------------------------------
-
-# graph_of_tree = lark.tree.pydot__tree_to_graph(tree)
-
-#---------------------------------------
-
-# graph = pydot.graph_from_dot_data(lark.tree.pydot__tree_to_graph(tree).to_string())
-# function toh chal gaya
-# print(type(graph[0]))
-
-#----------------------------------------------------------------------------------------------------------------------------
-
-# png_name = "parse_tree.png"
-# graph[0].write_png(png_name)
-
-# graph bhi chal gaya!
-#----------------------------------------------------------------------------------------------------------------------------
-
-# leaf_nodes = []
-# dfs(tree, leaf_nodes)
-
-# ----------------------------------------------------------------------------------------------------------------------------
-
-# Final function to be used: 
-# final_iteration(tree, tokens, graph=graph[0])
-
-# ----------------------------------------------------------------------------------------------------------------------------
-
-# leaf_nodes_new = []
-# dfs(tree, leaf_nodes_new)
-
-# ----------------------------------------------------------------------------------------------------------------------------
-
-# FINAL GRAPH:
-# graph_of_tree_modified = pydot.graph_from_dot_data(lark.tree.pydot__tree_to_graph(tree).to_string())
-# # Writing the graph to a PNG file
-# png_name = "modified_parse_tree.png"
-# graph_of_tree_modified[0].write_png(png_name)
-# print("The modified parse tree has been written to", png_name, "inside ./correct_testcases")
