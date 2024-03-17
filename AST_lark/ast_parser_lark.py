@@ -15,27 +15,58 @@ from dataclasses import dataclass
 # ----------------------------------------------------------------------------------------------------------------------------
 
 from dataclasses import dataclass
+from typing import *
 
 # ----------------------------------------------------------------------------------------------------------------------------
 # Dataclasses for the AST
+
+# class Program:
+#     statements: list
 @dataclass
 class Program:
-    statements: list
+    elements: List[Union['Statement', 'FunctionDefinition']]
+
+@dataclass
+# class FunctionDefinition:
+#     function_type: str
+#     identifier: str
+#     parameters: list
+#     function_block: list
 
 @dataclass
 class FunctionDefinition:
     function_type: str
     identifier: str
-    parameters: list
-    function_block: list
+    parameters: list ['Parameter']
+    function_block: List ['Statement']
+    return_val : List ['Yield']
+    # line: int
 
 @dataclass
-class StatementBlock:
-    statements: list
+class Parameter:
+    parameter_type: str
+    parameter_val: str
+    # line: int
+
+@dataclass
+class Yield:
+    yield_type: str
+    yield_value: object 
+    # line: int
+
+
+# @dataclass
+# class StatementBlock:
+#     statements: list
+
+# @dataclass
+# class Statement:
+#     statement: object
 
 @dataclass
 class Statement:
-    statement: object
+    statement: object #how to give array?
+    # line: int
 
 @dataclass
 class Assignment:
@@ -54,7 +85,9 @@ class FunctionCall:
 
 @dataclass
 class ShowStatement:
-    expression: object
+    # expression: object
+    expression: Any
+
 
 @dataclass
 class ValueChangeArray:
@@ -109,8 +142,6 @@ class SkipStop:
 
 # Transformer class
 @v_args(inline=True)
-# Transformer class
-@v_args(inline=True)
 class MyTransformer(Transformer):
     def start(self, *args):
         return Program(args[0])
@@ -118,14 +149,14 @@ class MyTransformer(Transformer):
     def func_def(self, *args):
         return FunctionDefinition(*args)
 
-    def statements(self, *args):
-        return StatementBlock(args)
+    # def statements(self, *args):
+    #     return StatementBlock(args)
 
     def statement(self, *args):
         return Statement(args[0])
 
     def assignment_statement(self, *args):
-        return Assignment(*args)
+        return Assignment(*args[1:])
 
     def if_statement(self, *args):
         return IfStatement(*args)
@@ -134,8 +165,8 @@ class MyTransformer(Transformer):
         return FunctionCall(*args)
 
     def show_statement(self, *args):
-        return ShowStatement(*args)
-
+    # Assuming expression and location are the first two arguments in args
+        return ShowStatement(args)
     def value_change_array(self, *args):
         return ValueChangeArray(*args)
 
@@ -146,7 +177,7 @@ class MyTransformer(Transformer):
         return TryCatchStatement(*args)
 
     def yield_block(self, *args):
-        return YieldBlock(*args)
+        return YieldBlock(*args[1:-3])
 
     def argument_list(self, *args):
         return ArgumentList(args)
@@ -161,7 +192,7 @@ class MyTransformer(Transformer):
         return LetInStatement(*args)
 
     def loop_statement(self, *args):
-        return LoopStatement(*args)
+        return LoopStatement(*args[2:])
 
     def skip_stop(self, *args):
         return SkipStop(*args)
@@ -434,7 +465,7 @@ tree = parser.parse(tokenised_code)
 transformer = MyTransformer()
 ast = transformer.transform(tree)
 print(ast)
-print(type(ast))
+# print(type(ast))
 
 # --------------------------------------
 
