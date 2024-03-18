@@ -196,8 +196,69 @@ class MyTransformer(Transformer):
 
     def skip_stop(self, *args):
         return SkipStop(*args)
+# ----------------------------------------------------------------------------------------------------------------------------
+    
+class GEKOTransformer(Transformer):
+    def program(self, items):
+        if len(items) == 1:
+            return ['function_definition', items[0]]
+        else:
+            return ['main_function', items[4], items[6]]
 
-    # Other methods...
+    def func_def(self, items):
+        return {
+            'function_type': items[1],
+            'function_name': items[2],
+            'parameters': items[4],
+            'function_body': items[6]
+        }
+
+    def function_block(self, items):
+        return items[1:-2]  # Return the statements and yield expression
+
+    def parameter_list(self, items):
+        return items
+
+    def parameters(self, items):
+        if items:
+            return items
+        else:
+            return []
+
+    def parameter(self, items):
+        return items
+
+    def statements(self, items):
+        if items:
+            statements = []
+            for item in items:
+                if isinstance(item, list):
+                    statements.extend(item)
+                else:
+                    statements.append(item)
+            return statements
+        else:
+            return []
+
+    def expression(self, items):
+        if items:
+            return items[0]
+        else:
+            return None
+# -->
+
+def __default__(self, data, children, meta):
+    # Ignore redundant nodes like parentheses, braces, etc.
+    if hasattr(meta, 'expr'):
+        node_name = meta.expr.name
+    else:
+        node_name = meta.data  # Fallback to using meta.data if expr is not available
+
+    if node_name in ['OPEN_BRACES', 'CLOSE_BRACES']:
+        return children
+    else:
+        return data
+
 # ----------------------------------------------------------------------------------------------------------------------------
 
 def read_geko_file(file_path):
@@ -463,24 +524,27 @@ tree = parser.parse(tokenised_code)
 # parser = Lark(grammar)
 tree = parser.parse(tokenised_code)
 transformer = MyTransformer()
+transformer = GEKOTransformer()
 ast = transformer.transform(tree)
 print(ast)
-# print(type(ast))
+print(type(ast))
+
+
 
 # --------------------------------------
 
-# graph_of_tree = lark.tree.pydot__tree_to_graph(tree)
+graph_of_tree = lark.tree.pydot__tree_to_graph(ast)
 
 #---------------------------------------
 
-# graph = pydot.graph_from_dot_data(lark.tree.pydot__tree_to_graph(tree).to_string())
+graph = pydot.graph_from_dot_data(lark.tree.pydot__tree_to_graph(ast).to_string())
 # function toh chal gaya
-# print(type(graph[0]))
+print(type(graph[0]))
 
 #----------------------------------------------------------------------------------------------------------------------------
 
-# png_name = "parse_tree.png"
-# graph[0].write_png(png_name)
+png_name = "abstract_syntax_tree.png"
+graph[0].write_png(png_name)
 
 # graph bhi chal gaya!
 #----------------------------------------------------------------------------------------------------------------------------
