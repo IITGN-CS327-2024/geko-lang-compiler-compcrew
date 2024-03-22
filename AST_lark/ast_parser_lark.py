@@ -198,9 +198,10 @@ class MyTransformer(Transformer):
         return SkipStop(*args)
 # ----------------------------------------------------------------------------------------------------------------------------
     
+# the following one is working:
 class GEKOTransformer(Transformer):
     def program(self, items):
-        if len(items) == 1:
+        if len(items) == 1: 
             return ['function_definition', items[0]]
         else:
             return ['main_function', items[4], items[6]]
@@ -245,6 +246,54 @@ class GEKOTransformer(Transformer):
             return items[0]
         else:
             return None
+        
+    def statement(self, items):
+        if len(items) == 1:
+            # block
+            # conditional_statement
+            # loop_statement
+            # try_catch_statement
+            # func_def
+            return items[0]
+        elif len(items) == 2:
+            # variable_declaration END_OF_LINE
+            # assignment_statement END_OF_LINE
+            # show_statement END_OF_LINE
+            # skip_stop END_OF_LINE
+            # value_change_array END_OF_LINE
+            # pop_statement END_OF_LINE
+            # function_call END_OF_LINE
+            # unary_operators IDENTIFIER END_OF_LINE
+            # IDENTIFIER UNARY_OPERATOR END_OF_LINE
+            return {
+                'type': items[0],
+                'value': items[1]
+            }
+        else:
+            raise ValueError(f"Unexpected number of items in statement: {items}")
+        
+
+    def block(self, items):
+        return {
+            'type': 'block',
+            'statements': items[1:-1]
+        }
+
+    def variable_declaration(self, items):
+        return {
+            'type': 'variable_declaration',
+            'data_type': items[0],
+            'identifier': items[1],
+            'value': items[2] if len(items) > 2 else None
+        }
+
+    def assignment_statement(self, items):
+        return {
+            'type': 'assignment_statement',
+            'identifier': items[0],
+            'operator': items[1],
+            'value': items[2]
+        }
 # -->
 
 def __default__(self, data, children, meta):
@@ -525,19 +574,15 @@ tree = parser.parse(tokenised_code)
 tree = parser.parse(tokenised_code)
 transformer = MyTransformer()
 transformer = GEKOTransformer()
-ast = transformer.transform(tree)
-print(ast)
-print(type(ast))
-
-
-
+# ast = transformer.transform(tree)
+# print(ast)
 # --------------------------------------
 
-graph_of_tree = lark.tree.pydot__tree_to_graph(ast)
+graph_of_tree = lark.tree.pydot__tree_to_graph(tree)
 
 #---------------------------------------
 
-graph = pydot.graph_from_dot_data(lark.tree.pydot__tree_to_graph(ast).to_string())
+graph = pydot.graph_from_dot_data(lark.tree.pydot__tree_to_graph(tree).to_string())
 # function toh chal gaya
 print(type(graph[0]))
 
@@ -555,7 +600,9 @@ graph[0].write_png(png_name)
 # ----------------------------------------------------------------------------------------------------------------------------
 
 # Final function to be used: 
-# final_iteration(tree, tokens, graph=graph[0])
+final_iteration(tree, tokens, graph=graph[0])
+ast = transformer.transform(tree)
+print(ast)
 
 # ----------------------------------------------------------------------------------------------------------------------------
 
