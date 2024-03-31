@@ -304,8 +304,8 @@ class ASTBuilder(Visitor):
             if not children:
                 print(f"node_type:{node_type}, value: []")
                 return []
-            expressions = [children[1]]
-            expressions.extend(children[2])
+            expressions = [children[1]] if len(children) > 1 else []
+            expressions.extend(children[2]) if len(children) > 2 else None
             print(f"node_type:{node_type}, expressions: {expressions}")
             return expressions
         elif node_type == "expression":
@@ -385,7 +385,8 @@ class ASTBuilder(Visitor):
             print(f"node_type:{node_type}, value: {children[0]}")
             return children[0]
         elif node_type == "conditional_argument":
-            if children[0].data == "special_function":
+            # if children[0].data == "special_function":
+            if children[0] == "special_function":
                 condition = children[0]
                 comparison_operator = str(children[1]) if len(children) > 1 else None
             else:
@@ -401,7 +402,7 @@ class ASTBuilder(Visitor):
             print(f"node_type:{node_type}, condition: {condition}, conditional_block: {conditional_block}, other_blocks: {other_blocks}, otherwise_block: {otherwise_block}")
             return ConditionalStatement(condition, conditional_block, other_blocks, otherwise_block)
         elif node_type == "other_block":
-            if not children:
+            if children == [None]:
                 print(f"node_type:{node_type}, value: []")
                 return []
             condition = children[2]
@@ -410,7 +411,7 @@ class ASTBuilder(Visitor):
             print(f"node_type:{node_type}, condition: {condition}, conditional_block: {conditional_block}, other_blocks: {other_blocks}")
             return [OtherBlock(condition, conditional_block)] + other_blocks
         elif node_type == "otherwise_block":
-            print(f"node_type:{node_type}, value: {children[1]}")
+            print(f"node_type:{node_type}, value: {children[0]}")
             return OtherwiseBlock(children[0])
         elif node_type == "loop_statement":
             if children[0].data == "ITER":
@@ -469,7 +470,7 @@ class ASTBuilder(Visitor):
         elif node_type == "let_in_statement":
             data_type = str(children[1])
             variable_name = str(children[2])
-            if children[4].data == "OPEN_BRACES":
+            if children[4] == "OPEN_BRACES":
                 value = children[5]
             else:
                 value = children[4]
@@ -771,6 +772,17 @@ code = """
 define num main() {
     num a = 7;
     b = 5;
+    given (a) {
+        show(a);
+        given (b) {
+            show(b);
+        } otherwise {
+            show(a);
+        }
+    }
+    num xx = let x = 5 in x*x;
+    show(xx);
+    show(a);
     yield 0;
 }"""
 # ----------------------------------------------------------------------------------------------------------------------------
