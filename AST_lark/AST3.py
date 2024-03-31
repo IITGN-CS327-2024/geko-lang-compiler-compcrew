@@ -2,7 +2,7 @@ from lark import Lark
 from lark.lexer import Lexer, Token
 from lark.exceptions import UnexpectedToken
 import re
-import ast_lexer as lexer_lark
+import ast_lexer_lark as lexer_lark
 import sys
 import os
 # ----------------------------------------------------------------------------------------------------------------------------
@@ -192,59 +192,80 @@ from typing import List, Optional, Union
 class ASTBuilder(Visitor):
     def __default__(self, tree):
         children = [self.transform(child) for child in tree.children]
+        print("----------------------------------------------------------")
+        print(f"the tree data is: {tree.data}, children are: {children}")
         return self.create_node(tree.data, children)
 
     def create_node(self, node_type, children):
-        if node_type == "program":
+        print("----------------------------------------------------------")
+        print(f"node_type from function call: {node_type}, children: {children}")
+        print("----------------------------------------------------------")
+        if node_type == "start":
+            print(f"node_type: {node_type}, value: {children[0]}")
+            return children[0]
+        elif node_type == "program":
             function_defs = [child for child in children[:-1] if isinstance(child, FunctionDef)]
             main_function = children[-1] if isinstance(children[-1], FunctionDef) else None
+            print(f"node_type:{node_type}, function_defs: {function_defs}, main_function: {main_function}")
             return Program(function_defs, main_function)
         elif node_type == "func_def":
             function_type = str(children[0])
             function_name = str(children[1])
             parameters = children[3]
             function_block = children[5]
+            print(f"node_type:{node_type}, function_type: {function_type}, function_name: {function_name}, parameters: {parameters}, function_block: {function_block}")
             return FunctionDef(function_type, function_name, parameters, function_block)
         elif node_type == "function_block":
             statements = children[1]
             return_value = children[3]
+            print(f"node_type:{node_type}, statements: {statements}, return_value: {return_value}")
             return FunctionBlock(statements, return_value)
         elif node_type == "parameter_list":
             parameters = children[0] if children else []
+            print(f"node_type:{node_type}, parameters: {parameters}")
             return parameters
         elif node_type == "parameters":
             if not children:
                 return []
             parameters = [children[0]]
             parameters.extend(children[2])
+            print(f"node_type:{node_type}, parameters: {parameters}")
             return parameters
         elif node_type == "parameter":
             if len(children) == 1:
                 parameter_name = str(children[0])
+                print(f"node_type:{node_type}, parameter_name: {parameter_name}")
                 return Parameter(None, parameter_name, None)
             else:
                 data_type = str(children[0])
                 parameter_name = str(children[1])
                 array_size = int(children[2].value) if len(children) > 2 else None
+                print(f"node_type:{node_type}, data_type: {data_type}, parameter_name: {parameter_name}, array_size: {array_size}")
                 return Parameter(data_type, parameter_name, array_size)
         elif node_type == "variable_declaration":
             data_type = str(children[0])
             variable_name = str(children[1])
-            initial_value = children[2] if len(children) > 2 else None
+            print(f"abhi variable declaration mai hai, kuch dikkat aa rahi hai. Ye rahe children: {children}")
+            initial_value = children[3] if len(children) > 3 else None
+            print(f"node_type:{node_type}, data_type: {data_type}, variable_name: {variable_name}, initial_value: {initial_value}")
             return VariableDeclaration(data_type, variable_name, initial_value)
         elif node_type == "compound_array":
             if len(children) == 1:
+                # print(f"node_type:{node_type}, data_type: {children[0].data}")
                 return CompoundArray(str(children[0][0]), None)
             else:
                 data_type = str(children[0])
                 identifier = str(children[1])
                 array_size = int(children[3].value) if len(children) > 3 else None
+                print(f"node_type:{node_type}, data_type: {data_type}, identifier: {identifier}, array_size: {array_size}")
                 return CompoundArray(data_type, identifier, array_size)
         elif node_type == "compound_var":
             if not children:
+                print(f"node_type:{node_type}, value: None")
                 return CompoundVar(None)
             else:
                 value = children[0]
+                print(f"node_type:{node_type}, value: {children[0]}")
                 return CompoundVar(value)
         elif node_type == "list_append_tail":
             if children[0].data == "expressions":
@@ -256,48 +277,69 @@ class ASTBuilder(Visitor):
             elif children[0].data == "APPEND":
                 elements = [children[2]]
                 identifier = str(children[4])
+            print(f"node_type:{node_type}, elements: {elements}, identifier: {identifier}")
             return ListAppendTail(elements, identifier)
         elif node_type == "assignment_statement":
             variable_name = str(children[0])
             assignment_operators = str(children[1])
             value = children[2]
+            print(f"node_type:{node_type}, variable_name: {variable_name}, assignment_operators: {assignment_operators}, value: {value}")
             return Assignment(variable_name, assignment_operators, value)
         elif node_type == "show_statement":
             expressions = children[2]
+            print(f"node_type:{node_type}, expressions: {expressions}")
             return ShowStatement(expressions)
         elif node_type == "block":
             statements = children[1]
+            print(f"node_type:{node_type}, statements: {statements}")
             return Block(statements)
         elif node_type == "value_change_array":
             identifier = str(children[0])
             index = int(children[2].value)
             assignment_operators = str(children[3])
             value = children[4]
+            print(f"node_type:{node_type}, identifier: {identifier}, index: {index}, assignment_operators: {assignment_operators}, value: {value}")
             return ValueChangeArray(identifier, index, assignment_operators, value)
         elif node_type == "expressions":
             if not children:
+                print(f"node_type:{node_type}, value: []")
                 return []
             expressions = [children[1]]
             expressions.extend(children[2])
+            print(f"node_type:{node_type}, expressions: {expressions}")
             return expressions
         elif node_type == "expression":
             terms = children[0] if children else []
             operations = children[1] if len(children) > 1 else None
+            print(f"node_type:{node_type}, terms: {terms}, operations: {operations}")
             return Expression(terms, operations)
         elif node_type == "terms":
+            print(f"the children of terms are as follows: {[child for child in children]}")
             if not children:
+                print(f"node_type:{node_type}, value: []")
                 return []
             operators = [children[0]]
-            terms = [children[1]]
-            terms.extend(children[2])
+            terms = [children[1]] if len(children) > 1 else None
+            terms.extend(children[2]) if len(children) > 2 else None
+            print(f"node_type:{node_type}, operators: {operators}, terms: {terms}")
+            if terms is None:
+                return None, None
             return [operator for operator in operators for _ in terms], terms
         elif node_type == "term":
+            value = children[0]
+            identifier = None
+            expression = None
+            unary_operator = None
             if isinstance(children[0], Token):
-                print(children[0].value)
+                value = "garbaaj"
+                # print("children[0]:", children[0])
+                # print("fdaffavra:", children[0].value)
                 value = children[0].value
+                value = children[0][0]
                 if children[0].type == "IDENTIFIER":
                     identifier = value
-                    value = None
+                    # value = None
+                    value = "garbaaj identifier"
                 elif children[0].type in ["NUM_LITERAL", "YAY", "NAY"]:
                     identifier = None
                 else:
@@ -305,33 +347,42 @@ class ASTBuilder(Visitor):
                 expression = None
                 unary_operator = None
             elif children[0] == "string":
-                value = children[0].children[0].value
+                # value = children[0].children[0].value
+                value = "garbaaj string"
                 identifier = None
                 expression = None
                 unary_operator = None
             elif children[0] == "expression":
-                value = None
+                # value = None
+                value = "garbaaj expression"
                 identifier = None
                 expression = children[0]
                 unary_operator = None
             elif children[0] == "unary_operators":
-                value = None
+                # value = None
+                value = "garbaaj unary_operators"
                 identifier = str(children[1])
                 expression = None
                 unary_operator = str(children[0])
             elif children[0] == "IDENTIFIER":
-                value = None
+                # value = None
+                value = "garbaaj identifier"
                 identifier = str(children[0])
                 expression = children[2] if len(children) > 2 else None
                 unary_operator = str(children[1]) if len(children) > 1 else None
+            print(f"node_type:{node_type}, value: {value}, identifier: {identifier}, expression: {expression}, unary_operator: {unary_operator}")
             return Term(value, identifier, expression, unary_operator)
         elif node_type == "binary_operators":
+            print(f"node_type:{node_type}, value: {children[0]}")
             return BinaryOperator(str(children[0]))
         elif node_type == "unary_operators":
+            print(f"node_type:{node_type}, value: {children[0]}")
             return UnaryOperator(str(children[0]))
         elif node_type == "assignment_operators":
+            print(f"node_type:{node_type}, value: {children[0]}")
             return AssignmentOperator(str(children[0]))
         elif node_type == "conditional_block":
+            print(f"node_type:{node_type}, value: {children[0]}")
             return children[0]
         elif node_type == "conditional_argument":
             if children[0].data == "special_function":
@@ -340,21 +391,26 @@ class ASTBuilder(Visitor):
             else:
                 condition = children[0]
                 comparison_operator = None
+            print(f"node_type:{node_type}, condition: {condition}, comparison_operator: {comparison_operator}")
             return ConditionalArgument(condition, comparison_operator)
         elif node_type == "conditional_statement":
             condition = children[2]
             conditional_block = children[4]
             other_blocks = children[5]
             otherwise_block = children[6] if len(children) > 6 else None
+            print(f"node_type:{node_type}, condition: {condition}, conditional_block: {conditional_block}, other_blocks: {other_blocks}, otherwise_block: {otherwise_block}")
             return ConditionalStatement(condition, conditional_block, other_blocks, otherwise_block)
         elif node_type == "other_block":
             if not children:
+                print(f"node_type:{node_type}, value: []")
                 return []
             condition = children[2]
             conditional_block = children[4]
             other_blocks = children[5] if len(children) > 5 else []
+            print(f"node_type:{node_type}, condition: {condition}, conditional_block: {conditional_block}, other_blocks: {other_blocks}")
             return [OtherBlock(condition, conditional_block)] + other_blocks
         elif node_type == "otherwise_block":
+            print(f"node_type:{node_type}, value: {children[1]}")
             return OtherwiseBlock(children[0])
         elif node_type == "loop_statement":
             if children[0].data == "ITER":
@@ -369,36 +425,46 @@ class ASTBuilder(Visitor):
                 loop_type = "repeat"
                 condition = children[4]
                 block = children[2]
+            print(f"node_type:{node_type}, loop_type: {loop_type}, condition: {condition}, block: {block}")
             return LoopStatement(loop_type, condition, block)
         elif node_type == "pop_statement":
             string_value = children[2].children[0].value
+            print(f"node_type:{node_type}, string_value: {string_value}")
             return PopStatement(string_value)
         elif node_type == "try_catch_statement":
             try_block = children[1]
             catch_string = children[4].children[0].value
             catch_block = children[6]
+            print(f"node_type:{node_type}, try_block: {try_block}, catch_string: {catch_string}, catch_block: {catch_block}")
             return TryCatchStatement(try_block, catch_string, catch_block)
         elif node_type == "yield_block":
             statements = children[1]
             expression = children[3]
+            print(f"node_type:{node_type}, statements: {statements}, expression: {expression}")
             return YieldBlock(statements, expression)
         elif node_type == "function_call":
             function_name = str(children[0])
             arguments = children[2]
+            print(f"node_type:{node_type}, function_name: {function_name}, arguments: {arguments}")
             return FunctionCall(function_name, arguments)
         elif node_type == "argument_list":
             if not children:
+                print(f"node_type:{node_type}, value: []")
                 return []
             arguments = [children[0]]
             arguments.extend(children[1])
+            print(f"node_type:{node_type}, arguments: {arguments}")
             return arguments
         elif node_type == "let_in_braces":
             let_in = children[0]
+            print(f"node_type:{node_type}, let_in: {let_in}")
             return LetInBraces(let_in)
         elif node_type == "let_in":
             if isinstance(children[0], LetInStatement):
+                print(f"node_type:{node_type}, value: {children[0]}")
                 return children[0]
             else:
+                print(f"node_type:{node_type}, value: {children[0]}")
                 return children[0]
         elif node_type == "let_in_statement":
             data_type = str(children[1])
@@ -409,10 +475,13 @@ class ASTBuilder(Visitor):
                 value = children[4]
             if len(children) > 6:
                 value = LetInBraces(value)
+            print(f"node_type:{node_type}, data_type: {data_type}, variable_name: {variable_name}, value: {value}")
             return LetInStatement(data_type, variable_name, value)
         elif node_type == "statement":
-            statement_type = children[0].data
+            # statement_type = children[0].data
+            statement_type = children[0] # ye galat hai i know, isko change karna padenga
             value = children[0]
+            print(f"node_type:{node_type}, statement_type: {statement_type}, value: {value}")
             return Statement(statement_type, value)
         elif node_type == "special_function":
             function_type = children[0].data
@@ -425,55 +494,58 @@ class ASTBuilder(Visitor):
                     arguments = [start, end]
             else:
                 arguments = [str(children[2])] if len(children) > 2 else []
+            print(f"node_type:{node_type}, function_type: {function_type}, arguments: {arguments}")
             return SpecialFunction(function_type, arguments)
         elif node_type == "data_type":
+            print(f"node_type:{node_type}, value: {children[0]}")
             return str(children[0]) if children else None
         elif node_type == "num_str_flag":
+            print(f"node_type:{node_type}, value: {children[0]}")
             return str(children[0])
         elif node_type == "basic_data_type":
             fix_let = str(children[0]) if children else None
             data_type = str(children[1])
+            print(f"node_type:{node_type}, fix_let: {fix_let}, data_type: {data_type}")
             return f"{fix_let} {data_type}" if fix_let else data_type
         elif node_type == "fix_let":
+            print(f"node_type:{node_type}, value: {children[0]}")
             return str(children[0]) if children else None
         elif node_type == "compound_data_type":
+            print(f"node_type:{node_type}, value: {children[0]}")
             return str(children[0])
         elif node_type == "string":
+            print(f"node_type:{node_type}, value: {children[1]}")
             return children[1].value
         elif node_type == "skip_stop":
+            print(f"node_type:{node_type}, value: {children[0]}")
             return str(children[0])
 
     def transform(self, tree):
         if isinstance(tree, Tree):
+            print("this is the start from a tree node....")
+            print("tree.data is:",tree.data)
             return self.__default__(tree)
         elif isinstance(tree, Token):
+            print("value is:",tree.value)
             return tree.value
         else:
             raise ValueError(f"Unexpected input: {tree}")
 
-
-
-
-  
-
-
 # ----------------------------------------------------------------------------------------------------------------------------
 
-# ----------------------------------------------------------------------------------------------------------------------------
-
-def read_geko_file(file_path):
-    with open(file_path, 'r') as file:
-        return file.read()
+# def read_geko_file(file_path):
+#     with open(file_path, 'r') as file:
+#         return file.read()
     
 # --------------------------------------------------------------------------------------------
     
 # we have to perform dfs on the tree to get the leaf nodes and then we can append the value
-def dfs(tree_node, leaf_nodes):
-    if isinstance(tree_node, Token):
-        leaf_nodes.append(tree_node)
-    else:
-        for child in tree_node.children:
-            dfs(child, leaf_nodes)
+# def dfs(tree_node, leaf_nodes):
+#     if isinstance(tree_node, Token):
+#         leaf_nodes.append(tree_node)
+#     else:
+#         for child in tree_node.children:
+#             dfs(child, leaf_nodes)
 
 # --------------------------------------------------------------------------------------------
 
@@ -698,12 +770,9 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 code = """
 define num main() {
     num a = 7;
+    b = 5;
     yield 0;
 }"""
-#--------------------------
-
-
-
 # ----------------------------------------------------------------------------------------------------------------------------
 
 parser_lark_dir = os.path.dirname(__file__)
@@ -721,56 +790,33 @@ for token in tokens:
 
 tree = parser.parse(tokenised_code)
 
-# ast_builder = ASTBuilder()
-# ast = ast_builder.transform(tree)
-# print(ast)
-
-
 graph_of_tree = lark.tree.pydot__tree_to_graph(tree)
-
-#---------------------------------------
-
 graph = pydot.graph_from_dot_data(lark.tree.pydot__tree_to_graph(tree).to_string())
 # function toh chal gaya
-print(type(graph[0]))
 
 #----------------------------------------------------------------------------------------------------------------------------
 
 png_name = "abstract_syntax_tree.png"
-# graph[0].write_png(png_name)
-
 # graph bhi chal gaya!
-#----------------------------------------------------------------------------------------------------------------------------
-
 
 # ----------------------------------------------------------------------------------------------------------------------------
 
 # Final function to be used: 
 final_iteration(tree, tokens, graph=graph[0])
 ast_builder = ASTBuilder()
+# print(tree.pretty())
 ast = ast_builder.transform(tree)
 # print(ast)
 
 import rich
 rich.print(ast)
+print("-----------------------------------------------------------------------------------------")
+# a function to print the ast:
+# print(type(ast))
+print("ast print kar rahe")
+print(ast)
+# print_ast(ast)
+print("-----------------------------------------------------------------------------------------")
+rich.print(tree)
 
 # ----------------------------------------------------------------------------------------------------------------------------
-# ast ke liye code: 
-# printing the AST:
-
-def print_ast(node, indent=0):
-    print("  " * indent + str(node))
-    if isinstance(node, list):
-        for child in node:
-            print_ast(child, indent + 1)
-    elif isinstance(node, tuple) and len(node) > 1:
-        for child in node[1:]:
-            print_ast(child, indent + 1)
-    elif isinstance(node, dict):
-        for key, value in node.items():
-            print("  " * (indent + 1) + str(key) + ":")
-            print_ast(value, indent + 2)
-
-# Assuming 'ast' is the variable holding the AST
-# print_ast(ast, indent=2)
-
