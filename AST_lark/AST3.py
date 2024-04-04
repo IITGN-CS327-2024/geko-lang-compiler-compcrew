@@ -49,6 +49,7 @@ class VariableDeclaration:
     data_type: str
     variable_name: str
     initial_value: Optional[Union['Expression', 'ListAppendTail', 'CompoundVar']]
+    equal_to: Optional[str]
 
 @dataclass
 class Assignment:
@@ -182,6 +183,10 @@ class ValueChangeArray:
 class PopStatement:
     string_value: str
 
+@dataclass
+class EqualTo:
+    value: list
+
 #================================
 from lark import Visitor, Tree, Token
 from dataclasses import dataclass
@@ -193,12 +198,12 @@ class ASTBuilder(Visitor):
     def __default__(self, tree):
         children = [self.transform(child) for child in tree.children]
         print("----------------------------------------------------------")
-        print(f"the tree data is: {tree.data}, children are: {children}")
+        print(f"the tree data from __default__ is: {tree.data}, children are: {children}")
         return self.create_node(tree.data, children)
 
     def create_node(self, node_type, children):
         print("----------------------------------------------------------")
-        print(f"node_type from function call: {node_type}, children: {children}")
+        print(f"node_type from create_node: {node_type}, children: {children}")
         print("----------------------------------------------------------")
         if node_type == "start":
             print(f"node_type: {node_type}, value: {children[0]}")
@@ -245,10 +250,11 @@ class ASTBuilder(Visitor):
         elif node_type == "variable_declaration":
             data_type = str(children[0])
             variable_name = str(children[1])
+            equal_to = children[2]
             print(f"abhi variable declaration mai hai, kuch dikkat aa rahi hai. Ye rahe children: {children}")
             initial_value = children[3] if len(children) > 3 else None
             print(f"node_type:{node_type}, data_type: {data_type}, variable_name: {variable_name}, initial_value: {initial_value}")
-            return VariableDeclaration(data_type, variable_name, initial_value)
+            return VariableDeclaration(data_type, variable_name, initial_value, equal_to)
         elif node_type == "compound_array":
             if len(children) == 1:
                 # print(f"node_type:{node_type}, data_type: {children[0].data}")
@@ -523,11 +529,14 @@ class ASTBuilder(Visitor):
 
     def transform(self, tree):
         if isinstance(tree, Tree):
-            print("this is the start from a tree node....")
-            print("tree.data is:",tree.data)
+            print("this is the start from a tree node i.e. transform...")
+            # print()
+            print("tree.data from transform is:",tree.data)
+            print()
             return self.__default__(tree)
         elif isinstance(tree, Token):
-            print("value is:",tree.value)
+            print("value from transform is:",tree.value)
+            print()
             return tree.value
         else:
             raise ValueError(f"Unexpected input: {tree}")
@@ -770,19 +779,7 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
 define num main() {
-    num a = 7;
-    b = 5;
-    given (a) {
-        show(a);
-        given (b) {
-            show(b);
-        } otherwise {
-            show(a);
-        }
-    }
-    num xx = let x = 5 in x*x;
-    show(xx);
-    show(a);
+    num a = 4+3;
     yield 0;
 }"""
 # ----------------------------------------------------------------------------------------------------------------------------
@@ -822,13 +819,13 @@ ast = ast_builder.transform(tree)
 
 import rich
 rich.print(ast)
-print("-----------------------------------------------------------------------------------------")
+# print("-----------------------------------------------------------------------------------------")
 # a function to print the ast:
 # print(type(ast))
-print("ast print kar rahe")
-print(ast)
+# print("ast print kar rahe")
+# print(ast)
 # print_ast(ast)
-print("-----------------------------------------------------------------------------------------")
-rich.print(tree)
+# print("-----------------------------------------------------------------------------------------")
+# rich.print(tree)
 
 # ----------------------------------------------------------------------------------------------------------------------------
