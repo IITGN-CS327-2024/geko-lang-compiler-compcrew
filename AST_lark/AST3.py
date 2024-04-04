@@ -58,10 +58,21 @@ class Assignment:
     value: Union['Expression', 'SpecialFunction', 'LetInStatement']
 
 @dataclass
-class CompoundArray:
+class Array:
     data_type: str
     identifier: str
     size: Optional[int]
+
+@dataclass
+class LIST:
+    data_type: str
+    identifier: str
+    size: Optional[int]
+
+@dataclass
+class TUP:
+    data_type: str
+    identifier: str
 
 @dataclass
 class UnaryOperator:
@@ -74,8 +85,21 @@ class AssignmentOperator:
 
 @dataclass
 class SpecialFunction:
-    function_type: str
-    arguments: Optional[List['Expression']]
+    # identifier
+    # num_literal_start and num_literal_end
+    # OR
+    # length/head/isempty
+    # identifier
+    # OR
+    # function_call
+    identifier: str
+    num_literal_start: Optional[int]
+    num_literal_end: Optional[int]
+    length: Optional[str]
+    head: Optional[str]
+    isempty: Optional[str]
+    function_call: Optional['FunctionCall']
+    # is upar wale ko change karna hai
 
 @dataclass
 class Expression:
@@ -155,9 +179,9 @@ class ListAppendTail:
     elements: List['Expression']
     identifier: Optional[str]
 
-@dataclass
-class CompoundVar:
-    value: Optional[Union['ListAppendTail', 'Expression']]
+# @dataclass
+# class CompoundVar:
+#     value: Optional[Union['ListAppendTail', 'Expression']]
 
 @dataclass
 class ShowStatement:
@@ -214,8 +238,9 @@ class ASTBuilder(Visitor):
             print(f"node_type:{node_type}, function_defs: {function_defs}, main_function: {main_function}")
             return Program(function_defs, main_function)
         elif node_type == "func_def":
-            function_type = str(children[0])
-            function_name = str(children[1])
+            print("ye func_def bhi galat hai isko bhi change crow")
+            function_type = str(children[1])
+            function_name = str(children[2])
             parameters = children[3]
             function_block = children[5]
             print(f"node_type:{node_type}, function_type: {function_type}, function_name: {function_name}, parameters: {parameters}, function_block: {function_block}")
@@ -225,20 +250,27 @@ class ASTBuilder(Visitor):
             return_value = children[3]
             print(f"node_type:{node_type}, statements: {statements}, return_value: {return_value}")
             return FunctionBlock(statements, return_value)
+        elif node_type == "function_type":
+            print(f"node_type:{node_type}, value: {children[0]}")
+            return str(children[0])
         elif node_type == "parameter_list":
             parameters = children[0] if children else []
             print(f"node_type:{node_type}, parameters: {parameters}")
             return parameters
+        elif node_type == "return_value":
+            print(f"node_type:{node_type}, value: {children[0]}")
+            return children[0]
         elif node_type == "parameters":
             if not children:
                 return []
-            parameters = [children[0]]
+            parameters = [children[1]]
             parameters.extend(children[2])
             print(f"node_type:{node_type}, parameters: {parameters}")
             return parameters
         elif node_type == "parameter":
-            if len(children) == 1:
-                parameter_name = str(children[0])
+            if len(children) == 2:
+                data_type = str(children[0])
+                parameter_name = str(children[1])
                 print(f"node_type:{node_type}, parameter_name: {parameter_name}")
                 return Parameter(None, parameter_name, None)
             else:
@@ -247,32 +279,133 @@ class ASTBuilder(Visitor):
                 array_size = int(children[2].value) if len(children) > 2 else None
                 print(f"node_type:{node_type}, data_type: {data_type}, parameter_name: {parameter_name}, array_size: {array_size}")
                 return Parameter(data_type, parameter_name, array_size)
+        elif node_type == "choose_array":
+            if not children:
+                print(f"node_type:{node_type}, value: None")
+                return None
+            print(f"node_type:{node_type}, value: {children[1]}")
+            return children[1]
+        elif node_type == "statements":
+            if not children:
+                print(f"node_type:{node_type}, value: []")
+                return []
+            statements = [children[0]]
+            statements.extend(children[1])
+            print(f"node_type:{node_type}, statements: {statements}")
+            return statements
+        elif node_type == "equal_to":
+            if not children:
+                print(f"node_type:{node_type}, value: []")
+                return []
+            print(f"node_type:{node_type}, value: {children[1]}")
+            return children[1]
+        elif node_type == "post_equal_to":
+            # TODO - handle ENTER or enter
+            # children[0].value/data ??
+            if children[0] == "enter":
+                value = str(children[2])
+            else:
+                value = children[0]
+            print(f"node_type:{node_type}, value: {value}")
+            return value
+        elif node_type == "special_function":
+            if len(children) == 1:
+                function_call = children[0]
+                print(f"node_type:{node_type}, function_call: {function_call}")
+                return SpecialFunction(None, None, None, None, None, None, function_call)
+            else:
+                if children[0] == "length":
+                    identifier = str(children[2])
+                    print(f"node_type:{node_type}, identifier: {identifier}")
+                    return SpecialFunction(identifier, None, None, "length", None, None, None)
+                elif children[0] == "head":
+                    identifier = str(children[2])
+                    print(f"node_type:{node_type}, identifier: {identifier}")
+                    return SpecialFunction(identifier, None, None, None, "head", None, None)
+                elif children[0] == "isempty":
+                    identifier = str(children[2])
+                    print(f"node_type:{node_type}, identifier: {identifier}")
+                    return SpecialFunction(identifier, None, None, None, None, "isempty", None)
+
+                identifier = str(children[0])
+                # .value?? .data?? ya phir children[2][0]???
+                num_literal_start = int(children[2].value)
+                num_literal_end = int(children[4].value)
+                print(f"node_type:{node_type}, identifier: {identifier}, num_literal_start: {num_literal_start}, num_literal_end: {num_literal_end}")
+                return SpecialFunction(identifier, num_literal_start, num_literal_end, None, None, None, None)
+        elif node_type == "data_type":
+            print(f"node_type:{node_type}, value: {children[0]}")
+            return str(children[0]) if children else None
+        elif node_type == "num_str_flag":
+            print(f"node_type:{node_type}, value: {children[0]}")
+            return str(children[0])
+        elif node_type == "basic_data_type":
+            fix_let = str(children[0])
+            data_type = str(children[-1])
+            print(f"node_type:{node_type}, fix_let: {fix_let}, data_type: {data_type}")
+            return f"{fix_let} {data_type}" if fix_let else data_type
+        elif node_type == "fix_let":
+            print(f"node_type:{node_type}, value: {children[0]}")
+            return str(children[0]) if children else None
+        elif node_type == "compound_data_type":
+            print(f"node_type:{node_type}, value: {children[0]}")
+            return str(children[0])
+        elif node_type == "string":
+            print(f"node_type:{node_type}, value: {children[1]}")
+            # TODO vapis value???
+            return children[1].value
+        elif node_type == "array":
+            data_type = str(children[0])
+            identifier = str(children[1])
+            # TODO vapis value???
+            size = int(children[3].value)
+            print(f"node_type:{node_type}, data_type: {data_type}, identifier: {identifier}, size: {size}")
+            return Array(data_type, identifier, size)
         elif node_type == "variable_declaration":
             data_type = str(children[0])
             variable_name = str(children[1])
-            equal_to = children[2]
+            equal_to = children[2] if len(children) > 2 else None
+            # pending work
+            print(f"node_type:{node_type}, data_type: {data_type}, variable_name: {variable_name}, initial_value: {initial_value}, equal_to: {equal_to}")
+            return VariableDeclaration(data_type, variable_name, initial_value, equal_to)
+        elif node_type == "compound_array":
+            if len(children) == 1:
+                return children[0]
+            else:
+                data_type = str(children[0])
+                identifier = str(children[1])
+                if data_type == "list":
+                    print(f"node_type:{node_type}, data_type: {data_type}, identifier: {identifier}")
+                    return LIST(data_type, identifier, None)
+                else:
+                    print(f"node_type:{node_type}, data_type: {data_type}, identifier: {identifier}")
+                    return TUP(data_type, identifier)
+        
+        elif node_type == "variable_declaration":
+            data_type = str(children[0])
+            variable_name = str(children[1])
+            equal_to = children[2] if len(children) > 2 else None
             print(f"abhi variable declaration mai hai, kuch dikkat aa rahi hai. Ye rahe children: {children}")
             initial_value = children[3] if len(children) > 3 else None
             print(f"node_type:{node_type}, data_type: {data_type}, variable_name: {variable_name}, initial_value: {initial_value}")
             return VariableDeclaration(data_type, variable_name, initial_value, equal_to)
-        elif node_type == "compound_array":
-            if len(children) == 1:
-                # print(f"node_type:{node_type}, data_type: {children[0].data}")
-                return CompoundArray(str(children[0][0]), None)
-            else:
-                data_type = str(children[0])
-                identifier = str(children[1])
-                array_size = int(children[3].value) if len(children) > 3 else None
-                print(f"node_type:{node_type}, data_type: {data_type}, identifier: {identifier}, array_size: {array_size}")
-                return CompoundArray(data_type, identifier, array_size)
         elif node_type == "compound_var":
-            if not children:
-                print(f"node_type:{node_type}, value: None")
-                return CompoundVar(None)
+
+            if len(children) == 1:
+                return None
+            elif len(children) == 2:
+                if children[0] == "EQUAL_TO":
+                    return 
+                else:
+                    return children[0]
+            elif len(children) == 4:
+                if children[0] == "EQUAL_TO":
+                    return BinaryOperator(children[2], children[1], children[3])
+                else:
+                    return children[0]
             else:
-                value = children[0]
-                print(f"node_type:{node_type}, value: {children[0]}")
-                return CompoundVar(value)
+                return None
+        
         elif node_type == "list_append_tail":
             if children[0].data == "expressions":
                 elements = children[1]
