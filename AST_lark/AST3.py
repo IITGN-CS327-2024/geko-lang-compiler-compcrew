@@ -650,7 +650,7 @@ class ASTBuilder(Visitor):
             return [OtherBlock(condition, conditional_block)] + other_blocks
         elif node_type == "otherwise_block":
             print(f"node_type:{node_type}, value: {children[0]}")
-            return OtherwiseBlock(children[0])
+            return OtherwiseBlock(children[1:])
         elif node_type == "loop_statement":
             if children[0].data == "ITER":
                 loop_type = "iter"
@@ -1015,15 +1015,8 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 code = """
 define num main() {
     ## add(1, 2);
-    given (length(b) >= 3) {
-        yield 30;
-    }other(b <= 2) {
-        yield 20;
-    }other(g != 1) {
-        yield 10;
-    }otherwise {
-        yield 0;
-    }
+    str a = enter(~hello~);
+    num x = let num a = 10 in a*a;
     yield 0;
 }"""
 # ----------------------------------------------------------------------------------------------------------------------------
