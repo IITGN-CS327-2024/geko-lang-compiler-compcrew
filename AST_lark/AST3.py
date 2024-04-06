@@ -540,18 +540,6 @@ class ASTBuilder(Visitor):
         elif node_type == "expression":
             terms = [children[0], children[1][1][0] if children[1][1] is not None else children[1][1]] if children else None
             operator_if_exists = children[1][0][0] if children[1][0] else None
-            print()
-            print("##########################################################")
-            print("##########################################################")
-            print("##########################################################")
-            print(type(operator_if_exists))
-            # print(operator_if_exists)
-            # print(terms)
-            print(children)
-            print("##########################################################")
-            print("##########################################################")
-            print("##########################################################")
-            print()
             # operations = children[1] if len(children) > 1 else None
             # print(f"node_type:{node_type}, terms: {terms}")
             return Expression(operator_if_exists, terms)
