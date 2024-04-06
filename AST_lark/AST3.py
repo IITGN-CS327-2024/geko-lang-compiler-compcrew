@@ -17,6 +17,7 @@ from typing import List, Optional, Union
 
 from dataclasses import dataclass
 from typing import *
+import rich
 
 # ----------------------------------------------------------------------------------------------------------------------------
 # Dataclasses for the AST
@@ -24,7 +25,10 @@ from typing import *
 @dataclass
 class Program:
     function_defs: List['FunctionDef']
-    main_function: 'FunctionDef'
+    main_function: 'MainFunc'
+@dataclass
+class MainFunc:
+    statements: List['Statement']
 
 @dataclass
 class FunctionDef:
@@ -48,7 +52,7 @@ class Parameter:
 class VariableDeclaration:
     data_type: str
     variable_name: str
-    initial_value: Optional[Union['Expression', 'ListAppendTail', 'CompoundVar']]
+    initial_value: Optional[Union['Expression', 'ListAppendTail']]
     equal_to: Optional[str]
 
 @dataclass
@@ -234,9 +238,13 @@ class ASTBuilder(Visitor):
             return children[0]
         elif node_type == "program":
             function_defs = [child for child in children[:-1] if isinstance(child, FunctionDef)]
-            main_function = children[-1] if isinstance(children[-1], FunctionDef) else None
+            main_function = children[-1]
+            # if isinstance(children[-1], FunctionDef) else None
             print(f"node_type:{node_type}, function_defs: {function_defs}, main_function: {main_function}")
             return Program(function_defs, main_function)
+        elif node_type == "main_func":
+            statements = children[6]
+            return MainFunc(statements)
         elif node_type == "func_def":
             print("ye func_def bhi galat hai isko bhi change crow")
             function_type = str(children[1])
@@ -286,11 +294,15 @@ class ASTBuilder(Visitor):
             print(f"node_type:{node_type}, value: {children[1]}")
             return children[1]
         elif node_type == "statements":
-            if not children:
-                print(f"node_type:{node_type}, value: []")
-                return []
+            # if not children:
+            #     print(f"node_type:{node_type}, value: []")
+            #     return []
             statements = [children[0]]
-            statements.extend(children[1])
+            if children[0] == None:
+                print(f"node_type:{node_type}, value: {children[0]}")
+                return statements
+            if children[1]!=None:
+                statements.extend(children[1])
             print(f"node_type:{node_type}, statements: {statements}")
             return statements
         elif node_type == "equal_to":
@@ -308,6 +320,20 @@ class ASTBuilder(Visitor):
                 value = children[0]
             print(f"node_type:{node_type}, value: {value}")
             return value
+        
+        # elif node_type == "post_equal_to":
+        #     if len(children) == 1:
+        #         value = children[0]
+        #         print(f"node_type:{node_type}, value: {value}")
+        #         return value
+        #     elif len(children) == 4 and children[0] == "ENTER":
+        #         string_value = str(children[2])
+        #         print(f"node_type:{node_type}, value: {string_value}")
+        #         return string_value
+        #     else:
+        #         raise ValueError("Unexpected structure for 'post_equal_to' node")
+
+
         elif node_type == "special_function":
             if len(children) == 1:
                 function_call = children[0]
@@ -350,10 +376,17 @@ class ASTBuilder(Visitor):
         elif node_type == "compound_data_type":
             print(f"node_type:{node_type}, value: {children[0]}")
             return str(children[0])
+        # elif node_type == "string":
+        #     print(f"node_type:{node_type}, value: {children[1]}")
+        #     # TODO vapis value???
+        #     return children[1].value
         elif node_type == "string":
+            # The string is wrapped with tildes (~), so we need to remove them
+            # and return the string value.
             print(f"node_type:{node_type}, value: {children[1]}")
-            # TODO vapis value???
-            return children[1].value
+            string_value = str(children[1])
+            return string_value
+
         elif node_type == "array":
             data_type = str(children[0])
             identifier = str(children[1])
@@ -361,13 +394,44 @@ class ASTBuilder(Visitor):
             size = int(children[3].value)
             print(f"node_type:{node_type}, data_type: {data_type}, identifier: {identifier}, size: {size}")
             return Array(data_type, identifier, size)
+        # elif node_type == "variable_declaration":
+        #     data_type = str(children[0])
+        #     variable_name = str(children[1])
+        #     equal_to = children[2] if len(children) > 2 else None
+        #     # pending work
+        #     print(f"node_type:{node_type}, data_type: {data_type}, variable_name: {variable_name}, initial_value: {initial_value}, equal_to: {equal_to}")
+        #     return VariableDeclaration(data_type, variable_name, initial_value, equal_to)
         elif node_type == "variable_declaration":
             data_type = str(children[0])
             variable_name = str(children[1])
-            equal_to = children[2] if len(children) > 2 else None
-            # pending work
+            equal_to = None
+            initial_value = None
+
+            if len(children) > 2:
+                equal_to = children[2]
+                if isinstance(equal_to, list):
+                    if isinstance(equal_to[1], Expression) or isinstance(equal_to[1], SpecialFunction) or isinstance(equal_to[1], LetInStatement):
+                        initial_value = equal_to[1]
+                    elif isinstance(equal_to[1], str):
+                        equal_to = equal_to[1]
+                else:
+                    initial_value = equal_to
+                    equal_to = None
+                # elif isinstance(equal_to, Expression) or isinstance(equal_to, SpecialFunction) or isinstance(equal_to, LetInStatement):
+                #     initial_value = equal_to
+                #     equal_to = None
             print(f"node_type:{node_type}, data_type: {data_type}, variable_name: {variable_name}, initial_value: {initial_value}, equal_to: {equal_to}")
             return VariableDeclaration(data_type, variable_name, initial_value, equal_to)
+        
+        elif node_type == "post_equal_to":
+            if len(children) == 4 and children[0] == "ENTER":
+                string_value = str(children[2])
+                return string_value
+            elif len(children) == 1:
+                return children[0]
+            else:
+                raise ValueError("Unexpected structure for 'post_equal_to' node")
+
         elif node_type == "compound_array":
             if len(children) == 1:
                 return children[0]
@@ -381,14 +445,14 @@ class ASTBuilder(Visitor):
                     print(f"node_type:{node_type}, data_type: {data_type}, identifier: {identifier}")
                     return TUP(data_type, identifier)
         
-        elif node_type == "variable_declaration":
-            data_type = str(children[0])
-            variable_name = str(children[1])
-            equal_to = children[2] if len(children) > 2 else None
-            print(f"abhi variable declaration mai hai, kuch dikkat aa rahi hai. Ye rahe children: {children}")
-            initial_value = children[3] if len(children) > 3 else None
-            print(f"node_type:{node_type}, data_type: {data_type}, variable_name: {variable_name}, initial_value: {initial_value}")
-            return VariableDeclaration(data_type, variable_name, initial_value, equal_to)
+        # elif node_type == "variable_declaration":
+        #     data_type = str(children[0])
+        #     variable_name = str(children[1])
+        #     equal_to = children[2] if len(children) > 2 else None
+        #     print(f"abhi variable declaration mai hai, kuch dikkat aa rahi hai. Ye rahe children: {children}")
+        #     initial_value = children[3] if len(children) > 3 else None
+        #     print(f"node_type:{node_type}, data_type: {data_type}, variable_name: {variable_name}, initial_value: {initial_value}")
+        #     return VariableDeclaration(data_type, variable_name, initial_value, equal_to)
         elif node_type == "compound_var":
 
             if len(children) == 1:
@@ -713,8 +777,9 @@ def final_iteration(tree_node, tokens,graph, parent_node=None):
 # Grammar for the parser
 grammar = """
 start                   :   program
-program	                :	DEFINE NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_BRACES statements YIELD NUM_LITERAL END_OF_LINE CLOSE_BRACES
+program	                :	main_func
                         |   func_def program
+main_func               :   DEFINE NUM MAIN OPEN_PARENTHESIS CLOSE_PARENTHESIS OPEN_BRACES statements YIELD NUM_LITERAL END_OF_LINE CLOSE_BRACES
 func_def                :   DEFINE function_type IDENTIFIER OPEN_PARENTHESIS parameter_list CLOSE_PARENTHESIS function_block
 
 function_block	        :	OPEN_BRACES statements YIELD return_value END_OF_LINE CLOSE_BRACES
@@ -912,7 +977,9 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
 define num main() {
-    num a = 4+3;
+    num a = 5;
+    num b = 7;
+    num c = a + b;
     yield 0;
 }"""
 # ----------------------------------------------------------------------------------------------------------------------------
@@ -946,11 +1013,12 @@ png_name = "abstract_syntax_tree.png"
 # Final function to be used: 
 final_iteration(tree, tokens, graph=graph[0])
 ast_builder = ASTBuilder()
-# print(tree.pretty())
+rich.print(tree)
+print(tree)
 ast = ast_builder.transform(tree)
 # print(ast)
 
-import rich
+
 rich.print(ast)
 # print("-----------------------------------------------------------------------------------------")
 # a function to print the ast:
