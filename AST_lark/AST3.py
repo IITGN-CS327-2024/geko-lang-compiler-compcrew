@@ -26,9 +26,30 @@ import rich
 class Program:
     function_defs: List['FunctionDef']
     main_function: 'MainFunc'
+
 @dataclass
 class MainFunc:
-    statements: List['Statement']
+    statements: List[Union['Scope', 'VariableDeclaration', 'AssignmentStatement', 'ShowStatement', 'ConditionalStatement', 'LoopStatement', 'ValueChangeArray', 'PopStatement', 'TryCatchStatement', 'FunctionCall', 'UnaryStatement', 'FunctionDef']]
+
+@dataclass
+class Scope:
+    statements: List[Union['Scope', 'VariableDeclaration', 'AssignmentStatement', 'ShowStatement', 'ConditionalStatement', 'LoopStatement', 'ValueChangeArray', 'PopStatement', 'TryCatchStatement', 'FunctionCall', 'UnaryStatement', 'FunctionDef']]
+
+@dataclass
+class AssignmentStatement:
+    variable_name: str
+    assignment_operators: str
+    value: Union['Expression', 'SpecialFunction', 'LetInStatement']
+
+@dataclass
+class EnterStatement:
+    string: str
+
+@dataclass
+class UnaryStatement:
+    unary_operator: str
+    # value: Union['Expression', 'SpecialFunction', 'LetInStatement']
+    value: str
 
 @dataclass
 class FunctionDef:
@@ -175,10 +196,6 @@ class LetInBraces:
     let_in: Union['LetInStatement', 'Expression']
 
 @dataclass
-class Block:
-    statements: List['Statement']
-
-@dataclass
 class ListAppendTail:
     elements: List['Expression']
     identifier: Optional[str]
@@ -238,7 +255,7 @@ class ASTBuilder(Visitor):
             return children[0]
         elif node_type == "program":
             function_defs = [child for child in children[:-1] if isinstance(child, FunctionDef)]
-            main_function = children[-1]
+            main_function = children[-1] # if children[-1].__class__.__name__ == "MainFunc" else None
             # if isinstance(children[-1], FunctionDef) else None
             print(f"node_type:{node_type}, function_defs: {function_defs}, main_function: {main_function}")
             return Program(function_defs, main_function)
@@ -391,7 +408,7 @@ class ASTBuilder(Visitor):
             data_type = str(children[0])
             identifier = str(children[1])
             # TODO vapis value???
-            size = int(children[3].value)
+            size = int(children[3])
             print(f"node_type:{node_type}, data_type: {data_type}, identifier: {identifier}, size: {size}")
             return Array(data_type, identifier, size)
         # elif node_type == "variable_declaration":
@@ -402,24 +419,30 @@ class ASTBuilder(Visitor):
         #     print(f"node_type:{node_type}, data_type: {data_type}, variable_name: {variable_name}, initial_value: {initial_value}, equal_to: {equal_to}")
         #     return VariableDeclaration(data_type, variable_name, initial_value, equal_to)
         elif node_type == "variable_declaration":
-            data_type = str(children[0])
-            variable_name = str(children[1])
-            equal_to = None
-            initial_value = None
+            if children[0].__class__.__name__ == "Array":
+                data_type = "Array " + children[0].data_type
+                variable_name = children[0].identifier
+                initial_value = children[0].size
+                equal_to = None
+            else:
+                data_type = children[0]
+                variable_name = str(children[1])
+                equal_to = None
+                initial_value = None
 
-            if len(children) > 2:
-                equal_to = children[2]
-                if isinstance(equal_to, list):
-                    if isinstance(equal_to[1], Expression) or isinstance(equal_to[1], SpecialFunction) or isinstance(equal_to[1], LetInStatement):
-                        initial_value = equal_to[1]
-                    elif isinstance(equal_to[1], str):
-                        equal_to = equal_to[1]
-                else:
-                    initial_value = equal_to
-                    equal_to = None
-                # elif isinstance(equal_to, Expression) or isinstance(equal_to, SpecialFunction) or isinstance(equal_to, LetInStatement):
-                #     initial_value = equal_to
-                #     equal_to = None
+                if len(children) > 2:
+                    equal_to = children[2]
+                    if isinstance(equal_to, list):
+                        if isinstance(equal_to[1], Expression) or isinstance(equal_to[1], SpecialFunction) or isinstance(equal_to[1], LetInStatement):
+                            initial_value = equal_to[1]
+                        elif isinstance(equal_to[1], str):
+                            equal_to = equal_to[1]
+                    else:
+                        initial_value = equal_to
+                        equal_to = None
+                    # elif isinstance(equal_to, Expression) or isinstance(equal_to, SpecialFunction) or isinstance(equal_to, LetInStatement):
+                    #     initial_value = equal_to
+                    #     equal_to = None
             print(f"node_type:{node_type}, data_type: {data_type}, variable_name: {variable_name}, initial_value: {initial_value}, equal_to: {equal_to}")
             return VariableDeclaration(data_type, variable_name, initial_value, equal_to)
         
@@ -471,13 +494,15 @@ class ASTBuilder(Visitor):
                 return None
         
         elif node_type == "list_append_tail":
-            if children[0].data == "expressions":
+            elements = None
+            identifier = None
+            if children[0] == "expressions":
                 elements = children[1]
                 identifier = None
-            elif children[0].data == "TAIL":
+            elif children[0] == "TAIL":
                 elements = None
                 identifier = str(children[2])
-            elif children[0].data == "APPEND":
+            elif children[0] == "APPEND":
                 elements = [children[2]]
                 identifier = str(children[4])
             print(f"node_type:{node_type}, elements: {elements}, identifier: {identifier}")
@@ -495,7 +520,7 @@ class ASTBuilder(Visitor):
         elif node_type == "block":
             statements = children[1]
             print(f"node_type:{node_type}, statements: {statements}")
-            return Block(statements)
+            return Scope(statements)
         elif node_type == "value_change_array":
             identifier = str(children[0])
             index = int(children[2].value)
@@ -683,7 +708,8 @@ class ASTBuilder(Visitor):
             return LetInStatement(data_type, variable_name, value)
         elif node_type == "statement":
             # statement_type = children[0].data
-            statement_type = children[0] # ye galat hai i know, isko change karna padenga
+            # statement_type = children[0] # ye galat hai i know, isko change karna padenga
+            statement_type = children[0].__class__.__name__
             value = children[0]
             print(f"node_type:{node_type}, statement_type: {statement_type}, value: {value}")
             return Statement(statement_type, value)
@@ -977,9 +1003,7 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
 define num main() {
-    num a = 5;
-    num b = 7;
-    num c = a + b;
+    add(1, 2);
     yield 0;
 }"""
 # ----------------------------------------------------------------------------------------------------------------------------
