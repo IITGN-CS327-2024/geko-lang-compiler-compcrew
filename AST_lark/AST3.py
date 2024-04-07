@@ -128,8 +128,8 @@ class SpecialFunction:
 
 @dataclass
 class Expression:
+    operator_if_exists: Optional[str]
     terms: List['Term']
-    operations: Optional[List['BinaryOperator']]
 
 @dataclass
 class Term:
@@ -141,13 +141,6 @@ class Term:
 @dataclass
 class BinaryOperator:
     operator: str
-
-@dataclass
-class ConditionalStatement:
-    condition: Union['SpecialFunction', 'Expression']
-    conditional_block: Union['YieldBlock', 'Block']
-    other_blocks: List['OtherBlock']
-    otherwise_block: Optional['OtherwiseBlock']
 
 @dataclass
 class OtherBlock:
@@ -166,8 +159,9 @@ class LoopStatement:
 
 @dataclass
 class ConditionalArgument:
-    condition: Union['SpecialFunction', 'Expression']
+    is_special: Optional['SpecialFunction']
     comparison_operator: Optional[str]
+    expression: 'Expression'
 
 @dataclass
 class TryCatchStatement:
@@ -232,6 +226,13 @@ class PopStatement:
 class EqualTo:
     value: list
 
+@dataclass
+class ConditionalStatement:
+    conditional_argument: 'ConditionalArgument'
+    conditional_block: Union['YieldBlock', 'Block']
+    other_blocks: Optional[List['OtherBlock']]
+    otherwise_block: Optional['OtherwiseBlock']
+
 #================================
 from lark import Visitor, Tree, Token
 from dataclasses import dataclass
@@ -242,14 +243,14 @@ from typing import List, Optional, Union
 class ASTBuilder(Visitor):
     def __default__(self, tree):
         children = [self.transform(child) for child in tree.children]
-        print("----------------------------------------------------------")
-        print(f"the tree data from __default__ is: {tree.data}, children are: {children}")
+        # print("----------------------------------------------------------")
+        # print(f"the tree data from __default__ is: {tree.data}, children are: {children}")
         return self.create_node(tree.data, children)
 
     def create_node(self, node_type, children):
-        print("----------------------------------------------------------")
-        print(f"node_type from create_node: {node_type}, children: {children}")
-        print("----------------------------------------------------------")
+        # print("----------------------------------------------------------")
+        # print(f"node_type from create_node: {node_type}, children: {children}")
+        # print("----------------------------------------------------------")
         if node_type == "start":
             print(f"node_type: {node_type}, value: {children[0]}")
             return children[0]
@@ -537,10 +538,23 @@ class ASTBuilder(Visitor):
             print(f"node_type:{node_type}, expressions: {expressions}")
             return expressions
         elif node_type == "expression":
-            terms = children[0] if children else []
-            operations = children[1] if len(children) > 1 else None
-            print(f"node_type:{node_type}, terms: {terms}, operations: {operations}")
-            return Expression(terms, operations)
+            terms = [children[0], children[2:]] if children else None
+            operator_if_exists = children[1][0][0] if children[1][0] else None
+            print()
+            print("##########################################################")
+            print("##########################################################")
+            print("##########################################################")
+            print(type(operator_if_exists))
+            # print(operator_if_exists)
+            # print(terms)
+            print(children)
+            print("##########################################################")
+            print("##########################################################")
+            print("##########################################################")
+            print()
+            # operations = children[1] if len(children) > 1 else None
+            # print(f"node_type:{node_type}, terms: {terms}")
+            return Expression(operator_if_exists, terms)
         elif node_type == "terms":
             print(f"the children of terms are as follows: {[child for child in children]}")
             if not children:
@@ -602,7 +616,7 @@ class ASTBuilder(Visitor):
             return Term(value, identifier, expression, unary_operator)
         elif node_type == "binary_operators":
             print(f"node_type:{node_type}, value: {children[0]}")
-            return BinaryOperator(str(children[0]))
+            return str(children[0])
         elif node_type == "unary_operators":
             print(f"node_type:{node_type}, value: {children[0]}")
             return UnaryOperator(str(children[0]))
@@ -614,21 +628,29 @@ class ASTBuilder(Visitor):
             return children[0]
         elif node_type == "conditional_argument":
             # if children[0].data == "special_function":
-            if children[0] == "special_function":
-                condition = children[0]
+            if children[0].__class__.__name__ == "SpecialFunction":
+                is_special = children[0]; 
                 comparison_operator = str(children[1]) if len(children) > 1 else None
+                expression = children[2] if len(children) > 1 else None
             else:
-                condition = children[0]
+
+                expression = children[0]
                 comparison_operator = None
-            print(f"node_type:{node_type}, condition: {condition}, comparison_operator: {comparison_operator}")
-            return ConditionalArgument(condition, comparison_operator)
+                is_special = None
+            print(f"node_type:{node_type}, is_special: {is_special}, comparison_operator: {comparison_operator}, expression: {expression}")
+            return ConditionalArgument(is_special, comparison_operator, expression)
         elif node_type == "conditional_statement":
-            condition = children[2]
+            # given = children[0]
+            # open_parenthesis = children[1]
+            conditional_argument = children[2]
+            # close_parenthesis = children[3]
             conditional_block = children[4]
-            other_blocks = children[5]
+            other_blocks = children[5] if len(children) > 5 else []
             otherwise_block = children[6] if len(children) > 6 else None
-            print(f"node_type:{node_type}, condition: {condition}, conditional_block: {conditional_block}, other_blocks: {other_blocks}, otherwise_block: {otherwise_block}")
-            return ConditionalStatement(condition, conditional_block, other_blocks, otherwise_block)
+            print(f"node_type:{node_type}, conditional_argument: {conditional_argument}, conditional_block: {conditional_block}, other_blocks: {other_blocks}, otherwise_block: {otherwise_block}")
+            return ConditionalStatement(conditional_argument, conditional_block, other_blocks, otherwise_block)
+            
+
         elif node_type == "other_block":
             if children == [None]:
                 print(f"node_type:{node_type}, value: []")
@@ -753,14 +775,14 @@ class ASTBuilder(Visitor):
 
     def transform(self, tree):
         if isinstance(tree, Tree):
-            print("this is the start from a tree node i.e. transform...")
+            # print("this is the start from a tree node i.e. transform...")
             # print()
-            print("tree.data from transform is:",tree.data)
-            print()
+            # print("tree.data from transform is:",tree.data)
+            # print()
             return self.__default__(tree)
         elif isinstance(tree, Token):
-            print("value from transform is:",tree.value)
-            print()
+            # print("value from transform is:",tree.value)
+            # print()
             return tree.value
         else:
             raise ValueError(f"Unexpected input: {tree}")
@@ -1005,11 +1027,14 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 code = """
 define num main() {
     ## add(1, 2);
-    num a = 4;
-    given(a == 4 && a == 5) {
-        show(a);
-    } otherwise {
-        show(0);
+    given (length(b) >= 3) {
+        yield 30;
+    }other(b <= 2) {
+        yield 20;
+    }other(g >= 1) {
+        yield 10;
+    }otherwise {
+        yield 0;
     }
     yield 0;
 }"""
