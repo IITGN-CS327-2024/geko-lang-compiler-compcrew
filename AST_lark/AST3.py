@@ -538,7 +538,7 @@ class ASTBuilder(Visitor):
             print(f"node_type:{node_type}, expressions: {expressions}")
             return expressions
         elif node_type == "expression":
-            terms = [children[0], children[2:]] if children else None
+            terms = [children[0], children[1][1][0] if children[1][1] is not None else children[1][1]] if children else None
             operator_if_exists = children[1][0][0] if children[1][0] else None
             print()
             print("##########################################################")
@@ -1031,7 +1031,7 @@ define num main() {
         yield 30;
     }other(b <= 2) {
         yield 20;
-    }other(g >= 1) {
+    }other(g != 1) {
         yield 10;
     }otherwise {
         yield 0;
