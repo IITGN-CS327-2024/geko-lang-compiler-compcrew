@@ -29,11 +29,11 @@ class Program:
 
 @dataclass
 class MainFunc:
-    statements: List[Union['Scope', 'VariableDeclaration', 'AssignmentStatement', 'ShowStatement', 'ConditionalStatement', 'LoopStatement', 'ValueChangeArray', 'PopStatement', 'TryCatchStatement', 'FunctionCall', 'UnaryStatement', 'FunctionDef']]
+    statements: List[Union['Block', 'VariableDeclaration', 'AssignmentStatement', 'ShowStatement', 'ConditionalStatement', 'LoopStatement', 'ValueChangeArray', 'PopStatement', 'TryCatchStatement', 'FunctionCall', 'UnaryStatement', 'FunctionDef']]
 
 @dataclass
-class Scope:
-    statements: List[Union['Scope', 'VariableDeclaration', 'AssignmentStatement', 'ShowStatement', 'ConditionalStatement', 'LoopStatement', 'ValueChangeArray', 'PopStatement', 'TryCatchStatement', 'FunctionCall', 'UnaryStatement', 'FunctionDef']]
+class Block:
+    statements: List[Union['Block', 'VariableDeclaration', 'AssignmentStatement', 'ShowStatement', 'ConditionalStatement', 'LoopStatement', 'ValueChangeArray', 'PopStatement', 'TryCatchStatement', 'FunctionCall', 'UnaryStatement', 'FunctionDef']]
 
 @dataclass
 class AssignmentStatement:
@@ -60,7 +60,7 @@ class FunctionDef:
 
 @dataclass
 class FunctionBlock:
-    statements: List['Statement']
+    statements: List[Union['Block', 'VariableDeclaration', 'AssignmentStatement', 'ShowStatement', 'ConditionalStatement', 'LoopStatement', 'ValueChangeArray', 'PopStatement', 'TryCatchStatement', 'FunctionCall', 'UnaryStatement', 'FunctionDef']]
     return_value: Union['Expression', 'FunctionCall']
 
 @dataclass
@@ -177,7 +177,7 @@ class TryCatchStatement:
 
 @dataclass
 class YieldBlock:
-    statements: List['Statement']
+    statements: List[Union['Block', 'VariableDeclaration', 'AssignmentStatement', 'ShowStatement', 'ConditionalStatement', 'LoopStatement', 'ValueChangeArray', 'PopStatement', 'TryCatchStatement', 'FunctionCall', 'UnaryStatement', 'FunctionDef']]
     expression: 'Expression'
 
 @dataclass
@@ -208,14 +208,14 @@ class ListAppendTail:
 class ShowStatement:
     expressions: List['Expression']
 
-@dataclass
-class Statement:
-    statement_type: str
-    value: Optional[Union[
-        'Block', 'VariableDeclaration', 'Assignment', 'ShowStatement',
-        'ConditionalStatement', 'LoopStatement', 'ValueChangeArray',
-        'PopStatement', 'TryCatchStatement', 'FunctionCall', 'FunctionDef'
-    ]]
+# @dataclass
+# class Statement:
+#     statement_type: str
+#     value: Optional[Union[
+#         'Block', 'VariableDeclaration', 'Assignment', 'ShowStatement',
+#         'ConditionalStatement', 'LoopStatement', 'ValueChangeArray',
+#         'PopStatement', 'TryCatchStatement', 'FunctionCall', 'FunctionDef'
+#     ]]
 
 @dataclass
 class ValueChangeArray:
@@ -520,7 +520,7 @@ class ASTBuilder(Visitor):
         elif node_type == "block":
             statements = children[1]
             print(f"node_type:{node_type}, statements: {statements}")
-            return Scope(statements)
+            return Block(statements)
         elif node_type == "value_change_array":
             identifier = str(children[0])
             index = int(children[2].value)
@@ -712,7 +712,8 @@ class ASTBuilder(Visitor):
             statement_type = children[0].__class__.__name__
             value = children[0]
             print(f"node_type:{node_type}, statement_type: {statement_type}, value: {value}")
-            return Statement(statement_type, value)
+            return children[:-1] if children[-1] == "END_OF_LINE" else children
+            # return Statement(statement_type, value)
         elif node_type == "special_function":
             function_type = children[0].data
             if function_type == "IDENTIFIER":
@@ -1003,7 +1004,13 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
 define num main() {
-    add(1, 2);
+    ## add(1, 2);
+    num a = 4;
+    given(a == 4 && a == 5) {
+        show(a);
+    } otherwise {
+        show(0);
+    }
     yield 0;
 }"""
 # ----------------------------------------------------------------------------------------------------------------------------
@@ -1038,7 +1045,7 @@ png_name = "abstract_syntax_tree.png"
 final_iteration(tree, tokens, graph=graph[0])
 ast_builder = ASTBuilder()
 rich.print(tree)
-print(tree)
+# print(tree)
 ast = ast_builder.transform(tree)
 # print(ast)
 
