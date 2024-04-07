@@ -546,9 +546,10 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
 define num main(){
-    given(meow){
-        num x = 4;
-    }
+    num a = 2;
+    num b = 3;
+    num c = a + b;
+    show(c);    
 	yield 0;
 }
 """
@@ -580,16 +581,17 @@ transformer = GEKOTransformer()
 
 graph_of_tree = lark.tree.pydot__tree_to_graph(tree)
 
+print(graph_of_tree)
 #---------------------------------------
 
 graph = pydot.graph_from_dot_data(lark.tree.pydot__tree_to_graph(tree).to_string())
 # function toh chal gaya
-print(type(graph[0]))
+# print(type(graph[0]))
 
 #----------------------------------------------------------------------------------------------------------------------------
 
 png_name = "abstract_syntax_tree.png"
-graph[0].write_png(png_name)
+# graph[0].write_png(png_name)
 
 # graph bhi chal gaya!
 #----------------------------------------------------------------------------------------------------------------------------
@@ -603,6 +605,8 @@ graph[0].write_png(png_name)
 final_iteration(tree, tokens, graph=graph[0])
 ast = transformer.transform(tree)
 print(ast)
+
+print(ast.pretty())
 
 # ----------------------------------------------------------------------------------------------------------------------------
 
