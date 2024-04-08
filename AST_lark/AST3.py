@@ -111,7 +111,10 @@ class ASTBuilder(Visitor):
             if not children:
                 print(f"node_type:{node_type}, value: []")
                 return []
-            print(f"node_type:{node_type}, value: {children[1]}")
+            elif len(children) == 1:
+                print(f"node_type:{node_type}, value: {children[0]}")
+                return children[0]
+            print(f"node_type:{node_type}, value: {children}")
             return children[1]
         elif node_type == "post_equal_to":
             # TODO - handle ENTER or enter
@@ -209,7 +212,10 @@ class ASTBuilder(Visitor):
                 variable_name = children[0].identifier
                 initial_value = children[0].size
                 initial_value = None
-                equal_to = [children[0], children[1][1]]
+                if children[1]:
+                    equal_to = [children[0], children[1][1]]
+                else:
+                    equal_to = None
                 # equal_to.extend(children[1][0]) if len(children) > 1 else None
             elif children[0].__class__.__name__ == "LIST": 
                 data_type = children[0]
@@ -514,15 +520,24 @@ class ASTBuilder(Visitor):
             #     data_type = None
             #     variable_name = str(children[1])
             #     value = children[3]
-            
+            data_type = children[1]
+            variable_name = children[2]
+            operation = None
             if children[4] == "OPEN_BRACES":
                 value = children[5]
+                # operation ka define karna padega iske liye
+                # value = 'bhai children[5]'
             else:
                 value = children[4]
+                # operation ka define karna padega iske liye
+                # value = 'bhai children[4] else'
             if len(children) > 6:
-                value = LetInStatement(value_or_letin=value, variable_name=children[6][1], data_type=children[6][0])
-            print(f"node_type:{node_type}, data_type: {data_type}, variable_name: {variable_name}, value: {value}")
-            return LetInStatement(data_type, variable_name, value)
+                # value = LetInStatement(value_or_letin=value, variable_name=children[6], data_type=children[6][0])
+                value = 'bhai children[6] if len(children) > 6'
+                value = children[4]
+                operation = children[6]
+            print(f"node_type:{node_type}, data_type: {data_type}, variable_name: {variable_name}, value: {value}, operation: {operation}")
+            return LetInStatement(data_type=data_type, variable_name=variable_name, value_or_letin=value, operation=operation)
             # if len(children)
             # if children[4] == "OPEN_BRACES":
             #     value = children[5]
@@ -628,11 +643,8 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 code = """
 define num main() {
     ## num testLet = let num testLetInside = 5 in testLetInside*testLetInside;
-    ## let num testLet = let num testLetInside = 5 in testLetInside*testLetInside;
-    list testList = tail(testVar);
-    list testList2 = [1, 2, 3, 4, 5];
-    list testList3 = append(6, testList2);
-    num c = 1+2+4+5+3+5;
+    num testLet = let num testLetInside = 5 in testLetInside + testLetInside*testLetInside;
+    num testArray[4];
     yield 658;
 }"""
 # ----------------------------------------------------------------------------------------------------------------------------

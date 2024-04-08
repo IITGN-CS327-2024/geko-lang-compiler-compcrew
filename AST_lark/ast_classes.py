@@ -167,6 +167,7 @@ class LetInStatement:
     variable_name: str
     # in_in = str
     value_or_letin: Optional[Union['Term', 'Expression', 'LetInStatement']]
+    operation: Optional['Expression']
     
 
 # @dataclass
