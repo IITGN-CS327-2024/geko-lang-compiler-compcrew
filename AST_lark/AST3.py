@@ -205,10 +205,19 @@ class ASTBuilder(Visitor):
         #     return VariableDeclaration(data_type, variable_name, initial_value, equal_to)
         elif node_type == "variable_declaration":
             if children[0].__class__.__name__ == "Array":
-                data_type = "Array " + children[0].data_type
+                data_type = children[0]
                 variable_name = children[0].identifier
                 initial_value = children[0].size
-                equal_to = None
+                initial_value = None
+                equal_to = [children[0], children[1][1]]
+                # equal_to.extend(children[1][0]) if len(children) > 1 else None
+            elif children[0].__class__.__name__ == "LIST" or children[0].__class__.__name__ == "TUP":
+                data_type = children[0]
+                variable_name = children[0].identifier
+                initial_value = children[0].size
+                initial_value = None
+                equal_to = [children[0], children[1][1]]
+                # equal_to.extend(children[1][0]) if len(children) > 1 else None
             else:
                 data_type = children[0]
                 variable_name = str(children[1])
@@ -266,8 +275,8 @@ class ASTBuilder(Visitor):
             if len(children) == 1:
                 return None
             elif len(children) == 2:
-                if children[0] == "EQUAL_TO":
-                    return 
+                if children[1].__class__.__name__ == "ListAppendTail":
+                    return children
                 else:
                     return children[0]
             elif len(children) == 4:
@@ -279,17 +288,21 @@ class ASTBuilder(Visitor):
                 return None
         
         elif node_type == "list_append_tail":
-            elements = None
-            identifier = None
-            if children[0] == "expressions":
-                elements = children[1]
+            elements = 'bhai0'
+            identifier = children
+            if children[1].__class__.__name__ == "Expression":
+                elements =[ children[1] ]
+                elements.extend(children[2]) if len(children) > 2 else None
                 identifier = None
-            elif children[0] == "TAIL":
+            elif children[0] == "tail":
                 elements = None
-                identifier = str(children[2])
-            elif children[0] == "APPEND":
-                elements = [children[2]]
-                identifier = str(children[4])
+                # identifier = str(children[2])
+                identifier = children[2]
+            elif children[0] == "append":
+                # elements = [children[2]]
+                # identifier = str(children[4])
+                elements = children[2].terms[0].value
+                identifier = children[4]
             print(f"node_type:{node_type}, elements: {elements}, identifier: {identifier}")
             return ListAppendTail(elements, identifier)
         elif node_type == "assignment_statement":
@@ -505,6 +518,10 @@ class ASTBuilder(Visitor):
             # statement_type = children[0] # ye galat hai i know, isko change karna padenga
             statement_type = children[0].__class__.__name__
             value = children[0]
+            if children[-1] == ";":
+                children.pop()
+                children = children[0] 
+                # ye change kar dena agar baadme kuch gadbad ho toh
             print(f"node_type:{node_type}, statement_type: {statement_type}, value: {value}")
             return children[:-1] if children[-1] == "END_OF_LINE" else children
             # return Statement(statement_type, value)
@@ -591,10 +608,11 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
 define num main() {
-    ## add(1, 2);
-    str a = enter(~hello~);
-    num x = let num a = 10 in a*a;
-    yield 0;
+    list testList = tail(testVar);
+    list testList2 = [1, 2, 3, 4, 5];
+    list testList3 = append(6, testList2);
+    num c = 1 + 2 + 3 + 4;
+    yield 658;
 }"""
 # ----------------------------------------------------------------------------------------------------------------------------
 

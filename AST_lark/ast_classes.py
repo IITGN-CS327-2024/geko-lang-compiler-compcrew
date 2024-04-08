@@ -205,7 +205,7 @@ class PopStatement:
 
 @dataclass
 class EqualTo:
-    value: list
+    value: List[Union['Expression', 'SpecialFunction', 'LetInStatement', 'FunctionCall']]
 
 @dataclass
 class ConditionalStatement:
