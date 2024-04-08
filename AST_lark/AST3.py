@@ -366,15 +366,15 @@ class ASTBuilder(Visitor):
                     identifier = str(children[2])
                     print(f"node_type:{node_type}, identifier: {identifier}")
                     return SpecialFunction(identifier, None, None, None, "head", None, None)
-                elif children[0] == "isempty":
+                elif children[0] == "isEmpty":
                     identifier = str(children[2])
                     print(f"node_type:{node_type}, identifier: {identifier}")
                     return SpecialFunction(identifier, None, None, None, None, "isempty", None)
 
                 identifier = str(children[0])
                 # .value?? .data?? ya phir children[2][0]???
-                num_literal_start = int(children[2].value)
-                num_literal_end = int(children[4].value)
+                num_literal_start = int(children[2])
+                num_literal_end = int(children[4])
                 print(f"node_type:{node_type}, identifier: {identifier}, num_literal_start: {num_literal_start}, num_literal_end: {num_literal_end}")
                 return SpecialFunction(identifier, num_literal_start, num_literal_end, None, None, None, None)
         elif node_type == "data_type":
