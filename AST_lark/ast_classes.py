@@ -162,13 +162,16 @@ class FunctionCall:
 
 @dataclass
 class LetInStatement:
+    # let: str
     data_type: str
     variable_name: str
-    value: Union['Term', 'Expression', 'LetInBraces']
+    # in_in = str
+    value_or_letin: Optional[Union['Term', 'Expression', 'LetInStatement']]
+    
 
-@dataclass
-class LetInBraces:
-    let_in: Union['LetInStatement', 'Expression']
+# @dataclass
+# class LetInBraces:
+#     let_in: Union['LetInStatement', 'Expression']
 
 @dataclass
 class ListAppendTail:

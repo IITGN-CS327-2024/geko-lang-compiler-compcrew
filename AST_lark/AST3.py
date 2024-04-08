@@ -211,10 +211,15 @@ class ASTBuilder(Visitor):
                 initial_value = None
                 equal_to = [children[0], children[1][1]]
                 # equal_to.extend(children[1][0]) if len(children) > 1 else None
-            elif children[0].__class__.__name__ == "LIST" or children[0].__class__.__name__ == "TUP":
+            elif children[0].__class__.__name__ == "LIST": 
                 data_type = children[0]
                 variable_name = children[0].identifier
-                initial_value = children[0].size
+                initial_value = None
+                equal_to = [children[0], children[1][1]]
+                # equal_to.extend(children[1][0]) if len(children) > 1 else None
+            elif children[0].__class__.__name__ == "TUP":
+                data_type = children[0]
+                variable_name = children[0].identifier
                 initial_value = None
                 equal_to = [children[0], children[1][1]]
                 # equal_to.extend(children[1][0]) if len(children) > 1 else None
@@ -494,25 +499,38 @@ class ASTBuilder(Visitor):
         elif node_type == "let_in_braces":
             let_in = children[0]
             print(f"node_type:{node_type}, let_in: {let_in}")
-            return LetInBraces(let_in)
+            return LetInBraces(let_in) # isko change crow
+        
         elif node_type == "let_in":
             if isinstance(children[0], LetInStatement):
                 print(f"node_type:{node_type}, value: {children[0]}")
                 return children[0]
             else:
                 print(f"node_type:{node_type}, value: {children[0]}")
-                return children[0]
+                # return 'bhai'
+                return children
         elif node_type == "let_in_statement":
-            data_type = str(children[1])
-            variable_name = str(children[2])
+            # if len(children) == 4:
+            #     data_type = None
+            #     variable_name = str(children[1])
+            #     value = children[3]
+            
             if children[4] == "OPEN_BRACES":
                 value = children[5]
             else:
                 value = children[4]
             if len(children) > 6:
-                value = LetInBraces(value)
+                value = LetInStatement(value_or_letin=value, variable_name=children[6][1], data_type=children[6][0])
             print(f"node_type:{node_type}, data_type: {data_type}, variable_name: {variable_name}, value: {value}")
             return LetInStatement(data_type, variable_name, value)
+            # if len(children)
+            # if children[4] == "OPEN_BRACES":
+            #     value = children[5]
+            # else:
+            #     value = children[5]
+            
+            # print(f"node_type:{node_type}, data_type: {data_type}, variable_name: {variable_name}, value: {value}")
+            # return LetInStatement(data_type, variable_name, value)
         elif node_type == "statement":
             # statement_type = children[0].data
             # statement_type = children[0] # ye galat hai i know, isko change karna padenga
@@ -523,6 +541,7 @@ class ASTBuilder(Visitor):
                 children = children[0] 
                 # ye change kar dena agar baadme kuch gadbad ho toh
             print(f"node_type:{node_type}, statement_type: {statement_type}, value: {value}")
+            return children
             return children[:-1] if children[-1] == "END_OF_LINE" else children
             # return Statement(statement_type, value)
         elif node_type == "special_function":
@@ -608,15 +627,18 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
 define num main() {
+    ## num testLet = let num testLetInside = 5 in testLetInside*testLetInside;
+    ## let num testLet = let num testLetInside = 5 in testLetInside*testLetInside;
     list testList = tail(testVar);
     list testList2 = [1, 2, 3, 4, 5];
     list testList3 = append(6, testList2);
-    num c = 1 + 2 + 3 + 4;
+    num c = 1+2+4+5+3+5;
     yield 658;
 }"""
 # ----------------------------------------------------------------------------------------------------------------------------
 
 parser_lark_dir = os.path.dirname(__file__)
+
 tokens = lexer_lark.lexer(code)
 
 # ----------------------------------------------------------------------------------------------------------------------------
