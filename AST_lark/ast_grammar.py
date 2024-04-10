@@ -10,7 +10,7 @@ func_def                :   DEFINE function_type IDENTIFIER OPEN_PARENTHESIS par
 function_block	        :	OPEN_BRACES statements YIELD return_value END_OF_LINE CLOSE_BRACES
 function_type	        :	NUM | STR | FLAG | VOID
 parameter_list	        :	parameter parameters | epsilon
-return_value	        :	expression | function_call
+return_value	        :	expression
 parameters	            :	ELEMENT_SEPERATOR parameter parameters 
                         |   epsilon
 parameter	            :	compound_data_type IDENTIFIER | basic_data_type IDENTIFIER choose_array
@@ -21,7 +21,6 @@ statements	            :	statement statements
 equal_to                :   EQUAL_TO post_equal_to | epsilon
 post_equal_to           :   ENTER OPEN_PARENTHESIS string CLOSE_PARENTHESIS 
                         |   expression
-                        |   special_function
                         |   let_in_statement 
                         
 special_function        :   IDENTIFIER OPEN_BRACKET NUM_LITERAL SLICING_COLON NUM_LITERAL CLOSE_BRACKET
@@ -81,6 +80,7 @@ term	                :   IDENTIFIER
                         |   IDENTIFIER UNARY_OPERATOR
                         |   IDENTIFIER OPEN_BRACKET expression CLOSE_BRACKET
                         |   LENGTH
+                        |   special_function
                         
 binary_operators	    :	BINARY_OPERATOR 
                         |   COMPARISON_OPERATOR 
