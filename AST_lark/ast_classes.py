@@ -111,6 +111,7 @@ class SpecialFunction:
 class Expression:
     operator_if_exists: Optional[str]
     terms: List['Term']
+    # terms: List[Union['Term', 'BinaryOperator', 'UnaryOperator', 'SpecialFunction', 'LetInStatement', 'FunctionCall']]
 
 @dataclass
 class Term:
@@ -217,3 +218,12 @@ class ConditionalStatement:
     conditional_block: Union['YieldBlock', 'Block']
     other_blocks: Optional[List['OtherBlock']]
     otherwise_block: Optional['OtherwiseBlock']
+
+def flatten_list(list_of_lists):
+    flat_list = []
+    for sublist in list_of_lists:
+        if isinstance(sublist, list):
+            flat_list.extend(flatten_list(sublist))
+        elif(sublist is not None):
+            flat_list.append(sublist)
+    return flat_list
