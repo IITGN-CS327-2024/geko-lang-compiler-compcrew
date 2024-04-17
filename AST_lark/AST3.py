@@ -381,7 +381,7 @@ class ASTBuilder(Visitor):
                 terms = [children[0], children[1] if children[1] is not None else None] if children else None
                 # terms = 'bhai1'
                 operator_if_exists = children if '=' in children else None
-                operator_if_exists = children
+                operator_if_exists = None
             elif len(children) == 3:
                 # terms = [children[0], children[1] if children[1] is not None else None]
                 terms = 'bhai2'
