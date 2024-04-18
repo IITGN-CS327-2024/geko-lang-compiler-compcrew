@@ -248,8 +248,10 @@ class ASTBuilder(Visitor):
                 data_type = children[0]
                 variable_name = children[0].identifier
                 initial_value = None
-                equal_to = [children[0], children[1][1]]
-                # equal_to.extend(children[1][0]) if len(children) > 1 else None
+                # equal_to = [children[0], children[1][1]]
+                # equal_to = children[1][1] if len(children[1]) > 1 else children
+                # equal_to.extend(children[1]) if len(children) > 1 else None
+                equal_to = children
             else:
                 data_type = children[0]
                 variable_name = str(children[1])
@@ -316,9 +318,11 @@ class ASTBuilder(Visitor):
                 if children[0] == "EQUAL_TO":
                     return BinaryOperator(children[2], children[1], children[3])
                 else:
-                    return children[0]
+                    # yaha dikkat horeli hai, isliye abhi isko change kiyela hai
+                    return children
             else:
-                return None
+                # yaha bhi dikkat horeli hai, ye isliye change kiya hai 
+                return children
         
         elif node_type == "list_append_tail":
             elements = 'bhai0'
@@ -536,16 +540,18 @@ class ASTBuilder(Visitor):
             block = children[4]
             if children[0] == "iter":
                 loop_type = "iter"
-                condition = [children[2], children[4]]
-                block = children[6]
+                # condition = [children[2], children[4]]
+                condition = [children[2], children[3], children[5]]
+                # block = children[6]
+                block = children[7]
             elif children[0] == "while":
                 loop_type = "while"
                 condition = children[2]
                 block = children[4]
             elif children[0] == "repeat":
-                loop_type = "repeat"
-                condition = children[4]
-                block = children[2]
+                loop_type = "repeat_while"
+                condition = children[-3]
+                block = children[1]
             print(f"node_type:{node_type}, loop_type: {loop_type}, condition: {condition}, block: {block}")
             return LoopStatement(loop_type, condition, block)
         
@@ -679,6 +685,12 @@ class ASTBuilder(Visitor):
         elif node_type == "skip_stop":
             print(f"node_type:{node_type}, value: {children[0]}")
             return str(children[0])
+        elif node_type == "compound_element":
+            print(f"node_type:{node_type}, value: {children[0]}")
+            terms = children if len(children) > 1 else None
+            terms.extend(children[3]) if len(children) > 3 else None
+            operator_if_exists = children[2] if len(children) > 2 else None
+            return Expression(operator_if_exists, terms)
 
     def transform(self, tree):
         if isinstance(tree, Tree):
@@ -726,13 +738,13 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
 define num main() {
-    num y = 2;
-    while (y>=8){
-        num z = 14098;
-        z /= 56/4;
-        
-        y*=4;
-    }
+    ## tup memberOne = [~Shreya~, ~CSE~, 20, yay];
+	## num len = length(data);
+	## str first = data[0];
+	tup tupOne = [1,2,3];
+	tup tupTwo = [~a~, ~b~, ~c~];
+	tup tupThree = tupOne + tupTwo;
+	## show(tupThree);
     yield 658;
 }"""
 # ----------------------------------------------------------------------------------------------------------------------------
