@@ -40,11 +40,31 @@ class ASTBuilder(Visitor):
             return children[0]
         
         elif node_type == "program":
-            function_defs = [child for child in children[:-1] if isinstance(child, FunctionDef)]
-            main_function = children[-1] # if children[-1].__class__.__name__ == "MainFunc" else None
-            # if isinstance(children[-1], FunctionDef) else None
-            print(f"node_type:{node_type}, function_defs: {function_defs}, main_function: {main_function}")
-            return Program(function_defs, main_function)
+            if(len(children) == 1):
+                main_function = children[0]
+                function_defs = []
+                print(f"node_type:{node_type}, main_function: {main_function}")
+                print("**************************************************************************")
+                return (Program(function_defs, main_function))
+            else:
+                function_defs = [children[0]]
+                program = children[1]
+                function_defs.extend(program.function_defs)
+                main_function = program.main_function
+                print(f"node_type:{node_type}, function_defs: {function_defs}, main_function: {main_function}")
+                return Program(function_defs, main_function)
+            #     return function_defs
+            
+            # # function_defs = [child for child in children [:-1]if isinstance(child, FunctionDef)]
+            # function_defs = children[0]
+            # print(f"node_type:{node_type}, function_defs: {function_defs}")
+            # print("**************************************************************************")
+            # main_function = children[-1]
+
+            # # main_function = children[-1] # if children[-1].__class__.__name__ == "MainFunc" else None
+            # # if isinstance(children[-1], FunctionDef) else None
+            # print(f"node_type:{node_type}, function_defs: {function_defs}, main_function: {main_function}")
+            # return Program(function_defs, main_function)
         
         elif node_type == "main_func":
             statements = children[6]
@@ -840,7 +860,6 @@ png_name = "abstract_syntax_tree.png"
 final_iteration(tree, tokens, graph=graph[0])
 ast_builder = ASTBuilder()
 rich.print(tree)
-print(tree)
 # print(tree)
 ast = ast_builder.transform(tree)
 # print(ast)
