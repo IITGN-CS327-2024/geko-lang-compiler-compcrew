@@ -531,15 +531,18 @@ class ASTBuilder(Visitor):
             return OtherwiseBlock(children[1:])
         
         elif node_type == "loop_statement":
-            if children[0].data == "ITER":
+            loop_type = children[0]
+            condition = children[2]
+            block = children[4]
+            if children[0] == "iter":
                 loop_type = "iter"
                 condition = [children[2], children[4]]
                 block = children[6]
-            elif children[0].data == "WHILE":
+            elif children[0] == "while":
                 loop_type = "while"
                 condition = children[2]
                 block = children[4]
-            elif children[0].data == "REPEAT":
+            elif children[0] == "repeat":
                 loop_type = "repeat"
                 condition = children[4]
                 block = children[2]
@@ -723,7 +726,21 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
 define num main() {
-    num testVar = 1 + 2 / 3 - 6; 
+    num y = 2;
+    while (y>=8){
+        num z = 14098;
+        z /= 56/4;
+        given(y>36){
+           skip;	
+        }
+        other(y==36){
+            ## num z = num(enter(~Enter any number~));
+        }
+        otherwise {
+            z -= 2;
+        }
+        y*=4;
+    }
     yield 658;
 }"""
 # ----------------------------------------------------------------------------------------------------------------------------
