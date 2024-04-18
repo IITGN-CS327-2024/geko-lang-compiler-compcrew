@@ -25,6 +25,7 @@ class AssignmentStatement:
 @dataclass
 class EnterStatement:
     string: str
+    enter_value: str
 
 @dataclass
 class UnaryStatement:
