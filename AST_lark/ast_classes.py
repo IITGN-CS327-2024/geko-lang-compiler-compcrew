@@ -28,9 +28,10 @@ class EnterStatement:
 
 @dataclass
 class UnaryStatement:
-    unary_operator: str
+    pre_unary_operator: str
     # value: Union['Expression', 'SpecialFunction', 'LetInStatement']
     value: str
+    post_unary_operator: str
 
 @dataclass
 class FunctionDef:
@@ -136,7 +137,9 @@ class OtherwiseBlock:
 @dataclass
 class LoopStatement:
     loop_type: str
+    declaration: Optional[Union['VariableDeclaration', 'AssignmentStatement']]
     condition: Optional[Union['Expression', 'ConditionalArgument']]
+    updation: Optional[Union['AssignmentStatement', 'UnaryStatement']]
     block: 'Block'
 
 @dataclass
