@@ -76,7 +76,6 @@ term	                :   IDENTIFIER
                         |   unary_operators IDENTIFIER
                         |   IDENTIFIER UNARY_OPERATOR
                         |   IDENTIFIER OPEN_BRACKET expression CLOSE_BRACKET
-                        |   LENGTH
                         |   special_function
                         
 binary_operators	    :	BINARY_OPERATOR 
