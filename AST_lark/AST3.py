@@ -163,12 +163,13 @@ class ASTBuilder(Visitor):
                 return children[0]
             print(f"node_type:{node_type}, value: {children}")
             return children[1]
-        
+
+
         elif node_type == "post_equal_to":
             # TODO - handle ENTER or enter
             # children[0].value/data ??
             if children[0] == "enter":
-                value = str(children[2])
+                value = EnterStatement(children[2],None)
             else:
                 value = children[0]
             print(f"node_type:{node_type}, value: {value}")
@@ -309,15 +310,6 @@ class ASTBuilder(Visitor):
                     #     equal_to = None
             print(f"node_type:{node_type}, data_type: {data_type}, variable_name: {variable_name}, initial_value: {initial_value}, equal_to: {equal_to}")
             return VariableDeclaration(data_type, variable_name, initial_value, equal_to)
-        
-        elif node_type == "post_equal_to":
-            if len(children) == 4 and children[0] == "ENTER":
-                string_value = str(children[2])
-                return string_value
-            elif len(children) == 1:
-                return children[0]
-            else:
-                raise ValueError("Unexpected structure for 'post_equal_to' node")
 
         elif node_type == "compound_array":
             if len(children) == 1:
@@ -518,7 +510,6 @@ class ASTBuilder(Visitor):
                 comparison_operator = str(children[1]) if len(children) > 1 else None
                 expression = children[2] if len(children) > 1 else None
             else:
-
                 expression = children[0]
                 comparison_operator = None
                 is_special = None
@@ -796,10 +787,57 @@ def final_iteration(tree_node, tokens,graph, parent_node=None):
 parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
-define num main() {
-    show(length(a));
-    show(a[1]);
-    yield 1;
+define num add(num x, num y){
+	yield x + y;
+}
+define num subtract(num x, num y){
+	yield x - y;
+}
+define num multiply(num x, num y){
+	yield x * y; 
+}
+define num divide(num x, num y){
+	test{
+		given(y!=0){
+			yield x/y;
+		}
+		otherwise{
+			pop (~Zeroerror~);
+		}
+	}
+	arrest(~Zeroerror~){
+		show (~Divison by zero is not possible!~);
+	}
+	yield x / y;
+}
+
+
+define num main(){
+    show(~Calculator program~);
+	num firstNum = enter(~Enter first number:~);
+	num secondNum = enter(~Enter second number:~);
+	str calFunc = enter(~Enter calculating function: ~);
+
+	given(calFunc == ~+~){
+		num calcVal = add(firstNum, secondNum);
+		show(firstnum, ~ + ~,secondNum, ~ = ~, calcVal);
+	}
+	other(calFunc == ~-~){
+		num calcVal = subtract(firstNum, secondNum);
+		show(firstnum, ~ - ~ ,secondNum, ~ = ~, calcVal);
+	}
+	other(calFunc == ~*~){
+		num calcVal = multiply(firstNum, secondNum);
+		show(firstnum, ~ * ~ ,secondNum, ~ = ~, calcVal);
+	}
+	other(calFunc == ~/~){
+		num calcVal = divide(firstNum, secondNum);
+		show(firstnum, ~ / ~ ,secondNum, ~ = ~, calcVal);
+	}
+	otherwise{
+		show(~invalid character input. Function returning with NULL.~);
+	}
+	yield 0;
 }
 
 
