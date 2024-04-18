@@ -49,11 +49,8 @@ compound_array          :   compound_data_type IDENTIFIER
                         |   array 
 
 compound_var            :   EQUAL_TO list_append_tail
-                        |   EQUAL_TO IDENTIFIER 
+                        |   EQUAL_TO IDENTIFIER
                         |   epsilon
-
-compound_element        :   IDENTIFIER
-                        |   OPEN_BRACKET expression expressions CLOSE_BRACKET
 
 list_append_tail        :   OPEN_BRACKET expression expressions CLOSE_BRACKET
                         |   TAIL OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS
@@ -102,10 +99,14 @@ otherwise_block	        :	OTHERWISE conditional_block
 skip_stop               :   SKIP
                         |   STOP
 
-loop_statement	        :	ITER OPEN_PARENTHESIS statement expression END_OF_LINE expression CLOSE_PARENTHESIS block
+loop_statement	        :	ITER OPEN_PARENTHESIS statement expression END_OF_LINE update_statement CLOSE_PARENTHESIS block
                         |   WHILE OPEN_PARENTHESIS conditional_argument CLOSE_PARENTHESIS block
                         |   REPEAT block WHILE OPEN_PARENTHESIS conditional_argument CLOSE_PARENTHESIS END_OF_LINE
 
+update_statement        :   IDENTIFIER assignment_operators expression
+                        |   IDENTIFIER UNARY_OPERATOR
+                        |   unary_operators IDENTIFIER
+                        
 pop_statement           :   POP OPEN_PARENTHESIS string CLOSE_PARENTHESIS
 
 try_catch_statement	    :	TEST block ARREST OPEN_PARENTHESIS string CLOSE_PARENTHESIS block
