@@ -54,8 +54,8 @@ class ASTBuilder(Visitor):
             print("ye func_def bhi galat hai isko bhi change crow")
             function_type = str(children[1])
             function_name = str(children[2])
-            parameters = children[3]
-            function_block = children[5]
+            parameters = children[4]
+            function_block = children[6]
             print(f"node_type:{node_type}, function_type: {function_type}, function_name: {function_name}, parameters: {parameters}, function_block: {function_block}")
             return FunctionDef(function_type, function_name, parameters, function_block)
         
@@ -81,6 +81,9 @@ class ASTBuilder(Visitor):
         elif node_type == "parameters":
             if not children:
                 return []
+            elif len(children) == 1:
+                print(f"node_type:{node_type}, value: None")
+                return []
             parameters = [children[1]]
             parameters.extend(children[2])
             print(f"node_type:{node_type}, parameters: {parameters}")
@@ -95,16 +98,27 @@ class ASTBuilder(Visitor):
             else:
                 data_type = str(children[0])
                 parameter_name = str(children[1])
-                array_size = int(children[2].value) if len(children) > 2 else None
+                array_size = children[2] if len(children) > 2 else None
                 print(f"node_type:{node_type}, data_type: {data_type}, parameter_name: {parameter_name}, array_size: {array_size}")
                 return Parameter(data_type, parameter_name, array_size)
         
+        # elif node_type == "choose_array":
+        #     if not children:
+        #         print(f"node_type:{node_type}, value: None")
+        #         return None
+        #     print(f"node_type:{node_type}, value: {children[1]}")
+        #     return children[1]
+
         elif node_type == "choose_array":
             if not children:
                 print(f"node_type:{node_type}, value: None")
                 return None
-            print(f"node_type:{node_type}, value: {children[1]}")
-            return children[1]
+            elif len(children) == 1:
+                print(f"node_type:{node_type}, value: None")
+                return None
+            else:
+                print(f"node_type:{node_type}, value: {children[1]}")
+                return children[1]
         
         elif node_type == "statements":
             # if not children:
@@ -777,14 +791,21 @@ def final_iteration(tree_node, tokens,graph, parent_node=None):
 parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
-define num main() {
-	##num x [3] = [1, 2, 3];
-    ##num y = 0;
-    y++;
-    iter(num i = 0; i < 3; i++) {
-        y++;
+define num func1_ex(num a, flag b){
+  yield a + b;
+}
+
+define num func2_ex(){
+    yield 3;
+}
+
+define num main(){
+    flag three = 0;
+    given(three==0){
+        show(~Hello!~);
     }
-    yield 0;
+    num ex_var = func_ex();
+	yield 0;
 }"""
 # ----------------------------------------------------------------------------------------------------------------------------
 
