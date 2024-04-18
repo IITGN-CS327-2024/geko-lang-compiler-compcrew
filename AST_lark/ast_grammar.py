@@ -49,7 +49,7 @@ compound_array          :   compound_data_type IDENTIFIER
                         |   array 
 
 compound_var            :   EQUAL_TO list_append_tail
-                        |   EQUAL_TO compound_element BINARY_OPERATOR compound_element
+                        |   EQUAL_TO IDENTIFIER 
                         |   epsilon
 
 compound_element        :   IDENTIFIER

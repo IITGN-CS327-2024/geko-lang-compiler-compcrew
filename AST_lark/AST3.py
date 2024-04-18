@@ -249,9 +249,9 @@ class ASTBuilder(Visitor):
                 variable_name = children[0].identifier
                 initial_value = None
                 # equal_to = [children[0], children[1][1]]
-                # equal_to = children[1][1] if len(children[1]) > 1 else children
+                equal_to = children[1][1] if len(children[1]) > 1 else children
                 # equal_to.extend(children[1]) if len(children) > 1 else None
-                equal_to = children
+                # equal_to = children
             else:
                 data_type = children[0]
                 variable_name = str(children[1])
@@ -738,13 +738,9 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
 define num main() {
-    ## tup memberOne = [~Shreya~, ~CSE~, 20, yay];
-	## num len = length(data);
-	## str first = data[0];
 	tup tupOne = [1,2,3];
 	tup tupTwo = [~a~, ~b~, ~c~];
-	tup tupThree = tupOne + tupTwo;
-	## show(tupThree);
+    tup tupThree = tupOne;
     yield 658;
 }"""
 # ----------------------------------------------------------------------------------------------------------------------------
