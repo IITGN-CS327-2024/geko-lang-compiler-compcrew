@@ -89,7 +89,6 @@ class UnaryOperator:
 class AssignmentOperator:
     operator: str
 
-
 @dataclass
 class SpecialFunction:
     # identifier
