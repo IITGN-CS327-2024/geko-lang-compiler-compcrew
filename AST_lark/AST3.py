@@ -393,6 +393,7 @@ class ASTBuilder(Visitor):
             statements = children[1]
             print(f"node_type:{node_type}, statements: {statements}")
             return Block(statements)
+        
         elif node_type == "value_change_array":
             identifier = str(children[0])
             index = int(children[2])
@@ -400,6 +401,7 @@ class ASTBuilder(Visitor):
             value = children[5]
             print(f"node_type:{node_type}, identifier: {identifier}, index: {index}, assignment_operators: {assignment_operators}, value: {value}")
             return ValueChangeArray(identifier, index, assignment_operators, value)
+        
         elif node_type == "expressions":
             if not children:
                 print(f"node_type:{node_type}, value: []")
@@ -408,6 +410,7 @@ class ASTBuilder(Visitor):
             expressions.extend(children[2]) if len(children) > 2 else None
             print(f"node_type:{node_type}, expressions: {expressions}")
             return expressions
+        
         elif node_type == "expression":
             # terms = [children[0], children[1][1] if children[1][1] is not None else children[1][1]] if children else None
             if len(children) == 1:
@@ -439,6 +442,7 @@ class ASTBuilder(Visitor):
             # operations = children[1] if len(children) > 1 else None
             # print(f"node_type:{node_type}, terms: {terms}")
             return Expression(operator_if_exists, terms)
+        
         elif node_type == "terms":
             print(f"the children of terms are as follows: {[child for child in children]}")
             if not children:
@@ -465,11 +469,6 @@ class ASTBuilder(Visitor):
             identifier = None
             expression = None
             unary_operator = None
-            print("##############################################################################################################")
-            print("##############################################################################################################")
-            print(children)
-            print("##############################################################################################################")
-            print("##############################################################################################################")
             if isinstance(children[0], Token):
                 value = "garbaaj"
                 # print("children[0]:", children[0])
@@ -586,9 +585,6 @@ class ASTBuilder(Visitor):
                 print(f"node_type:{node_type}, pre_unary_operator: {pre_unary_operator}, value: {value}, post_unary_operator: {post_unary_operator}")
                 return UnaryStatement(pre_unary_operator, value, post_unary_operator)
 
-
-        
-
         elif node_type == "loop_statement":
             loop_type = children[0]
             declaration = None
@@ -663,6 +659,7 @@ class ASTBuilder(Visitor):
                 print(f"node_type:{node_type}, value: {children[0]}")
                 # return 'bhai'
                 return children
+        
         elif node_type == "let_in_statement":
             # if len(children) == 4:
             #     data_type = None
@@ -714,6 +711,9 @@ class ASTBuilder(Visitor):
                     print(f"node_type:{node_type}, pre_unary_operator: {pre_unary_operator}, value: {value},post_unary_operator: {post_unary_operator}")
                     return UnaryStatement(pre_unary_operator, value, post_unary_operator)
             statement_type = children[0].__class__.__name__
+            if statement_type == "ConditionalStatement":
+                # return len(children)
+                return children[0]
             value = children[0]
             if children[-1] == ";":
                 children.pop()
@@ -723,6 +723,7 @@ class ASTBuilder(Visitor):
             return children
             return children[:-1] if children[-1] == "END_OF_LINE" else children
             # return Statement(statement_type, value)
+
         elif node_type == "special_function":
             function_type = children[0].data
             if function_type == "IDENTIFIER":
@@ -736,29 +737,37 @@ class ASTBuilder(Visitor):
                 arguments = [str(children[2])] if len(children) > 2 else []
             print(f"node_type:{node_type}, function_type: {function_type}, arguments: {arguments}")
             return SpecialFunction(function_type, arguments)
+        
         elif node_type == "data_type":
             print(f"node_type:{node_type}, value: {children[0]}")
             return str(children[0]) if children else None
+        
         elif node_type == "num_str_flag":
             print(f"node_type:{node_type}, value: {children[0]}")
             return str(children[0])
+        
         elif node_type == "basic_data_type":
             fix_let = str(children[0]) if children else None
             data_type = str(children[1])
             print(f"node_type:{node_type}, fix_let: {fix_let}, data_type: {data_type}")
             return f"{fix_let} {data_type}" if fix_let else data_type
+        
         elif node_type == "fix_let":
             print(f"node_type:{node_type}, value: {children[0]}")
             return str(children[0]) if children else None
+        
         elif node_type == "compound_data_type":
             print(f"node_type:{node_type}, value: {children[0]}")
             return str(children[0])
+        
         elif node_type == "string":
             print(f"node_type:{node_type}, value: {children[1]}")
             return children[1].value
+        
         elif node_type == "skip_stop":
             print(f"node_type:{node_type}, value: {children[0]}")
             return str(children[0])
+        
         elif node_type == "compound_element":
             print(f"node_type:{node_type}, value: {children[0]}")
             terms = children if len(children) > 1 else None
