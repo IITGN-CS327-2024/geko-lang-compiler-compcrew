@@ -341,7 +341,7 @@ class ASTBuilder(Visitor):
         
         elif node_type == "assignment_statement":
             variable_name = str(children[0])
-            assignment_operators = str(children[1])
+            assignment_operators = children[1].operator
             value = children[2]
             print(f"node_type:{node_type}, variable_name: {variable_name}, assignment_operators: {assignment_operators}, value: {value}")
             return Assignment(variable_name, assignment_operators, value)
@@ -730,15 +730,7 @@ define num main() {
     while (y>=8){
         num z = 14098;
         z /= 56/4;
-        given(y>36){
-           skip;	
-        }
-        other(y==36){
-            ## num z = num(enter(~Enter any number~));
-        }
-        otherwise {
-            z -= 2;
-        }
+        
         y*=4;
     }
     yield 658;
