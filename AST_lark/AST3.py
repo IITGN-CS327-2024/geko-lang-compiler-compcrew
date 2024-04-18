@@ -74,7 +74,9 @@ class ASTBuilder(Visitor):
             print("ye func_def bhi galat hai isko bhi change crow")
             function_type = str(children[1])
             function_name = str(children[2])
-            parameters = children[4]
+            parameters = [children[4][0]]
+            parameters.extend(children[4][1]) if len(children[4]) > 1 else None
+
             function_block = children[6]
             print(f"node_type:{node_type}, function_type: {function_type}, function_name: {function_name}, parameters: {parameters}, function_block: {function_block}")
             return FunctionDef(function_type, function_name, parameters, function_block)
@@ -820,21 +822,13 @@ def final_iteration(tree_node, tokens,graph, parent_node=None):
 parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
-define num func1_ex(num a, flag b){
-  yield a + b;
+## This is a comment
+define num testFunc1(num d, flag z, flag f, flag w){
+    yield x;
 }
-
-define num func2_ex(){
-    yield 3;
-}
-
-define num main(){
-    flag three = 0;
-    given(three==0){
-        show(~Hello!~);
-    }
-    num ex_var = func_ex();
-	yield 0;
+define num main() {
+    num x = testFunc1(1, yay, nay, nay);
+	yield 5769787987;
 }"""
 # ----------------------------------------------------------------------------------------------------------------------------
 
