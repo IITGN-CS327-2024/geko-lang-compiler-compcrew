@@ -70,7 +70,7 @@ class ASTBuilder(Visitor):
             return str(children[0])
         
         elif node_type == "parameter_list":
-            parameters = children[0] if children else []
+            parameters = children if children else []
             print(f"node_type:{node_type}, parameters: {parameters}")
             return parameters
         
@@ -361,9 +361,9 @@ class ASTBuilder(Visitor):
             return Block(statements)
         elif node_type == "value_change_array":
             identifier = str(children[0])
-            index = int(children[2].value)
-            assignment_operators = str(children[3])
-            value = children[4]
+            index = int(children[2])
+            assignment_operators = str(children[4])
+            value = children[5]
             print(f"node_type:{node_type}, identifier: {identifier}, index: {index}, assignment_operators: {assignment_operators}, value: {value}")
             return ValueChangeArray(identifier, index, assignment_operators, value)
         elif node_type == "expressions":
@@ -484,8 +484,9 @@ class ASTBuilder(Visitor):
             return str(children[0])
         
         elif node_type == "unary_operators":
+            pre_unary_operator = str(children[0])
             print(f"node_type:{node_type}, value: {children[0]}")
-            return UnaryOperator(str(children[0]))
+            return str(children[0])
         
         elif node_type == "assignment_operators":
             print(f"node_type:{node_type}, value: {children[0]}")
@@ -534,14 +535,40 @@ class ASTBuilder(Visitor):
             print(f"node_type:{node_type}, value: {children[0]}")
             return OtherwiseBlock(children[1:])
         
+        elif node_type == "update_statement":
+            if len(children) > 2:
+                return Assignment(children[0], children[1], children[2])
+            
+            elif children[1] == "++" or children[1] == "--":
+                value = str(children[0])
+                post_unary_operator = str(children[1])
+                pre_unary_operator = None
+                print(f"node_type:{node_type}, pre_unary_operator: {pre_unary_operator}, value: {value}, post_unary_operator: {post_unary_operator}")
+                return UnaryStatement(pre_unary_operator, value, post_unary_operator)
+            else: 
+                value = str(children[1])
+                pre_unary_operator = str(children[0])
+                post_unary_operator = None
+                print(f"node_type:{node_type}, pre_unary_operator: {pre_unary_operator}, value: {value}, post_unary_operator: {post_unary_operator}")
+                return UnaryStatement(pre_unary_operator, value, post_unary_operator)
+
+
+        
+
         elif node_type == "loop_statement":
             loop_type = children[0]
+            declaration = None
             condition = children[2]
+            updation = None
             block = children[4]
             if children[0] == "iter":
                 loop_type = "iter"
+                declaration = children[2]
                 # condition = [children[2], children[4]]
-                condition = [children[2], children[3], children[5]]
+                # condition = [children[2], children[3], children[5]]
+                condition = children[3]
+                # if children[6] == "update_statement":
+                updation = children[5]
                 # block = children[6]
                 block = children[7]
             elif children[0] == "while":
@@ -553,7 +580,7 @@ class ASTBuilder(Visitor):
                 condition = children[-3]
                 block = children[1]
             print(f"node_type:{node_type}, loop_type: {loop_type}, condition: {condition}, block: {block}")
-            return LoopStatement(loop_type, condition, block)
+            return LoopStatement(loop_type, declaration,condition, updation, block)
         
         elif node_type == "pop_statement":
             string_value = children[2].children[0].value
@@ -639,6 +666,19 @@ class ASTBuilder(Visitor):
         elif node_type == "statement":
             # statement_type = children[0].data
             # statement_type = children[0] # ye galat hai i know, isko change karna padenga
+            if len(children) == 3:
+                if children[0] == "++" or children[0] == "--" or children[0]=="`" or children[0]=="!":
+                    pre_unary_operator = children[0]
+                    value = children[1]
+                    post_unary_operator = None
+                    print(f"node_type:{node_type}, pre_unary_operator: {pre_unary_operator}, value: {value}, post_unary_operator: {post_unary_operator}")
+                    return UnaryStatement(pre_unary_operator, value, post_unary_operator)
+                else:
+                    pre_unary_operator = None
+                    value = children[0]
+                    post_unary_operator = children[1]
+                    print(f"node_type:{node_type}, pre_unary_operator: {pre_unary_operator}, value: {value},post_unary_operator: {post_unary_operator}")
+                    return UnaryStatement(pre_unary_operator, value, post_unary_operator)
             statement_type = children[0].__class__.__name__
             value = children[0]
             if children[-1] == ";":
@@ -738,10 +778,13 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
 define num main() {
-	tup tupOne = [1,2,3];
-	tup tupTwo = [~a~, ~b~, ~c~];
-    tup tupThree = tupOne;
-    yield 658;
+	##num x [3] = [1, 2, 3];
+    ##num y = 0;
+    y++;
+    iter(num i = 0; i < 3; i++) {
+        y++;
+    }
+    yield 0;
 }"""
 # ----------------------------------------------------------------------------------------------------------------------------
 
@@ -776,6 +819,7 @@ png_name = "abstract_syntax_tree.png"
 final_iteration(tree, tokens, graph=graph[0])
 ast_builder = ASTBuilder()
 rich.print(tree)
+print(tree)
 # print(tree)
 ast = ast_builder.transform(tree)
 # print(ast)
