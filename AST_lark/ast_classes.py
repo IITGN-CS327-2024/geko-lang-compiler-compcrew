@@ -119,7 +119,8 @@ class Term:
     value: Union[str, int, bool]
     identifier: Optional[str]
     expression: Optional['Expression']
-    unary_operator: Optional[str]
+    pre_unary_operator: Optional[str]
+    post_unary_operator: Optional[str]
 
 @dataclass
 class BinaryOperator:
