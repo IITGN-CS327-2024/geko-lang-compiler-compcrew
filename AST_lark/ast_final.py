@@ -4,6 +4,7 @@ from lark.exceptions import UnexpectedToken
 import ast_lexer_lark as lexer_lark
 import sys
 import os
+import re
 # ----------------------------------------------------------------------------------------------------------------------------
 import lark
 import pydot
@@ -244,7 +245,7 @@ class ASTBuilder(Visitor):
             # The string is wrapped with tildes (~), so we need to remove them
             # and return the string value.
             # print(f"node_type:{node_type}, value: {children[1]}")
-            string_value = str(children[1])
+            string_value = "THIS_IS_A_STRING_SO_THAT_IT_DOES_NOT_CONFLICT_WITH_OTHER_TYPES" + str(children[1])
             return string_value
 
         elif node_type == "array":
@@ -254,62 +255,35 @@ class ASTBuilder(Visitor):
             size = int(children[3])
             # print(f"node_type:{node_type}, data_type: {data_type}, identifier: {identifier}, size: {size}")
             return Array(data_type, identifier, size)
-        # elif node_type == "variable_declaration":
-        #     data_type = str(children[0])
-        #     variable_name = str(children[1])
-        #     equal_to = children[2] if len(children) > 2 else None
-        #     # pending work
-        #     print(f"node_type:{node_type}, data_type: {data_type}, variable_name: {variable_name}, initial_value: {initial_value}, equal_to: {equal_to}")
-        #     return VariableDeclaration(data_type, variable_name, initial_value, equal_to)
         
         elif node_type == "variable_declaration":
             if children[0].__class__.__name__ == "Array":
-                data_type = children[0]
+                data_type = children[0].data_type
                 variable_name = children[0].identifier
-                initial_value = children[0].size
-                initial_value = None
+                size_array = children[0].size
                 if children[1]: # agar bas num x; ho to isliye
-                    equal_to = [children[0], children[1][1]]
+                    equal_to = children[1][1]
                 else:
                     equal_to = None
-                    equal_to = "bhai"
                 # equal_to.extend(children[1][0]) if len(children) > 1 else None
-            elif children[0].__class__.__name__ == "LIST": 
+            elif children[0].__class__.__name__ == "LIST":
+                size_array = None 
                 data_type = children[0]
                 variable_name = children[0].identifier
-                initial_value = None
                 equal_to = [children[0], children[1][1]]
-                # equal_to.extend(children[1][0]) if len(children) > 1 else None
             elif children[0].__class__.__name__ == "TUP":
                 data_type = children[0]
+                size_array = None
                 variable_name = children[0].identifier
-                initial_value = None
-                # equal_to = [children[0], children[1][1]]
                 equal_to = children[1][1] if len(children[1]) > 1 else children
-                # equal_to.extend(children[1]) if len(children) > 1 else None
-                # equal_to = children
             else:
                 data_type = children[0]
                 variable_name = str(children[1])
                 equal_to = children
-                initial_value = None
-
+                size_array = None
                 if len(children) > 2:
-                    equal_to = children[2]
-                    if isinstance(equal_to, list):
-                        if isinstance(equal_to[1], Expression) or isinstance(equal_to[1], SpecialFunction) or isinstance(equal_to[1], LetInStatement):
-                            initial_value = equal_to[1]
-                        elif isinstance(equal_to[1], str):
-                            equal_to = equal_to[1]
-                    else:
-                        initial_value = None
-                        # equal_to = None
-                        # equal_to = "bhai2"
-                    # elif isinstance(equal_to, Expression) or isinstance(equal_to, SpecialFunction) or isinstance(equal_to, LetInStatement):
-                    #     initial_value = equal_to
-                    #     equal_to = None
-            # print(f"node_type:{node_type}, data_type: {data_type}, variable_name: {variable_name}, initial_value: {initial_value}, equal_to: {equal_to}")
-            return VariableDeclaration(data_type, variable_name, initial_value, equal_to)
+                    equal_to = children[2]           
+            return VariableDeclaration(data_type, variable_name, size_array, equal_to)
 
         elif node_type == "compound_array":
             if len(children) == 1:
@@ -365,7 +339,7 @@ class ASTBuilder(Visitor):
             elif children[0] == "append":
                 # elements = [children[2]]
                 # identifier = str(children[4])
-                elements = children[2].terms[0].value
+                elements = children[2].terms[0]
                 identifier = children[4]
             # print(f"node_type:{node_type}, elements: {elements}, identifier: {identifier}")
             return ListAppendTail(elements, identifier)
@@ -460,19 +434,33 @@ class ASTBuilder(Visitor):
             # ye upar wala kya hai??? isse dikkat ho rahi hai, iske vajah se teen teen baar aa raha sab kuch...
         
         elif node_type == "term":
+            identifier = None
             if len(children)==1:  
+                print(children[0])
                 if children[0].__class__.__name__ == "SpecialFunction":
                     expression = children[0]
                     value = None
+                
+                elif str(children[0]).startswith("THIS_IS_A_STRING_SO_THAT_IT_DOES_NOT_CONFLICT_WITH_OTHER_TYPES"):
+                    value = str(children[0])[len("THIS_IS_A_STRING_SO_THAT_IT_DOES_NOT_CONFLICT_WITH_OTHER_TYPES"):]
+                    identifier = None
+                    expression = None
                 else:
-                    value = children[0]
+                    value = None
+                    identifier = children[0]
                     # print(children[0].__class__.__name__)
                     # print(value)
                     # print()
                     expression = None
+                # print(children[0].__class__)
+                # children[0] is a token - I want to know it's type. 
+                if children[0].__class__.__name__ == "Token":
+                    identifier = children[0].__class__.__name__
+                    # expression = None
+
                 pre_unary_operator = None
                 post_unary_operator = None
-                identifier = None 
+                # identifier = None 
                 
             elif len(children) == 2:
                 if children[0].__class__.__name__ == "UnaryOperator":
@@ -746,9 +734,6 @@ class ASTBuilder(Visitor):
         elif node_type == "compound_data_type":
             # print(f"node_type:{node_type}, value: {children[0]}")
             return str(children[0])
-        elif node_type == "string":
-            # print(f"node_type:{node_type}, value: {children[1]}")
-            return children[1].value
         elif node_type == "skip_stop":
             # print(f"node_type:{node_type}, value: {children[0]}")
             return str(children[0])
@@ -808,15 +793,9 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
 define num main() {
-    ## Testing various assignment and unary operators below:
-    numTwo += numOne;
-    numThree -= numOne;
-    numFour /= numOne; ##only integral division is allowed. No Floats are defined in our language.
-    numFive *= --numOne;  ##unary "--" operator
-    numSix = ++numFive; ##unary "++" operator
-    numSix = numSix++;
-    numSeven %= numOne; 
-    yield 0;
+    num a = ~hello~;
+    num b = hfjahfjk;
+	yield 0;
 }
 
 """

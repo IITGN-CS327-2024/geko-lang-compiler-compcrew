@@ -56,8 +56,8 @@ class Parameter:
 class VariableDeclaration:
     data_type: str
     variable_name: str
-    initial_value: Optional[Union['Expression', 'ListAppendTail']]
-    equal_to: Optional[str]
+    size_array: Optional[int]
+    equal_to: Optional[Union['Expression', 'ListAppendTail',str]]
 
 @dataclass
 class Assignment:
