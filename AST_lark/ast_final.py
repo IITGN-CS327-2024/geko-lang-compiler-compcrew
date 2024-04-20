@@ -268,11 +268,11 @@ class ASTBuilder(Visitor):
                 # equal_to.extend(children[1][0]) if len(children) > 1 else None
             elif children[0].__class__.__name__ == "LIST":
                 size_array = None 
-                data_type = children[0]
+                data_type = children[0].data_type
                 variable_name = children[0].identifier
-                equal_to = [children[0], children[1][1]]
+                equal_to = children[1][1]
             elif children[0].__class__.__name__ == "TUP":
-                data_type = children[0]
+                data_type = children[0].data_type
                 size_array = None
                 variable_name = children[0].identifier
                 equal_to = children[1][1] if len(children[1]) > 1 else children
@@ -328,8 +328,10 @@ class ASTBuilder(Visitor):
                 return children
         
         elif node_type == "list_append_tail":
-            elements = 'bhai0'
+            elements = None
             identifier = children
+            tail = None
+            append = None
             if children[1].__class__.__name__ == "Expression":
                 elements =[ children[1] ]
                 elements.extend(children[2]) if len(children) > 2 else None
@@ -338,13 +340,15 @@ class ASTBuilder(Visitor):
                 elements = None
                 # identifier = str(children[2])
                 identifier = children[2]
+                tail = str(children[0])
             elif children[0] == "append":
                 # elements = [children[2]]
                 # identifier = str(children[4])
                 elements = children[2].terms[0]
                 identifier = children[4]
+                append = str(children[0])
             # print(f"node_type:{node_type}, elements: {elements}, identifier: {identifier}")
-            return ListAppendTail(elements, identifier)
+            return ListAppendTail(elements, identifier, tail, append)
         
         elif node_type == "assignment_statement":
             variable_name = str(children[0])
@@ -373,7 +377,7 @@ class ASTBuilder(Visitor):
         elif node_type == "value_change_array":
             identifier = str(children[0])
             index = int(children[2])
-            assignment_operators = str(children[4])
+            assignment_operators = children[4]
             value = children[5]
             # print(f"node_type:{node_type}, identifier: {identifier}, index: {index}, assignment_operators: {assignment_operators}, value: {value}")
             return ValueChangeArray(identifier, index, assignment_operators, value)
@@ -430,7 +434,7 @@ class ASTBuilder(Visitor):
             # terms.extend(children[2]) if len(children) > 2 else None
             # print(f"node_type:{node_type}, operators: {operator_if_exists}, terms: {terms}")
             if terms is None:
-                return None, None
+                return None
             return Expression(operator_if_exists=operator_if_exists, terms=terms)
             return [operator for operator in operators for _ in terms], terms
             # ye upar wala kya hai??? isse dikkat ho rahi hai, iske vajah se teen teen baar aa raha sab kuch...
@@ -448,6 +452,10 @@ class ASTBuilder(Visitor):
                     identifier = None
                     expression = None
                 elif type(children[0]) == int:
+                    value = children[0]
+                    identifier = None
+                    expression = None
+                elif type(children[0]) == bool:
                     value = children[0]
                     identifier = None
                     expression = None
@@ -763,6 +771,11 @@ class ASTBuilder(Visitor):
             if tree.type == 'NUM_LITERAL':
                 # Convert the string value of NUM_LITERAL to an integer
                 return int(tree.value)
+            if tree.type == 'YAY':
+                return True
+            if tree.type == 'NAY':
+                return False
+
             return tree.value
         else:
             raise ValueError(f"Unexpected input: {tree}")
@@ -799,10 +812,14 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
 define num main(){
-    num x = 4 + 5 + 8 + f;
-    yield 464846468732130;
+	tup memberOne = [~Shreya~, ~CSE~, 20, yay];
+	num len = length(data);
+	str first = data[0];
+	tup tupOne = [1,2,3];
+	tup tupTwo = [~a~, ~b~, ~c~];
+	show(tupThree);
+    yield 0;
 }
-
 """
 # ----------------------------------------------------------------------------------------------------------------------------
 
