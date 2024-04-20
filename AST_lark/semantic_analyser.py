@@ -6,10 +6,10 @@ class SemanticError(Exception):
 
 dict_of_types = { 
     'int':'num',
-    'float':'num',
     'str':'str',
     'list':'list',
-    'tuple':'tuple',
+    'tuple':'tup',
+    'bool':'flag'
 }
 
                 
@@ -85,7 +85,10 @@ class SemanticAnalyzer:
         print(node.equal_to)
         expr_type = self.type_of_expression(node.equal_to[1])
         # change expr_type according to dict_of_types
-        expr_type = dict_of_types[expr_type]
+        if expr_type in dict_of_types:
+            expr_type = dict_of_types[expr_type]
+        else:
+            expr_type = node.equal_to[1].identifier
         if expr_type != type_name:
             raise SemanticError(f"Type mismatch: variable '{node.variable_name}' declared as '{type_name}' but assigned '{expr_type}'")
         self.declare_variable(node.variable_name, type_name, mutability)
