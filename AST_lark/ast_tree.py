@@ -13,9 +13,15 @@ def build_tree(node):
         return root
     elif isinstance(node, MainFunc):
         main_func_node = TreeNode("MainFunc")
-        for stmt in node.statements:
+        for stmt in node.statements[:-1]:
             main_func_node.children.append(build_tree(stmt))
         return main_func_node
+        
+    # Darshi is writing this
+    # elif isinstance(node, ShowStatement):
+    #     show_node = TreeNode("Show")
+    #     for expr in node.expressions:
+
     elif isinstance(node, Array):
         array_node = TreeNode("Array")
         array_node.children.append(build_tree(node.size))
@@ -24,12 +30,25 @@ def build_tree(node):
         var_decl_node = TreeNode("VariableDeclaration")
         var_decl_node.children.append(TreeNode(f"{node.data_type}"))
         var_decl_node.children.append(TreeNode(f"{node.variable_name}"))
-        if node.size_array:
+        if node.size_array is not None:
             var_decl_node.children.append(TreeNode(f"{node.size_array}"))
+        print(len(node.equal_to))
         if node.equal_to:
-            equal_to_subtree = build_tree(node.equal_to)
-            print("equal_to_subtree mai hai hum ab")
-            var_decl_node.children.append(equal_to_subtree)
+            if (len(node.equal_to) == 3):
+                for elements in node.equal_to:
+                    if elements is not None:
+                        equal_to_subtree = build_tree(elements)
+                        if equal_to_subtree is not None:
+                            var_decl_node.children.append(equal_to_subtree)
+            else:
+                expr = TreeNode("Equation")
+                var_decl_node.children.append(expr)
+                for elements in node.equal_to:
+                    if elements is not None:
+                        equal_to_subtree = build_tree(elements)
+                        print("equal_to_subtree mai hai hum ab")
+                        if equal_to_subtree is not None:
+                            expr.children.append(TreeNode(equal_to_subtree))
         # if node.initial_value:
         #     var_decl_node.children.append(build_tree(node.initial_value))
         # if node.equal_to:
@@ -73,12 +92,13 @@ def build_tree(node):
             return node.value
         elif node.identifier:
             return node.identifier
-        elif node.expression:
-            return build_tree(node.expression)
+        # elif node.expression:
+        #     return build_tree(node.expression)
     elif isinstance(node, BinaryOperator):
-        bin_op_node = TreeNode("BinaryOperator")
-        bin_op_node.children.append(TreeNode(f"operator: {node.operator}"))
-        return bin_op_node
+        # bin_op_node = TreeNode("BinaryOperator")
+        # bin_op_node.children.append(TreeNode(f"operator: {node.operator}"))
+        if node.operator is not None:
+            return node.operator
     elif isinstance(node, UnaryOperator):
         unary_op_node = TreeNode("UnaryOperator")
         unary_op_node.children.append(TreeNode(f"operator: {node.operator}"))
