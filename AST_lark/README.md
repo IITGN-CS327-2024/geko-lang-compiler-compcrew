@@ -1,4 +1,4 @@
-##RUNNING INSTRUCTIONS
+**RUNNING INSTRUCTIONS
 
 Download the whole repository.
 Open the AST_lark folder on terminal.
