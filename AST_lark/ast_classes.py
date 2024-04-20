@@ -231,3 +231,17 @@ def flatten_list(list_of_lists):
         elif(sublist is not None):
             flat_list.append(sublist)
     return flat_list
+
+def flatten_expression(expression: Union[Expression, Term, Any]) -> List[Union[Term, Any]]:
+    flattened = []
+
+    if isinstance(expression, Expression):
+        flattened.append(BinaryOperator(operator=expression.operator_if_exists))
+        for term in expression.terms:
+            flattened.extend(flatten_expression(term))
+    elif isinstance(expression, Term):
+        flattened.append(expression)
+    else:
+        flattened.append(expression)
+
+    return flattened

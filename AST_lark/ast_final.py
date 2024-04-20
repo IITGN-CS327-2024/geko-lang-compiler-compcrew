@@ -283,6 +283,8 @@ class ASTBuilder(Visitor):
                 size_array = None
                 if len(children) > 2:
                     equal_to = children[2]           
+                if equal_to:
+                    equal_to = flatten_expression(equal_to)
             return VariableDeclaration(data_type, variable_name, size_array, equal_to)
 
         elif node_type == "compound_array":
