@@ -445,6 +445,10 @@ class ASTBuilder(Visitor):
                     value = str(children[0])[len("THIS_IS_A_STRING_SO_THAT_IT_DOES_NOT_CONFLICT_WITH_OTHER_TYPES"):]
                     identifier = None
                     expression = None
+                elif type(children[0]) == int:
+                    value = children[0]
+                    identifier = None
+                    expression = None
                 else:
                     value = None
                     identifier = children[0]
@@ -793,8 +797,10 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
 define num main() {
-    num a = ~hello~;
-    num b = hfjahfjk;
+    num a = 4564;
+    num b = 1234;
+    num c;
+    c = a + b;
 	yield 0;
 }
 
