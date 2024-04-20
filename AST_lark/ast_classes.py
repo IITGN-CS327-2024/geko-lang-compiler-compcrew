@@ -183,6 +183,8 @@ class LetInStatement:
 class ListAppendTail:
     elements: List['Expression']
     identifier: Optional[str]
+    tail: Optional[str]
+    append: Optional[str]
 
 # @dataclass
 # class CompoundVar:
