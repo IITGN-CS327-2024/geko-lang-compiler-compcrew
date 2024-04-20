@@ -796,12 +796,9 @@ def final_iteration(tree_node, tokens,graph, parent_node=None):
 parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
-define num main() {
-    num a = 4564;
-    num b = 1234;
-    num c;
-    c = a + b;
-	yield 0;
+define num main(){
+    num x = 4 + 5 + 8 + f;
+    yield 464846468732130;
 }
 
 """

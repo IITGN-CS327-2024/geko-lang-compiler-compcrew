@@ -24,10 +24,16 @@ def build_tree(node):
         var_decl_node = TreeNode("VariableDeclaration")
         var_decl_node.children.append(TreeNode(f"{node.data_type}"))
         var_decl_node.children.append(TreeNode(f"{node.variable_name}"))
+        if node.size_array:
+            var_decl_node.children.append(TreeNode(f"{node.size_array}"))
+        if node.equal_to:
+            equal_to_subtree = build_tree(node.equal_to)
+            print("equal_to_subtree mai hai hum ab")
+            var_decl_node.children.append(equal_to_subtree)
         # if node.initial_value:
         #     var_decl_node.children.append(build_tree(node.initial_value))
-        if node.equal_to:
-            var_decl_node.children.append(TreeNode(build_tree(node.equal_to)))
+        # if node.equal_to:
+        #     var_decl_node.children.append(TreeNode(build_tree(node.equal_to)))
         return var_decl_node
     elif isinstance(node, Assignment):
         assignment_node = TreeNode("Assignment")
@@ -39,14 +45,18 @@ def build_tree(node):
         # expr_node = TreeNode("Expression")
         op_node = TreeNode("NoOp")
         if node.operator_if_exists:
+            print("operator_if_exists mai hai hum ab")
             # expr_node.children.append(TreeNode(f"Operator: {node.operator_if_exists}"))
             op_node = TreeNode("BinOp")
+            op_node = TreeNode(node.operator_if_exists)
             for term in node.terms:
                 op_node.children.append(build_tree(term))
             return op_node
         else:
+            print("operator_if_exists mai nahi hai hum ab")
             for term in node.terms:
-                return build_tree(term)
+                op_node.children.append(build_tree(term))
+            return op_node
         #     expr_node.children.append(build_tree(term))
     elif isinstance(node, Term):
         # term_node = TreeNode("Term")
@@ -77,7 +87,8 @@ def build_tree(node):
         return TreeNode(str(node))
 
 def print_tree(node, indent=0):
-    if type(node) == str:
+    if type(node) is not TreeNode:
+        print(" " * indent, node)
         return
     print(" " * indent, node.label)
     for child in node.children:
