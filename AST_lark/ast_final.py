@@ -142,7 +142,8 @@ class ASTBuilder(Visitor):
 
         elif node_type == "post_equal_to":
             if children[0] == "enter":
-                value = EnterStatement(children[2],None)
+                string = str(children[2])[len("THIS_IS_A_STRING_SO_THAT_IT_DOES_NOT_CONFLICT_WITH_OTHER_TYPES"):]
+                value = EnterStatement(string,None)
             else:
                 value = children[0]
             # print(f"node_type:{node_type}, value: {value}")
