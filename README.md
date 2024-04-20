@@ -27,3 +27,10 @@ NOTE: For viewing the updated version, please go into the "lexer" folder, and ha
 
 NOTE: Similar to the lexer, the updated instructions on how to run our parser are posted under ./parser_lark inside the readme file.
 
+## AST:
+- Under the AST_lark folder
+- The final AST file is named as ast_final.py, and all the correct tescases are also nested under the correct_testcases folder (inside ./AST_lark).
+- The defined classes are in ast_classes.py file.
+- Our grammar is stored in ast_grammar.py
+
+NOTE: For viewing the updated version, please go into the "lexer" folder, and have a look at the README file for instructions on how to run our lexer.
