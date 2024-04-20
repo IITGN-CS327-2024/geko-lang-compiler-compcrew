@@ -1,5 +1,5 @@
 from rich import print
-from AST3 import *
+from ast_final import *
 
 class TreeNode:
     def __init__(self, label):
@@ -24,8 +24,8 @@ def build_tree(node):
         var_decl_node = TreeNode("VariableDeclaration")
         var_decl_node.children.append(TreeNode(f"{node.data_type}"))
         var_decl_node.children.append(TreeNode(f"{node.variable_name}"))
-        if node.initial_value:
-            var_decl_node.children.append(build_tree(node.initial_value))
+        # if node.initial_value:
+        #     var_decl_node.children.append(build_tree(node.initial_value))
         if node.equal_to:
             var_decl_node.children.append(TreeNode(build_tree(node.equal_to)))
         return var_decl_node
@@ -77,6 +77,8 @@ def build_tree(node):
         return TreeNode(str(node))
 
 def print_tree(node, indent=0):
+    if type(node) == str:
+        return
     print(" " * indent, node.label)
     for child in node.children:
         print_tree(child, indent + 4)

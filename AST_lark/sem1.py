@@ -8,7 +8,7 @@ import pydot
 from typing import *
 import rich
 from ast_classes import *
-import AST3 as geko_ast
+import ast_final as geko_ast
 from ast_grammar import grammar
 import ast_tree as astt
 
@@ -37,7 +37,7 @@ class SymbolTableEntry:
         self.scope = scope
 
 # Symbol table
-symbol_table = [None] * 1000
+symbol_table = [None] * 10
 
 def lookup_symbol(name):
     if name is None:
@@ -73,15 +73,24 @@ def semantic_analyze(node, current_scope):
     if node is None:
         return Type.UNKNOWN_TYPE
 
-    str1 = node.label
+    if isinstance(node, str):
+        str1 = node
+    else:
+        str1 = node.label
     print(str1)
 
     if str1 == 'VariableDeclaration':
         add_symbol(node.children[1],node.children[0],'global')
         print(type(node.children[1].label))
         if  len(node.children) > 2:
-            if (type(node.children[2].label) != node.children[0]):
-                raise  Exception('Type mismatch on variable declaration')
+            print(type(node.children[2].label),"= hona chahiye =", node.children[0].label.split()[1], "meow moew")
+            if node.children[0].label.split()[1] == "num": 
+                if type(node.children[2].label) != int:
+                    raise Exception('Type mismatch on variable declaration')
+            else:
+                if type(node.children[2].label) == int:
+                    raise Exception('Type mismatch on variable declaration')
+            # if (type(node.children[2].label) != node.children[0].label.split()[1]):
 
     if str1 == "assignment":
         lhs = node.children[0]
@@ -278,8 +287,11 @@ def semantic_analyze(node, current_scope):
         return Type.NUMBER_TYPE
 
     else:
-        for child in node.children:
-            semantic_analyze(child, current_scope)
+        if type(node) != str:
+            for child in node.children:
+                semantic_analyze(child, current_scope)
+        else:
+            return Type.NODE_TYPE
 
         return Type.NODE_TYPE
     
@@ -288,9 +300,7 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
 define num main() {
-    num a = ~abc~;
-    str x = ~abc~;
-    flag bool = yay;
+
     yield 0;
 }
 """
@@ -324,7 +334,9 @@ def print_symbol_table():
     print("Symbol Table")
     print("------------")
     for symbol in symbol_table:
-        print("Name:", symbol.name, "\t Type:", symbol.typ, "\t Scope:", symbol.scope)
+        if symbol is not None:
+            print(type(symbol.typ))
+            print("Name:", symbol.name.label, "\t Type:", symbol.typ.label, "\t Scope:", symbol.scope)
     print()
 
 # Define the global scope or other initial scope
