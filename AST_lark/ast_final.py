@@ -589,6 +589,8 @@ class ASTBuilder(Visitor):
             value = children[0]
             if statement_type == "Block":
                 return children[0]
+            if statement_type == "LoopStatement":
+                return children[0]
             if children[-1] == ";":
                 children.pop()
                 children = children[0] 
@@ -633,7 +635,7 @@ class ASTBuilder(Visitor):
         
         elif node_type == "skip_stop":
             # print(f"node_type:{node_type}, value: {children[0]}")
-            return str(children[0])
+            return Skip(skip=children[0])
         
         elif node_type == "compound_element":
             # print(f"node_type:{node_type}, value: {children[0]}")
@@ -696,11 +698,11 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
 define num main(){
-    num b = 5;
+    num y = 2;
     {
-        num a = 5;
+        num x = 5;
+        skip;
     }
-    a++;
 	yield 0;
 }
 
@@ -712,14 +714,14 @@ def read_geko_file(file_path):
     with open(file_path, 'r') as file:
         return file.read()
 
-testcase_folder_path = os.path.join(parser_lark_dir,"..", "testcases")
-sys.path.append(testcase_folder_path)
+# testcase_folder_path = os.path.join(parser_lark_dir,"..", "testcases")
+# sys.path.append(testcase_folder_path)
 
-if len(sys.argv) != 2:
-    print("Usage: python parser_lark.py <path to geko file>")
-    sys.exit(1)
-geko_file_path = sys.argv[-1]
-code = read_geko_file(geko_file_path)
+# if len(sys.argv) != 2:
+#     print("Usage: python parser_lark.py <path to geko file>")
+#     sys.exit(1)
+# geko_file_path = sys.argv[-1]
+# code = read_geko_file(geko_file_path)
 
 tokens = lexer_lark.lexer(code)
 
