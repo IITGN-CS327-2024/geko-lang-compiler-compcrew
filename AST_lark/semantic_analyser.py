@@ -102,21 +102,20 @@ class SemanticAnalyzer:
     def visit_VariableDeclaration(self, node):
         # node.data_type might contain "None num", "let num", or "fix num"
         mutability, type_name = node.data_type.split()
-        # print(mutability)
-        # print(type_name)
-        # print(node.equal_to)
+        # Visiting the VariableDeclaration
         test_lst = []
-        for i in node.equal_to[:-1]:
-            if (isinstance(i, Term)):
+        for equal_to_term in node.equal_to[:-1]:
+            if (isinstance(equal_to_term, Term)):
                 print(1)
-                expr_type = self.type_of_expression(i)
+                expr_type = self.type_of_expression(equal_to_term)
+                print('expr_type:',expr_type)
                 test_lst.append(expr_type)
         # change expr_type according to dict_of_types
-        print('###################################')
-        print(test_lst)
+        # print('###################################')
+        # print(test_lst)
         test_lst = flatten_list(test_lst)
-        print(test_lst)
-        print('###################################')
+        # print(test_lst)
+        # print('###################################')
         var_val_tp = test_lst[0]
         for i in test_lst:
             print("i is:", i)
@@ -168,7 +167,7 @@ class SemanticAnalyzer:
         
     def visit_ConditionalStatement(self, node):
         self.enter_scope()
-        self.visit(node.conditional_argument.expression)
+        self.visit(node.conditional_argument)
         for statement in node.conditional_block.statements:
             self.visit(statement)
         self.exit_scope()
@@ -204,8 +203,63 @@ class SemanticAnalyzer:
     
     def visit_Expression(self, node):
         for term in node.terms:
+            # print("now visiting in expression, terms: ", term)
+            print(type(term))
+            if term == "None":
+                pass
             self.visit(term)
     
+    def visit_Block(self, node):
+        # enter scope for block
+        self.enter_scope()
+        for statement in node.statements:
+            # print("now visiting statement in block: ", statement)
+            self.visit(statement)
+        # exit scope for block
+        self.exit_scope()
+
+    def visit_LoopStatement(self, node):
+        self.enter_scope()
+        # print("node.loop_type:",node.loop_type)
+        loop_type = node.loop_type
+        if loop_type == 'while':
+            # Visiting is_special
+            # print("now visiting:",node.condition)
+            self.visit(node.condition)
+            # Visiting updation
+            # print("now visiting:",node.updation)
+            self.visit(node.updation)
+            # Visiting block
+            # print("now visiting:",node.block)
+            self.visit(node.block)
+        elif loop_type == 'iter':
+            # Visiting declaration
+            print("now visiting in iter declaraion:",node.declaration)
+            self.visit(node.declaration)
+            # Visiting condition
+            print("now visiting in iter condition:",node.condition)
+            self.visit(node.condition)
+            # Visiting updation
+            print("now visiting in iter updation:",node.updation)
+            self.visit(node.updation)
+            # Visiting block
+            print("now visiting in iter block:",node.block)
+            self.visit(node.block)
+        # TODO work is going on here. The above is giving an error
+        self.exit_scope()
+        # TODO elif for third type of loop ---> repeat-while
+
+    def visit_ConditionalArgument(self, node):
+        self.visit(node.expression)
+
+    # Isko change karna padenga for loop
+    def visit_Skip(self, node):
+        # agar koi loop statement not found before this
+        # then this is semantically incorrect
+        # TODO : check if loop statement is present before this - PENDING 
+        # Currently, Darshi is working on this part
+        pass
+
     def visit_Term(self, node):
         if node.identifier:
             self.check_variable_declared(node.identifier)

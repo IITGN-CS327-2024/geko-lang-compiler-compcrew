@@ -83,6 +83,10 @@ class TUP:
     identifier: str
 
 @dataclass
+class Skip:
+    skip: str
+
+@dataclass
 class UnaryOperator:
     operator: str
 
