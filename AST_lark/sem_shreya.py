@@ -108,27 +108,39 @@ class SemanticAnalyzer:
 
     def visit_ListAppendTail(self, node):
         print('ListAppendTail')
-        type_list = []
-        length = len(node.elements)
-        count = 0
-        for i in node.elements:
-            print(i)
-            if (isinstance(i, Expression)):
-                    print(1)
-                    if (isinstance(i.terms[1], Expression)):
-                        print(2)
-                        print(i)
-                        ex_type = self.type_of_expression(i)
-                        print()
-                        print(ex_type)
-                        if ex_type == "Undetermined":
-                            raise SemanticError(f"Type mismatch in the index:{count+1}")
-                        type_list.append(ex_type)
-                    expr_type = self.type_of_expression(i.terms[0])
-                    type_list.append(expr_type)
-                    print(type_list)
-                    count += 1
-        return (length, type_list)
+
+        if node.tail is not None:
+            var_info = self.check_variable_declared(node.identifier)
+            print('var_info:',var_info)
+            return (None,[])
+        
+        if node.append is not None:
+            var_info = self.check_variable_declared(node.identifier)
+            print('var_info:',var_info)
+            return (None,[])
+
+        else:        
+            type_list = []
+            length = len(node.elements)
+            count = 0
+            for i in node.elements:
+                print(i)
+                if (isinstance(i, Expression)):
+                        print(1)
+                        if (isinstance(i.terms[1], Expression)):
+                            print(2)
+                            print(i)
+                            ex_type = self.type_of_expression(i)
+                            print()
+                            print(ex_type)
+                            if ex_type == "Undetermined":
+                                raise SemanticError(f"Type mismatch in the index:{count+1}")
+                            type_list.append(ex_type)
+                        expr_type = self.type_of_expression(i.terms[0])
+                        type_list.append(expr_type)
+                        print(type_list)
+                        count += 1
+            return (length, type_list)
 
 
     def visit_VariableDeclaration(self, node):
@@ -139,8 +151,10 @@ class SemanticAnalyzer:
             print(mutability)
             print(type_name)
             (length_list, type_list_list) = self.visit(node.equal_to)
-            size = length_list
-            self.declare_variable(node.variable_name, type_name, mutability,size)
+            if (length_list != None and len(type_list_list)!=0):
+                print("Bhai yaha aaya")     
+                size = length_list
+                self.declare_variable(node.variable_name, type_name, mutability,size)
 
         elif node.size_array: #when the variable is an array
             print('array')
