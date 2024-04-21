@@ -83,14 +83,32 @@ class SemanticAnalyzer:
         print(mutability)
         print(type_name)
         print(node.equal_to)
-        expr_type = self.type_of_expression(node.equal_to[1])
+        test_lst = []
+        for i in node.equal_to[:-1]:
+            if (isinstance(i, Term)):
+                print(1)
+                expr_type = self.type_of_expression(i)
+                test_lst.append(expr_type)
         # change expr_type according to dict_of_types
-        if expr_type in dict_of_types:
-            expr_type = dict_of_types[expr_type]
-        else:
-            expr_type = node.equal_to[1].identifier
-        if expr_type != type_name:
-            raise SemanticError(f"Type mismatch: variable '{node.variable_name}' declared as '{type_name}' but assigned '{expr_type}'")
+        print('###################################')
+        print(len(test_lst))
+        print(test_lst)
+        print('###################################')
+        for i in range(len(test_lst)):
+            # print(j)
+            print(dict_of_types['int'])
+            print(2)
+            # if j in dict_of_types:
+            #     j = dict_of_types[j]
+            if test_lst[i] == 'int':
+                test_lst[i] = dict_of_types['int']
+            elif test_lst[i] == 'str':
+                test_lst[i] = dict_of_types['str']
+            elif test_lst[i] == 'bool':
+                test_lst[i] = dict_of_types['bool']
+            if test_lst[i] != type_name:
+                raise SemanticError(f"Type mismatch: variable '{node.variable_name}' declared as '{type_name}' but assigned '{test_lst[i]}'")
+        print(test_lst)
         self.declare_variable(node.variable_name, type_name, mutability)
 
     def visit_UnaryStatement(self, node):
