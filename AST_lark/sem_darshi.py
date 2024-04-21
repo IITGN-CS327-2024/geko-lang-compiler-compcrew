@@ -51,9 +51,15 @@ class SemanticAnalyzer:
 
     def check_variable_declared(self, name):
         # Check if a variable is declared in any accessible scope
+        # print(self.scopes[-1],"\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
         if name in self.symbol_table[self.scopes[-1]]:
             print(self.scopes[-1])
             return self.symbol_table[self.scopes[-1]][name]
+        elif self.scopes[-1] == 'Block':
+            for i in range(len(self.scopes)-2,-1,-1):
+                if name in self.symbol_table[self.scopes[i]]:
+                    print(self.scopes[i])
+                    return self.symbol_table[self.scopes[i]][name]
         elif 'parameters' in  self.symbol_table[self.scopes[-1]]:
             if name in self.symbol_table[self.scopes[-1]]['parameters']:
                 print("found in parameters")
@@ -257,7 +263,7 @@ class SemanticAnalyzer:
             raise SemanticError(f"Cannot assign to constant variable '{node.variable_name}'")
         
     def visit_ConditionalStatement(self, node):
-        # self.enter_scope("Conditional")
+        # self.enter_scope("Conditional")n``1
         self.visit(node.conditional_argument)
         for statement in node.conditional_block.statements:
             self.type_of_expression(statement)
@@ -286,7 +292,10 @@ class SemanticAnalyzer:
         self.enter_scope("main")
         for statement in node.statements:
             if statement:
-                self.visit(statement)
+                if type(statement) is list:
+                    self.visit(statement[0])
+                else:
+                    self.visit(statement)
         rich.print(self.symbol_table)
         self.exit_scope()
 
@@ -342,7 +351,7 @@ class SemanticAnalyzer:
         if loop_type == 'while':
             # Visiting is_special
             # print("now visiting:",node.condition)
-            self.visit(node.condition)
+            self.type_of_expression(node.condition)
             # Visiting updation
             # print("now visiting:",node.updation)
             self.visit(node.updation)
@@ -353,9 +362,10 @@ class SemanticAnalyzer:
             # Visiting declaration
             print("now visiting in iter declaraion:",node.declaration)
             self.visit(node.declaration)
+            rich.print(self.symbol_table)
             # Visiting condition
             print("now visiting in iter condition:",node.condition)
-            self.visit(node.condition)
+            self.type_of_expression(node.condition)
             # Visiting updation
             print("now visiting in iter updation:",node.updation)
             self.visit(node.updation)
