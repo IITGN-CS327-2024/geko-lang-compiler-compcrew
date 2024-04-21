@@ -11,13 +11,13 @@ dict_of_types = {
     'tuple':'tup',
     'bool':'flag'
 }
-# dict_types = { 
-#     'num',
-#     'str',
-#     'list',
-#     'tup',
-#     'flag':
-# }
+dict_types = { 
+    'num':'int',
+    'str':'str',
+    'list':'list',
+    'tup':'tup',
+    'flag':'bool'
+}
                 
 class SemanticAnalyzer:
     def __init__(self):
@@ -69,7 +69,7 @@ class SemanticAnalyzer:
                 return self.type_of_expression(expression.expression)
             if expression.identifier:
                 var_info = self.check_variable_declared(expression.identifier)
-                return var_info['type']
+                return dict_types[var_info['type']]
             # else:
             #     return self.type_of_expression(expression.value)
         elif expression.__class__.__name__ == "Expression":
@@ -78,7 +78,12 @@ class SemanticAnalyzer:
                 if term:
                     temp = self.type_of_expression(term)
                     expr_type_list.append(temp)
-            return expr_type_list
+            exp_typ = expr_type_list[0]
+            for i in expr_type_list:
+                if (i != exp_typ):
+                    exp_typ = "Undetermined"
+                    break
+            return exp_typ
         elif isinstance(expression, BinaryOperator):
             # Handle binary operations like +, -, *, etc.
             # You need to determine the resulting type based on the operation
@@ -88,7 +93,7 @@ class SemanticAnalyzer:
             # Assuming for simplicity that the result type is the same as the operand type
             return left_type if left_type == right_type else None
         elif isinstance(expression, (int, float)):
-            return 'num'
+            return 'int'
     # Add more comprehensive handling here based on your expression AST node types
 
     # You should add more comprehensive handling here based on your expression AST node types
@@ -97,9 +102,9 @@ class SemanticAnalyzer:
     def visit_VariableDeclaration(self, node):
         # node.data_type might contain "None num", "let num", or "fix num"
         mutability, type_name = node.data_type.split()
-        print(mutability)
-        print(type_name)
-        print(node.equal_to)
+        # print(mutability)
+        # print(type_name)
+        # print(node.equal_to)
         test_lst = []
         for i in node.equal_to[:-1]:
             if (isinstance(i, Term)):
@@ -108,39 +113,58 @@ class SemanticAnalyzer:
                 test_lst.append(expr_type)
         # change expr_type according to dict_of_types
         print('###################################')
-        print(len(test_lst))
         print(test_lst)
         test_lst = flatten_list(test_lst)
         print(test_lst)
         print('###################################')
-        for i in range(len(test_lst)):
-            # print(j)
-            print(dict_of_types['int'])
-            print(2)
-            # if j in dict_of_types:
-            #     j = dict_of_types[j]
-            if test_lst[i] in dict_of_types.keys():
-                test_lst[i] = dict_of_types[test_lst[i]]
-            if test_lst[i] != type_name:
-                raise SemanticError(f"Type mismatch: variable '{node.variable_name}' declared as '{type_name}' but assigned '{test_lst[i]}'")
+        var_val_tp = test_lst[0]
+        for i in test_lst:
+            print("i is:", i)
+            if i != var_val_tp:
+                var_val_tp = "Undetermined"
+                break
+        if ((var_val_tp != "Undetermined") and (var_val_tp in dict_of_types.keys())):
+            var_val_tp = dict_of_types[var_val_tp]
+        # for i in range(len(test_lst)):
+        #     # print(j)
+        #     print(dict_of_types['int'])
+        #     print(2)
+        #     # if j in dict_of_types:
+        #     #     j = dict_of_types[j]
+        #     # if test_lst[i] in dict_of_types.keys():
+        #     #     test_lst[i] = dict_of_types[test_lst[i]]
+        #     # if test_lst[i] != type_name:
+        if var_val_tp != type_name:
+            raise SemanticError(f"Type mismatch: variable '{node.variable_name}' declared as '{type_name}' but assigned '{var_val_tp}'")
         print(test_lst)
         self.declare_variable(node.variable_name, type_name, mutability)
 
     def visit_UnaryStatement(self, node):
         self.check_variable_declared(node.value)
+    
+    def visit_ShowStatement(self, node):
+        for stmt in node.expressions:
+            temp_type = self.type_of_expression(stmt)
+            if temp_type == "Undetermined":
+                raise SemanticError(f"Type mismatch in the expression in show statement")
 
     def visit_Assignment(self, node):
         var_info = self.check_variable_declared(node.variable_name)
         expr_type = self.type_of_expression(node.value)
-        expr_type = flatten_list(expr_type)
-        for i in range(len(expr_type)):
-            if expr_type[i] in dict_of_types.keys():
-                expr_type[i] = dict_of_types[expr_type[i]]
-            tp = expr_type[i]
-            if tp != var_info['type']:
-                raise SemanticError(f"Type mismatch: variable '{node.variable_name}' expected '{var_info['type']}' but got '{tp}'")
-            if var_info['mutability'] == 'fix':
-                raise SemanticError(f"Cannot assign to constant variable '{node.variable_name}'")
+        # print('before ka before:',expr_type)
+        # expr_type = flatten_list(expr_type)
+        # for i in range(len(expr_type)):
+            # print('before ka before:',expr_type[i])
+        if expr_type in dict_of_types.keys():
+            print('before:', expr_type)
+            expr_type = dict_of_types[expr_type]
+        tp = expr_type
+        print('expr_type:',expr_type)
+        print('tp:',tp)
+        if tp != var_info['type']:
+            raise SemanticError(f"Type mismatch: variable '{node.variable_name}' expected '{var_info['type']}' but got '{tp}'")
+        if var_info['mutability'] == 'fix':
+            raise SemanticError(f"Cannot assign to constant variable '{node.variable_name}'")
         
     def visit_ConditionalStatement(self, node):
         self.enter_scope()
