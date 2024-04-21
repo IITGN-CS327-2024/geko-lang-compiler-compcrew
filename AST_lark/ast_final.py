@@ -634,7 +634,8 @@ class ASTBuilder(Visitor):
         
         elif node_type == "skip_stop":
             # print(f"node_type:{node_type}, value: {children[0]}")
-            return str(children[0])
+            return Skip(skip=children[0])
+
         
         elif node_type == "compound_element":
             # print(f"node_type:{node_type}, value: {children[0]}")
