@@ -55,13 +55,23 @@ class SemanticAnalyzer:
             return operand_type
         # elif isinstance(expression, Term):
         elif expression.__class__.__name__ == 'Term':
-            print(type(expression.value))
-            return type(expression.value).__name__
-            # if expression.identifier:
-            #     var_info = self.check_variable_declared(expression.identifier)
-            #     return var_info['type']
+            if expression.value:
+                print(type(expression.value))
+                return type(expression.value).__name__
+            if expression.expression:
+                return self.type_of_expression(expression.expression)
+            if expression.identifier:
+                var_info = self.check_variable_declared(expression.identifier)
+                return var_info['type']
             # else:
             #     return self.type_of_expression(expression.value)
+        elif expression.__class__.__name__ == "Expression":
+            expr_type_list = []
+            for term in expression.terms:
+                if term:
+                    temp = self.type_of_expression(term)
+                    expr_type_list.append(temp)
+            return expr_type_list
         elif isinstance(expression, BinaryOperator):
             # Handle binary operations like +, -, *, etc.
             # You need to determine the resulting type based on the operation
@@ -92,6 +102,8 @@ class SemanticAnalyzer:
         # change expr_type according to dict_of_types
         print('###################################')
         print(len(test_lst))
+        print(test_lst)
+        test_lst = flatten_list(test_lst)
         print(test_lst)
         print('###################################')
         for i in range(len(test_lst)):
@@ -171,44 +183,6 @@ class SemanticAnalyzer:
 
     def visit_NoneType(self, node):
         pass
-    
-
-# Assuming 'ast' is an instance of your AST class Program
-# ast = Program(
-#     function_defs=[],
-#     main_function=MainFunc(
-#         statements=[
-#             VariableDeclaration(
-#                 data_type='None num',
-#                 variable_name='a',
-#                 size_array=None,
-#                 equal_to=[BinaryOperator(operator=None), Term(value='hello', identifier=None, expression=None, pre_unary_operator=None, post_unary_operator=None), None]
-#             ),
-#             Assignment(
-#                 variable_name='a',
-#                 assignment_operators='=',
-#                 value=Expression(operator_if_exists=None, terms=[Term(value=5, identifier=None, expression=None, pre_unary_operator=None, post_unary_operator=None), None])
-#             ),
-#             ConditionalStatement(
-#                 conditional_argument=ConditionalArgument(
-#                     is_special=None,
-#                     comparison_operator=None,
-#                     expression=Expression(
-#                         operator_if_exists=None,
-#                         terms=[
-#                             Term(value=None, identifier='a', expression=None, pre_unary_operator=None, post_unary_operator=None),
-#                             Expression(operator_if_exists='==', terms=[Term(value=4, identifier=None, expression=None, pre_unary_operator=None, post_unary_operator=None), None])
-#                         ]
-#                     )
-#                 ),
-#                 conditional_block=Block(statements=[UnaryStatement(pre_unary_operator=None, value='b', post_unary_operator='++'), None]),
-#                 other_blocks=[],
-#                 otherwise_block=OtherwiseBlock(conditional_block=[])
-#             ),
-#             None
-#         ]
-#     )
-# )
 
 analyzer = SemanticAnalyzer()
 try:
