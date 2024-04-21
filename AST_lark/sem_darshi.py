@@ -257,11 +257,11 @@ class SemanticAnalyzer:
             raise SemanticError(f"Cannot assign to constant variable '{node.variable_name}'")
         
     def visit_ConditionalStatement(self, node):
-        self.enter_scope()
-        self.visit(node.conditional_argument.expression)
+        # self.enter_scope("Conditional")
+        self.visit(node.conditional_argument)
         for statement in node.conditional_block.statements:
-            self.visit(statement)
-        self.exit_scope()
+            self.type_of_expression(statement)
+        # self.exit_scope()
 
     def visit(self, node):
         # General visit method that calls specific methods based on node type
@@ -300,6 +300,9 @@ class SemanticAnalyzer:
             self.visit(param)
         for statement in node.function_block.statements:
             self.visit(statement)
+        yield_type = self.type_of_expression(node.function_block.return_value)
+        if (dict_of_types[yield_type] != node.function_type):
+            raise SemanticError(f"return type must be {node.function_type} but was given {yield_type}")
         self.exit_scope()
 
     def visit_Parameter(self,node):
@@ -315,14 +318,67 @@ class SemanticAnalyzer:
             #     self.symbol_table[self.scopes[-1]][] =
         # print("\n\nvisited\n\n")
     
-    def visit_Expression(self, node):
-        for term in node.terms:
-            self.visit(term)
+    # def visit_Expression(self, node):
+    #     for term in node.terms:
+    #         # print("now visiting in expression, terms: ", term)
+    #         print(type(term))
+    #         if term == "None":
+    #             pass
+    #         self.visit(term)
     
-    # Not used
-    def visit_Term(self, node):
-        if node.identifier:
-            self.check_variable_declared(node.identifier)
+    def visit_Block(self, node):
+        # enter scope for block
+        self.enter_scope("Block")
+        for statement in node.statements:
+            # print("now visiting statement in block: ", statement)
+            self.visit(statement)
+        # exit scope for block
+        self.exit_scope()
+
+    def visit_LoopStatement(self, node):
+        self.enter_scope("Loop")
+        # print("node.loop_type:",node.loop_type)
+        loop_type = node.loop_type
+        if loop_type == 'while':
+            # Visiting is_special
+            # print("now visiting:",node.condition)
+            self.visit(node.condition)
+            # Visiting updation
+            # print("now visiting:",node.updation)
+            self.visit(node.updation)
+            # Visiting block
+            # print("now visiting:",node.block)
+            self.visit(node.block)
+        elif loop_type == 'iter':
+            # Visiting declaration
+            print("now visiting in iter declaraion:",node.declaration)
+            self.visit(node.declaration)
+            # Visiting condition
+            print("now visiting in iter condition:",node.condition)
+            self.visit(node.condition)
+            # Visiting updation
+            print("now visiting in iter updation:",node.updation)
+            self.visit(node.updation)
+            # Visiting block
+            print("now visiting in iter block:",node.block)
+            self.visit(node.block)
+        # TODO work is going on here. The above is giving an error
+        self.exit_scope()
+        # TODO elif for third type of loop ---> repeat-while
+
+    def visit_ConditionalArgument(self, node):
+        self.type_of_expression(node.expression)
+
+    # Isko change karna padenga for loop
+    def visit_Skip(self, node):
+        # agar koi loop statement not found before this
+        # then this is semantically incorrect
+        # TODO : check if loop statement is present before this - PENDING 
+        # Currently, Darshi is working on this part
+        pass
+    # def visit_Term(self, node):
+    #     if node.identifier:
+    #         self.check_variable_declared(node.identifier)
 
     def visit_NoneType(self, node):
         pass
