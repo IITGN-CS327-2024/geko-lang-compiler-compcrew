@@ -11,7 +11,13 @@ dict_of_types = {
     'tuple':'tup',
     'bool':'flag'
 }
-
+# dict_types = { 
+#     'num',
+#     'str',
+#     'list',
+#     'tup',
+#     'flag':
+# }
                 
 class SemanticAnalyzer:
     def __init__(self):
@@ -38,6 +44,7 @@ class SemanticAnalyzer:
     def check_variable_declared(self, name):
         # Check if a variable is declared in any accessible scope
         for scope in reversed(self.scopes):
+            print("scope:\n",scope)
             if name in scope:
                 return scope[name]
         raise SemanticError(f"Variable '{name}' not declared")
@@ -112,12 +119,8 @@ class SemanticAnalyzer:
             print(2)
             # if j in dict_of_types:
             #     j = dict_of_types[j]
-            if test_lst[i] == 'int':
-                test_lst[i] = dict_of_types['int']
-            elif test_lst[i] == 'str':
-                test_lst[i] = dict_of_types['str']
-            elif test_lst[i] == 'bool':
-                test_lst[i] = dict_of_types['bool']
+            if test_lst[i] in dict_of_types.keys():
+                test_lst[i] = dict_of_types[test_lst[i]]
             if test_lst[i] != type_name:
                 raise SemanticError(f"Type mismatch: variable '{node.variable_name}' declared as '{type_name}' but assigned '{test_lst[i]}'")
         print(test_lst)
@@ -129,10 +132,15 @@ class SemanticAnalyzer:
     def visit_Assignment(self, node):
         var_info = self.check_variable_declared(node.variable_name)
         expr_type = self.type_of_expression(node.value)
-        if expr_type != var_info['type']:
-            raise SemanticError(f"Type mismatch: variable '{node.variable_name}' expected '{var_info['type']}' but got '{expr_type}'")
-        if var_info['mutability'] == 'fix':
-            raise SemanticError(f"Cannot assign to constant variable '{node.variable_name}'")
+        expr_type = flatten_list(expr_type)
+        for i in range(len(expr_type)):
+            if expr_type[i] in dict_of_types.keys():
+                expr_type[i] = dict_of_types[expr_type[i]]
+            tp = expr_type[i]
+            if tp != var_info['type']:
+                raise SemanticError(f"Type mismatch: variable '{node.variable_name}' expected '{var_info['type']}' but got '{tp}'")
+            if var_info['mutability'] == 'fix':
+                raise SemanticError(f"Cannot assign to constant variable '{node.variable_name}'")
         
     def visit_ConditionalStatement(self, node):
         self.enter_scope()
@@ -169,9 +177,6 @@ class SemanticAnalyzer:
         for statement in node.statements:
             self.visit(statement)
         self.exit_scope()
-
-    # def visit_VariableDeclaration(self, node):
-    #     self.declare_variable(node.variable_name, node.data_type)
     
     def visit_Expression(self, node):
         for term in node.terms:
