@@ -165,8 +165,9 @@ class ASTBuilder(Visitor):
                     return SpecialFunction(identifier, None, None, None, "head", None, None)
                 elif children[0] == "isEmpty":
                     identifier = str(children[2])
+                    isEmpty = "isEmpty"
                     # print(f"node_type:{node_type}, identifier: {identifier}")
-                    return SpecialFunction(identifier, None, None, None, None, "isempty", None)
+                    return SpecialFunction(identifier, None, None, None, None,isEmpty, None)
 
                 identifier = str(children[0])
                 num_literal_start = int(children[2])
@@ -589,8 +590,6 @@ class ASTBuilder(Visitor):
             value = children[0]
             if statement_type == "Block":
                 return children[0]
-            if statement_type == "LoopStatement":
-                return children[0]
             if children[-1] == ";":
                 children.pop()
                 children = children[0] 
@@ -635,7 +634,7 @@ class ASTBuilder(Visitor):
         
         elif node_type == "skip_stop":
             # print(f"node_type:{node_type}, value: {children[0]}")
-            return Skip(skip=children[0])
+            return str(children[0])
         
         elif node_type == "compound_element":
             # print(f"node_type:{node_type}, value: {children[0]}")
@@ -698,11 +697,9 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
 define num main(){
-    num y = 2;
-    {
-        num x = 5;
-        skip;
-    }
+    list b = [];
+    tup c = [];
+    flag darshi = ismpty(c);
 	yield 0;
 }
 
