@@ -1,0 +1,16 @@
+define num main(){
+	fix num a = 8;
+    fix num b = 2;
+    num ans;
+    ans = a + b;
+    show(~Addition~,ans);
+    ans = a - b;
+    show(~Subtraction~,ans);
+    ans = a * b;
+    show(~Multiplication~,ans);
+    ans = a / b;
+    show(~Division~,ans);
+    ans = a % b;
+    show(~Modulus~,ans);
+	yield 0;
+}
