@@ -222,7 +222,10 @@ class ASTBuilder(Visitor):
                 size_array = None 
                 data_type = children[0].data_type
                 variable_name = children[0].identifier
-                equal_to = children[1][1]
+                if children[1]:
+                    equal_to = children[1][1]
+                else:
+                    equal_to = None
             elif children[0].__class__.__name__ == "TUP":
                 data_type = children[0].data_type
                 size_array = None
@@ -462,7 +465,10 @@ class ASTBuilder(Visitor):
         
         elif node_type == "otherwise_block":
             # print(f"node_type:{node_type}, value: {children[0]}")
+            # print(children[1])
+            return OtherwiseBlock(children[1]) if children[0] else None
             return OtherwiseBlock(children[1:])
+            # TODO FIX - current fix to not have list return in otherwise_block in AST
         
         elif node_type == "update_statement":
             if len(children) > 2:
@@ -571,8 +577,9 @@ class ASTBuilder(Visitor):
 
         elif node_type == "statement":
             if len(children) == 3:
-                if children[0] == "++" or children[0] == "--" or children[0]=="`" or children[0]=="!":
-                    pre_unary_operator = children[0]
+                # if children[0] == "++" or children[0] == "--" or children[0]=="`" or children[0]=="!":
+                if children[0].__class__.__name__ == "UnaryOperator":
+                    pre_unary_operator = children[0].operator
                     value = children[1]
                     post_unary_operator = None
                     # print(f"node_type:{node_type}, pre_unary_operator: {pre_unary_operator}, value: {value}, post_unary_operator: {post_unary_operator}")
@@ -698,9 +705,21 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
 define num main(){
-    list b = [];
-    tup c = [];
-    flag darshi = ismpty(c);
+    num testVar;
+    list c;
+    while(testVar == 10){
+        num x;
+        given(testVar == 52){
+            ++x;
+        }
+        other(testVar == 5){
+            
+        }
+        otherwise{
+            --testVar;
+        }
+    }
+    testVar++;
 	yield 0;
 }
 
