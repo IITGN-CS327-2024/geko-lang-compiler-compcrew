@@ -4,6 +4,8 @@ import rich
 class SemanticError(Exception):
     pass
 
+SymTable = {}
+
 dict_of_types = { 
     'int':'num',
     'str':'str',
@@ -41,7 +43,9 @@ class SemanticAnalyzer:
             raise SemanticError("Trying to exit the global scope")
 
     def declare_variable(self, name, data_type, mutability, size = None):
-        if name in self.scopes[-1]:
+        print(self.symbol_table[self.scopes[-1]])
+        print(self.scopes[-1])
+        if name in self.symbol_table[self.scopes[-1]]:
             raise SemanticError(f"Variable '{name}' already declared in this scope")
         if size is not None:
             self.symbol_table[self.scopes[-1]][name] = {'type': data_type, 'mutability': mutability, 'size': size}
@@ -106,6 +110,9 @@ class SemanticAnalyzer:
                     exp_typ = "Undetermined"
                     break
             return exp_typ
+        elif isinstance (expression, SpecialFunction):
+            if expression.function_call:
+                return self.visit(expression.function_call)
         elif isinstance(expression, BinaryOperator):
             # Handle binary operations like +, -, *, etc.
             # You need to determine the resulting type based on the operation
@@ -117,6 +124,9 @@ class SemanticAnalyzer:
         elif isinstance(expression, (int, float)):
             return 'int'
     # Add more comprehensive handling here based on your expression AST node types
+
+    # def visit_FunctionCall(self, node):
+    #     if node.function_name not in 
 
     # You should add more comprehensive handling here based on your expression AST node types
     def visit_ListAppendTail(self, node):
@@ -267,7 +277,31 @@ class SemanticAnalyzer:
         self.visit(node.conditional_argument)
         for statement in node.conditional_block.statements:
             self.type_of_expression(statement)
+        if len(node.other_blocks) > 0:
+            for other in node.other_blocks:
+                self.visit(other)
+        self.visit(node.otherwise_block)
         # self.exit_scope()
+    
+    def visit_Otherwise(self,node):
+        self.visit(node.conditional_block)
+
+    def visit_TryCatchStatement(self, node):
+        self.enter_scope("Try")
+        for stmt in node.try_block.statements:
+            if stmt:
+                self.visit(stmt)
+        self.symbol_table['Try']['catch'] = node.catch_string
+        self.enter_scope("Catch")
+        for stmt in node.catch_block.statements:
+            if stmt:
+                self.visit(stmt)
+        
+        self.exit_scope()
+        self.exit_scope()
+    
+    def visit_PopStatement(self,node):
+        self.symbol_table[self.scopes[-1]]['pop'] = node.string_value
 
     def visit(self, node):
         # General visit method that calls specific methods based on node type
@@ -297,6 +331,7 @@ class SemanticAnalyzer:
                 else:
                     self.visit(statement)
         rich.print(self.symbol_table)
+        SymTable = self.symbol_table
         self.exit_scope()
 
     def visit_FunctionDef(self, node):
