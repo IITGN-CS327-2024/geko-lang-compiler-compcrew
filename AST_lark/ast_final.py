@@ -380,6 +380,9 @@ class ASTBuilder(Visitor):
                     value = children[0]
                     identifier = None
                     expression = None
+                elif children[0].__class__.__name__ == "ListAppendTail":
+                    expression = children[0]
+                    value = None
                 else:
                     value = None
                     identifier = children[0]
@@ -705,21 +708,15 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
 define num main(){
-    num testVar;
+    num a;
+    list b;
     list c;
-    while(testVar == 10){
-        num x;
-        given(testVar == 52){
-            ++x;
-        }
-        other(testVar == 5){
-            
-        }
-        otherwise{
-            --testVar;
-        }
-    }
-    testVar++;
+    num d;
+    list ls = [1,2,3];
+    a = 1;
+    b = tail(ls);
+    c = append(7,ls);
+    d = length(ls);
 	yield 0;
 }
 
