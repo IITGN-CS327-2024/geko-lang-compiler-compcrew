@@ -262,13 +262,9 @@ class SemanticAnalyzer:
             else:
                 raise SemanticError(f"Array size must be an integer")
             size = node.size_array
-            
             # var_info = self.check_variable_declared(node.variable_name)
-
             print(node.equal_to)
             (length_arr, type_list_arr) = self.visit(node.equal_to)
-
-            
 
             if type_list_arr == []:
                 print(4)
@@ -518,7 +514,7 @@ class SemanticAnalyzer:
 
 
     def visit_ConditionalStatement(self, node):
-        # self.enter_scope("Conditional")n``1
+        # self.enter_scope("Conditional")
         self.visit(node.conditional_argument)
         for statement in node.conditional_block.statements:
             self.type_of_expression(statement)
@@ -528,8 +524,14 @@ class SemanticAnalyzer:
         self.visit(node.otherwise_block)
         # self.exit_scope()
     
-    def visit_Otherwise(self,node):
-        self.visit(node.conditional_block)
+    def visit_OtherBlock(self, node):
+        self.visit(node.condition)
+        for statement in node.conditional_block.statements:
+            self.type_of_expression(statement)
+    
+    def visit_OtherwiseBlock(self,node):
+        for statement in node.conditional_block.statements:
+            self.type_of_expression(statement)
 
     def visit_TryCatchStatement(self, node):
         self.enter_scope("Try")
