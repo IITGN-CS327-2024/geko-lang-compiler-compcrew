@@ -51,13 +51,20 @@ class SemanticAnalyzer:
             self.symbol_table[self.scopes[-1]][name] = {'type': data_type, 'mutability': mutability, 'size': size}
         else:  
             self.symbol_table[self.scopes[-1]][name] = {'type': data_type, 'mutability': mutability}
-        print(self.scopes)
+        # print(self.scopes)
+
+    def declare_list(self, name, data_type, mutability,size, list_for_elements):
+        # Declare a variable in the current scope
+        if name in self.symbol_table[self.scopes[-1]]:
+            raise SemanticError(f"Variable '{name}' already declared in this scope")
+        self.symbol_table[self.scopes[-1]][name] = {'type': data_type, 'mutability': mutability, 'size': size, 'elements_type': list_for_elements}
+        # print(self.scopes)
 
     def check_variable_declared(self, name):
         # Check if a variable is declared in any accessible scope
         # print(self.scopes[-1],"\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
         if name in self.symbol_table[self.scopes[-1]]:
-            print(self.scopes[-1])
+            # print(self.scopes[-1])
             return self.symbol_table[self.scopes[-1]][name]
         elif self.scopes[-1] == 'Block':
             for i in range(len(self.scopes)-2,-1,-1):
@@ -74,7 +81,7 @@ class SemanticAnalyzer:
     def type_of_expression(self, expression):
         if isinstance(expression, str):
             if expression.startswith('~') and expression.endswith('~'):
-                return 'string'
+                return 'str'
             else:
                 # Handling direct variable name references
                 var_info = self.check_variable_declared(expression)
@@ -85,6 +92,7 @@ class SemanticAnalyzer:
         # elif isinstance(expression, Term):
         elif expression.__class__.__name__ == 'Term':
             if expression.value:
+                print('value:',expression.value)
                 print(type(expression.value))
                 return type(expression.value).__name__
             if expression.expression:
@@ -111,8 +119,9 @@ class SemanticAnalyzer:
                     break
             return exp_typ
         elif isinstance (expression, SpecialFunction):
-            if expression.function_call:
-                return self.visit(expression.function_call)
+            return self.visit(expression)
+            # if expression.function_call:
+            #     return self.visit(expression.function_call)
         elif isinstance(expression, BinaryOperator):
             # Handle binary operations like +, -, *, etc.
             # You need to determine the resulting type based on the operation
@@ -129,16 +138,68 @@ class SemanticAnalyzer:
     #     if node.function_name not in 
 
     # You should add more comprehensive handling here based on your expression AST node types
+
+    def visit_SpecialFunction(self, node):
+        print('SpecialFunction')
+        #array, list, tup teeno ke liye ek saath handle karega
+        type = None
+        if node.length and node.identifier:
+            print('length')
+            var_info = self.check_variable_declared(node.identifier)
+            print('var_info',var_info)
+            if len(var_info) == 2:
+                raise SemanticError(f"Variable '{node.identifier}' is not an array/list/tuple")
+            type = 'num'
+            return [type,var_info['size']]
+        
+        elif node.head and node.identifier:
+            print('head')
+            var_info = self.check_variable_declared(node.identifier)
+            if var_info['size'] == 0:
+                raise SemanticError(f"Variable '{node.identifier}' is an empty list/tuple")
+            print('var_info',var_info)
+            if len(var_info) == 2:
+                raise SemanticError(f"Variable '{node.identifier}' is not an array/list/tuple")
+        
+            type = var_info['elements_type'][0]
+            return [type,var_info['size']]
+        
+        elif node.isempty and node.identifier:
+            print('isempty')
+            var_info = self.check_variable_declared(node.identifier)
+            if len(var_info) == 2:
+                raise SemanticError(f"Variable '{node.identifier}' is not an array/list/tuple")
+            if var_info['size'] == 0:
+                return ['flag',0]
+            return ['flag',1]
+        elif node.function_call:
+            func_call_list = self.visit(node.function_call)
+            return func_call_list
+
+    
+    # 'add': {'parameters': {'return_value': 'num', 'x': 'num', 'y': 'num'}, 'sum': {'type': 'num', 'mutability': 'None'}}    
+    def visit_FunctionCall(self,node):
+        if node.function_name not in self.symbol_table:
+            raise SemanticError("Undefined function '%s'" % node.function_name)
+        else:
+            param_list = self.symbol_table[node.function_name]['params'].values()
+            return param_list
+            
+
     def visit_ListAppendTail(self, node):
         print('ListAppendTail')
 
         if node.tail is not None:
             var_info = self.check_variable_declared(node.identifier)
+            if (len(var_info) <= 3):
+                raise SemanticError(f"Variable '{node.identifier}' is not a list")
             print('var_info:',var_info)
             return (None,[])
         
         if node.append is not None:
             var_info = self.check_variable_declared(node.identifier)
+            if (len(var_info) <= 3):
+                raise SemanticError(f"Variable '{node.identifier}' is not a list")
             print('var_info:',var_info)
             return (None,[])
 
@@ -147,8 +208,8 @@ class SemanticAnalyzer:
             length = len(node.elements)
             count = 0
             for i in node.elements:
-                print("#########BLAHBLAHBLAH########################\n",i)
-                if (isinstance(i, Expression)):
+                print(i)
+                if (isinstance(i, Expression)) and (i.terms is not None):
                         print(1)
                         if (isinstance(i.terms[1], Expression)):
                             print(2)
@@ -163,6 +224,9 @@ class SemanticAnalyzer:
                         type_list.append(expr_type)
                         print(type_list)
                         count += 1
+                elif (i.terms is None):
+                    type_list = []
+                    length = 0
             return (length, type_list)
 
     def visit_VariableDeclaration(self, node):
@@ -172,14 +236,25 @@ class SemanticAnalyzer:
             type_name = node.data_type
             print(mutability)
             print(type_name)
+            #when the equal_to goes to ListAppendTail
+            if node.equal_to.__class__.__name__ == "ListAppendTail":
+                if node.equal_to.tail is not None or node.equal_to.append is not None:
+                    (length_list, type_list_list) = self.visit(node.equal_to)
+                    self.declare_list(node.variable_name, type_name, mutability,length_list, type_list_list)
+                    return
+                
+            #to handle empty list, tuple                
+            if node.equal_to.elements[0].terms == None:
+                self.declare_list(node.variable_name, type_name, mutability, 0, [])
+                return
             (length_list, type_list_list) = self.visit(node.equal_to)
-            if (length_list != None and len(type_list_list)!=0):
-                print("Bhai yaha aaya")     
-                size = length_list
-                self.declare_variable(node.variable_name, type_name, mutability,size)
-
-        elif node.size_array: #when the variable is an array
+            self.declare_list(node.variable_name, type_name, mutability, length_list, type_list_list)
+            return
+        
+        elif node.size_array is not None: #when the variable is an array
             print('array')
+            mutability, type_name = node.data_type.split()
+
             if isinstance(node.size_array, int):
                 if node.size_array < 0:
                     raise SemanticError(f"Array size must be a positive integer")
@@ -191,6 +266,12 @@ class SemanticAnalyzer:
 
             print(node.equal_to)
             (length_arr, type_list_arr) = self.visit(node.equal_to)
+
+            
+
+            if type_list_arr == []:
+                self.declare_variable(node.variable_name, type_name, mutability,size)
+                return 
 
             #pehle ye check karlo ki elements ki length ke size ke equal hai ya nahi
             if (length_arr != size):
@@ -204,13 +285,82 @@ class SemanticAnalyzer:
                     raise SemanticError(f"Type mismatch: variable '{node.variable_name}' declared as '{type_name}' but assigned '{type_list_arr[i]}'")
             # phir us variable ko symbol table me store karo 
             self.declare_variable(node.variable_name, type_name, mutability,size)
-            
         else:
             mutability, type_name = node.data_type.split()
             print(mutability)
             print(type_name)
             test_lst = []
             if (node.equal_to):
+                for i in node.equal_to[:-1]: #-1 is for epsilon
+                    if (isinstance(i, Term)):
+                        print(1)
+                        expr_type = self.type_of_expression(i)
+                        test_lst.append(expr_type)
+                # change expr_type according to dict_of_types
+                print('###################################')
+                print(test_lst)
+                test_lst = flatten_list(test_lst)
+                print(test_lst)
+                print('###################################')
+                ################
+                # Darshi is handling special function here
+                ################
+                if  len(test_lst) > 0:
+                    var_val_tp = test_lst[0]
+                    for i in test_lst:
+                        print("i is:", i)
+                        if i != var_val_tp:
+                            var_val_tp = "Undetermined"
+                            break
+                    if ((var_val_tp != "Undetermined") and (var_val_tp in dict_of_types.keys())):
+                        var_val_tp = dict_of_types[var_val_tp]
+                # for i in range(len(test_lst)):
+                #     # print(j)
+                #     print(dict_of_types['int'])
+                #     print(2)
+                #     # if j in dict_of_types:
+                #     #     j = dict_of_types[j]
+                #     # if test_lst[i] in dict_of_types.keys():
+                #     #     test_lst[i] = dict_of_types[test_lst[i]]
+                #     # if test_lst[i] != type_name:
+                    if var_val_tp != type_name:
+                        raise SemanticError(f"Type mismatch: variable '{node.variable_name}' declared as '{type_name}' but assigned '{var_val_tp}'")
+                print(test_lst)
+            self.declare_variable(node.variable_name, type_name, mutability)
+
+            #to handle num a = b[2];
+            if (node.equal_to and node.equal_to[1] and node.equal_to[1].identifier is not None and (node.equal_to[1].expression and node.equal_to[1].expression.terms[0].value is not None)) :
+                var_info = self.check_variable_declared(node.equal_to[1].identifier)
+                if len(var_info) == 2:
+                    raise SemanticError(f"Variable '{node.equal_to[1].identifier}' is not an array/list/tuple")
+                if var_info['size'] == 0:
+                    raise SemanticError(f"Variable '{node.equal_to[1].identifier}' is an empty list/tuple")
+                if var_info['type'] != type_name:
+                    raise SemanticError(f"Type mismatch: variable '{node.variable_name}' declared as '{type_name}' but assigned '{var_info['type']}'")
+                if var_info['size'] <= node.equal_to[1].expression.terms[0].value:
+                    raise SemanticError(f"Index out of bounds")
+                self.declare_variable(node.variable_name, type_name, mutability)
+                # return
+            
+            #this is for declaration
+            # test_lst = []
+            if (node.equal_to and node.equal_to[1] and node.equal_to[1].expression.__class__.__name__ == "SpecialFunction"):
+                (type,length) = self.visit(node.equal_to[1].expression)
+
+                if (node.equal_to[1].expression.length is not None) and type != type_name:
+                    raise SemanticError(f"Type mismatch: variable '{node.variable_name}' declared as '{type_name}' but assigned '{type}'")
+                
+                elif (node.equal_to[1].expression.head is not None) and type != type_name:
+                    if type in dict_of_types.keys(): #like int to num conversion
+                        type = dict_of_types[type]
+                    if type != type_name:
+                        raise SemanticError(f"Type mismatch: variable '{node.variable_name}' declared as '{type_name}' but assigned '{type}'")
+
+                elif (node.equal_to[1].expression.isempty is not None) and type != type_name:
+                    raise SemanticError(f"Type mismatch: variable '{node.variable_name}' declared as {type_name} but assigned '{type}'")
+
+                self.declare_variable(node.variable_name, type_name, mutability,length)
+                # return
                 for i in node.equal_to[:-1]: #-1 is for epsilon
                     if (isinstance(i, Term)):
                         print(1)
@@ -243,7 +393,8 @@ class SemanticAnalyzer:
                     if var_val_tp != type_name:
                         raise SemanticError(f"Type mismatch: variable '{node.variable_name}' declared as '{type_name}' but assigned '{var_val_tp}'")
                 print(test_lst)
-            self.declare_variable(node.variable_name, type_name, mutability)
+                self.declare_variable(node.variable_name, type_name, mutability)
+            # return
 
     def visit_UnaryStatement(self, node):
         self.check_variable_declared(node.value)
@@ -255,23 +406,103 @@ class SemanticAnalyzer:
                 raise SemanticError(f"Type mismatch in the expression in show statement")
 
     def visit_Assignment(self, node):
+        print('Assignment')
+        print()
         var_info = self.check_variable_declared(node.variable_name)
-        expr_type = self.type_of_expression(node.value)
-        # print('before ka before:',expr_type)
-        # expr_type = flatten_list(expr_type)
-        # for i in range(len(expr_type)):
-            # print('before ka before:',expr_type[i])
-        if expr_type in dict_of_types.keys():
-            print('before:', expr_type)
-            expr_type = dict_of_types[expr_type]
-        tp = expr_type
-        print('expr_type:',expr_type)
-        print('tp:',tp)
-        if tp != var_info['type']:
-            raise SemanticError(f"Type mismatch: variable '{node.variable_name}' expected '{var_info['type']}' but got '{tp}'")
-        if var_info['mutability'] == 'fix':
-            raise SemanticError(f"Cannot assign to constant variable '{node.variable_name}'")
+        print('var_info:',var_info)
+
+        #to handle array, list, tuple
+        if len(var_info) > 2:
+            if var_info['type'] == 'tup' or var_info['size'] != None:
+                    raise SemanticError(f"Cannot assign to tuple/array '{node.variable_name}'")
         
+        elif (len(var_info) <= 3):
+            #to handle length for array, list, tuple      
+            if (node.value.terms[0].expression.__class__.__name__ == "SpecialFunction"):
+                var_info = self.check_variable_declared(node.variable_name)
+
+                if var_info['type']=='list': 
+                    raise SemanticError(f"Cannot assign to list '{node.variable_name}'")
+                (type,length) = self.visit(node.value.terms[0].expression)
+                
+                if (node.value.terms[0].expression.length is not None) and var_info['type'] != type:
+                    raise SemanticError(f"Type mismatch: variable '{node.variable_name}' expected '{var_info['type']}' but got '{type}'")
+                elif (node.value.terms[0].expression.head is not None) and var_info['type'] != type:
+                    if type in dict_of_types.keys():
+                        type = dict_of_types[type]
+                    if type != var_info['type']:
+                        raise SemanticError(f"Type mismatch: variable '{node.variable_name}' expected '{var_info['type']}' but got '{type}'")
+                elif (node.value.terms[0].expression.isempty is not None) and var_info['type'] != type:
+                    raise SemanticError(f"Type mismatch: variable '{node.variable_name}' expected '{var_info['type']}' but got '{type}'")
+
+            #to handle a = b[2];
+            elif (node.value.terms[0].identifier is not None and node.value.terms[0].expression.terms[0].value is not None) :
+                var_info_rhs_id = self.check_variable_declared(node.value.terms[0].identifier)
+                var_info_lhs = self.check_variable_declared(node.variable_name)
+                if (var_info_rhs_id['type'] == 'list'):
+                    raise SemanticError(f"Cannot assign element of 'list' to variable '{node.variable_name}'")    
+                if len(var_info_rhs_id) == 2:
+                    raise SemanticError(f"Variable '{node.equal_to[1].identifier}' is not an array/list/tuple")
+                if var_info_rhs_id['size'] == 0:
+                    raise SemanticError(f"Variable '{node.equal_to[1].identifier}' is an empty list/tuple")
+                if var_info_rhs_id['type'] != var_info_lhs['type']:
+                    raise SemanticError(f"Type mismatch: variable '{node.variable_name}' expected '{var_info_rhs_id['type']}' but got '{var_info_lhs['type']}'")
+                if var_info_rhs_id['size'] <= node.value.terms[0].expression.terms[0].value:
+                    raise SemanticError(f"Index out of bounds")
+                return
+
+
+            # #to handle tail append for list
+            # if (node.value.terms[0].expression.__class__.__name__ == "ListAppendTail"):
+            #     if (node.value.tail is not None or node.value.append is not None):
+            #         raise SemanticError(f"Cannot assign to variable '{node.variable_name}'")
+     
+            #///////////////////////////////////////////////////////////////////
+            else:
+                print(node.value)
+                expr_type = self.type_of_expression(node.value) #ye expression ke liye hai
+                if expr_type in dict_of_types.keys():
+                    print('before:', expr_type)
+                    expr_type = dict_of_types[expr_type]
+                tp = expr_type
+                print('expr_type:',expr_type)
+                print('tp:',tp)
+                if tp != var_info['type']:
+                    raise SemanticError(f"Type mismatch: variable '{node.variable_name}' expected '{var_info['type']}' but got '{tp}'")
+                if var_info['mutability'] == 'fix':
+                    raise SemanticError(f"Cannot assign to constant variable '{node.variable_name}'")
+        
+    def visit_ValueChangeArray(self, node):
+    #to handle a[2] = 5 value change array;
+        print('ValueChangeArray')
+        var_info_lhs = self.check_variable_declared(node.identifier)
+        if len(var_info_lhs) == 2:
+            raise SemanticError(f"Variable '{node.identifier}' is not an array")
+        if var_info_lhs['type'] == 'list':
+            raise SemanticError(f"Cannot change element in variable '{node.identifier}' of type 'list'") 
+        if var_info_lhs['size'] == 0:
+            raise SemanticError(f"Variable '{node.identifier}' is an empty array")
+        if var_info_lhs['size'] <= node.index:
+            raise SemanticError(f"Index out of bounds")  
+        if (node.value.terms[0].expression.__class__.__name__ == "SpecialFunction"):
+            (type,length) = self.visit(node.value.terms[0].expression)
+            
+            if (node.value.terms[0].expression.length is not None) and var_info_lhs['type'] != type:
+                raise SemanticError(f"Type mismatch: variable '{node.variable_name}' expected '{var_info_lhs['type']}' but got '{type}'")
+            elif (node.value.terms[0].expression.head is not None) and var_info_lhs['type'] != type:
+                if type in dict_of_types.keys():
+                    type = dict_of_types[type]
+                if type != var_info_lhs['type']:
+                    raise SemanticError(f"Type mismatch: variable '{node.variable_name}' expected '{var_info_lhs['type']}' but got '{type}'")
+            elif (node.value.terms[0].expression.isempty is not None) and var_info_lhs['type'] != type:
+                raise SemanticError(f"Type mismatch: variable '{node.variable_name}' expected '{var_info_lhs['type']}' but got '{type}'")
+
+        if (node.value.terms[0].expression is None):
+            if var_info_lhs['type'] != dict_of_types[self.type_of_expression(node.value)]:
+                    raise SemanticError(f"Type mismatch: variable '{node.identifier}' expected '{var_info_lhs['type']}' but got '{self.type_of_expression(node.value)}'")
+
+
+
     def visit_ConditionalStatement(self, node):
         # self.enter_scope("Conditional")n``1
         self.visit(node.conditional_argument)
