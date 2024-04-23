@@ -77,6 +77,7 @@ term	                :   IDENTIFIER
                         |   IDENTIFIER UNARY_OPERATOR
                         |   IDENTIFIER OPEN_BRACKET expression CLOSE_BRACKET
                         |   special_function
+                        |   list_append_tail
                         
 binary_operators	    :	BINARY_OPERATOR 
                         |   COMPARISON_OPERATOR 
