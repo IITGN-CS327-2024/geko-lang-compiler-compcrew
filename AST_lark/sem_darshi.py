@@ -174,8 +174,8 @@ class SemanticAnalyzer:
             return ('flag',1)
         
         elif node.function_call:
-            func_call_list = self.visit(node.function_call)
-            return func_call_list
+            func_call_lst = self.visit(node.function_call)
+            return func_call_lst
 
     
     # 'add': {'parameters': {'return_value': 'num', 'x': 'num', 'y': 'num'}, 'sum': {'type': 'num', 'mutability': 'None'}}    
@@ -183,8 +183,24 @@ class SemanticAnalyzer:
         if node.function_name not in self.symbol_table:
             raise SemanticError("Undefined function '%s'" % node.function_name)
         else:
-            param_list = self.symbol_table[node.function_name]['params'].values()
-            return param_list
+            param_lst = []
+            return_tp = self.symbol_table[node.function_name]['parameters']['return_value']
+            actual_param_lst = list(self.symbol_table[node.function_name]['parameters'].values())[1:]
+            for i in range(len(actual_param_lst)):
+                actual_param_lst[i] = dict_types[actual_param_lst[i]]
+            for arg in node.arguments:
+                param_lst.append(self.type_of_expression(arg))
+            print(param_lst)
+            print(actual_param_lst)
+            if (param_lst != actual_param_lst):
+                raise SemanticError(f"invalid parameters given to the declared function")
+            return (return_tp,None)
+            
+            # print(param_list)
+            # if (len(param_list) == 1):
+            #     return (param_list[0], None)
+            # elif (len(param_list) > 1):
+            #     return (param_list[0],param_list[1:])
             
 
     def visit_ListAppendTail(self, node):
@@ -510,8 +526,6 @@ class SemanticAnalyzer:
         if (node.value.terms[0].expression is None):
             if var_info_lhs['type'] != dict_of_types[self.type_of_expression(node.value)]:
                     raise SemanticError(f"Type mismatch: variable '{node.identifier}' expected '{var_info_lhs['type']}' but got '{self.type_of_expression(node.value)}'")
-
-
 
     def visit_ConditionalStatement(self, node):
         # self.enter_scope("Conditional")
