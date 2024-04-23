@@ -22,6 +22,7 @@ equal_to                :   EQUAL_TO post_equal_to | epsilon
 post_equal_to           :   ENTER OPEN_PARENTHESIS string CLOSE_PARENTHESIS 
                         |   expression
                         |   let_in_statement 
+                        |   list_append_tail
                         
 special_function        :   IDENTIFIER OPEN_BRACKET NUM_LITERAL SLICING_COLON NUM_LITERAL CLOSE_BRACKET
                         |   LENGTH OPEN_PARENTHESIS IDENTIFIER CLOSE_PARENTHESIS
@@ -77,7 +78,6 @@ term	                :   IDENTIFIER
                         |   IDENTIFIER UNARY_OPERATOR
                         |   IDENTIFIER OPEN_BRACKET expression CLOSE_BRACKET
                         |   special_function
-                        |   list_append_tail
                         
 binary_operators	    :	BINARY_OPERATOR 
                         |   COMPARISON_OPERATOR 
