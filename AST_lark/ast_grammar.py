@@ -14,7 +14,7 @@ return_value	        :	expression
 parameters	            :	ELEMENT_SEPERATOR parameter parameters 
                         |   epsilon
 parameter	            :	compound_data_type IDENTIFIER | basic_data_type IDENTIFIER choose_array
-choose_array            :   OPEN_BRACKET NUM_LITERAL CLOSE_BRACKET | epsilon                        
+choose_array            :   OPEN_BRACKET term CLOSE_BRACKET | epsilon                        
 
 statements	            :	statement statements
                         |   epsilon
@@ -41,7 +41,7 @@ compound_data_type	    :	LIST | TUP
 
 
 string	                :	TILDE STRING_LITERAL TILDE
-array	                :	basic_data_type IDENTIFIER OPEN_BRACKET NUM_LITERAL CLOSE_BRACKET
+array	                :	basic_data_type IDENTIFIER OPEN_BRACKET expression CLOSE_BRACKET
 
 variable_declaration	:	basic_data_type IDENTIFIER equal_to
                         |   compound_array compound_var
@@ -60,8 +60,7 @@ list_append_tail        :   OPEN_BRACKET expression expressions CLOSE_BRACKET
 assignment_statement	:	IDENTIFIER assignment_operators post_equal_to
 show_statement	        :	SHOW OPEN_PARENTHESIS expression expressions CLOSE_PARENTHESIS
 block	                :	OPEN_BRACES statements CLOSE_BRACES
-value_change_array	    :	IDENTIFIER OPEN_BRACKET NUM_LITERAL CLOSE_BRACKET assignment_operators expression
-                        | IDENTIFIER OPEN_BRACKET IDENTIFIER CLOSE_BRACKET assignment_operators expression
+value_change_array	    :	IDENTIFIER OPEN_BRACKET expression CLOSE_BRACKET assignment_operators expression
 
 expressions             :   ELEMENT_SEPERATOR expression expressions
                         |   epsilon
