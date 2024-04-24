@@ -597,6 +597,8 @@ class ASTBuilder(Visitor):
             statement_type = children[0].__class__.__name__
             if statement_type == "ConditionalStatement":
                 return children[0]
+            elif statement_type == "TryCatchStatement":
+                return children[0]
             value = children[0]
             if statement_type == "Block":
                 return children[0]
@@ -707,62 +709,62 @@ def final_iteration(tree_node, tokens,graph, parent_node=None):
 parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
-define void trial(num x, flag arr[10], str qwerty) {
-    num i;
-    i = 7/1*-5+9;
-    yield;
+
+define num add(num x, num y){
+	yield x + y;
 }
-define num add(num x, num y) {
-    show(~adding~);
-    num sm = x + y;
-    yield sm;
+define num subtract(num x, num y){
+	yield x - y;
 }
-define num diff(num a, num y) {
-    show(~subtracting~);
-    num sub = a - y;
-    yield sub;
+define num multiply(num x, num y){
+	yield x * y; 
 }
-define flag arr(flag abc[6]) {
-    show(~arraying~);
-    flag first = yay;
-    flag second = nay;
-    yield first + second;
-}
-define num main(){
-    list b = [5,~qwe~,6,nay];
-    tup c = [5,4,6];
-    num age;
-    test {
-        age = 10;
-        num r = 125;
-        given (age >= 18) {
-            show (~valid age~);
+define num divide(num x, num y){
+    test{
+        given (y != 0) {
+            show(~valid divisor for divident.~);
         }
         otherwise {
-            pop (~ValueError~);
+            pop(~ValueError~);
         }
     }
     arrest (~ValueError~) {
         show(~ValueError: The age must be greater than or equal to 18 years.~);
     }
+	yield x/y;
+}
 
-    num arr[3] = [9,8,7];
-    flag x2 = isEmpty(b);
-    num qw = length(arr) + length(b);
-    num temp = 1;
-    list d = [1,5,~qwer~,yay, 9,nay];
-    num y;
-    num t = let y = 9 in y / 3;
-    num q;
-    t = let q = 9 in q - 5;
-    temp = arr[2];
-    arr[1] = t;
-    ## x = 0;
-    num sum = 5 + (6 - (5 * y) / 2);
-    sum = add(y,temp);
+
+define num main(){
+	show(~Calculator program~);
+	num firstNum = enter(~Enter first number:~);
+	num secondNum = enter(~Enter second number:~);
+	str calFunc = enter(~Enter calculating function: ~);
+
+	given(calFunc == ~+~){
+		num calcVal = add(firstNum, secondNum);
+		##show(firstnum, ~ + ~,secondNum, ~ = ~, calcVal);
+	}
+	other(calFunc == ~-~){
+		num calcVal = subtract(firstNum, secondNum);
+		##show(firstnum, ~ - ~ ,secondNum, ~ = ~, calcVal);
+	}
+	other(calFunc == ~*~){
+		num calcVal = multiply(firstNum, secondNum);
+		##show(firstnum, ~ * ~ ,secondNum, ~ = ~, calcVal);
+	}
+	other(calFunc == ~/~){
+		num calcVal = divide(firstNum, secondNum);
+		##show(firstnum, ~ / ~ ,secondNum, ~ = ~, calcVal);
+	}
+	otherwise{
+		##show(~invalid character input. Function returning with NULL.~);
+	}
 	yield 0;
 }
+
 """
+
 # ----------------------------------------------------------------------------------------------------------------------------
 
 parser_lark_dir = os.path.dirname(__file__)

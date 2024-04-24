@@ -73,11 +73,16 @@ class SemanticAnalyzer:
         if name in self.symbol_table[self.scopes[-1]]:
             # print(self.scopes[-1])
             return self.symbol_table[self.scopes[-1]][name]
-        elif self.scopes[-1] == 'Block' or self.scopes[-1] == 'ConditionalStatement' or self.scopes[-1] == 'Try' or self.scopes[-1].startswith('LetIn'):
-            for i in range(len(self.scopes)-2,-1,-1):
+        elif self.scopes[-1] == 'Block' or self.scopes[-1] == 'ConditionalStatement' or self.scopes[-1] == 'Try' or self.scopes[-1].startswith('LetIn'): 
+            for i in range(len(self.scopes)-1,-1,-1):
                 if name in self.symbol_table[self.scopes[i]]:
                     # print(self.scopes[i])
                     return self.symbol_table[self.scopes[i]][name]
+                elif 'parameters' in  self.symbol_table[self.scopes[i]]:
+                    if name in self.symbol_table[self.scopes[i]]['parameters']:
+                        # print("found in parameters")
+                        # print(name, self.symbol_table[self.scopes[-1]]['parameters'][name])
+                        return self.symbol_table[self.scopes[i]]['parameters'][name]
         elif 'parameters' in  self.symbol_table[self.scopes[-1]]:
             if name in self.symbol_table[self.scopes[-1]]['parameters']:
                 # print("found in parameters")
@@ -105,6 +110,8 @@ class SemanticAnalyzer:
                     raise SemanticError(f"Variable '{expression.identifier}' is not an array/list/tuple")
                 if var_info['size'] == 0:
                     raise SemanticError(f"Variable '{expression.identifier}' is an empty list/tuple")
+                if var_info['type'] == 'list' or var_info['type'] == 'tup':
+                    raise SemanticError(f"Cannot access element in variable '{expression.identifier}' of type '{var_info['type']}'") 
                 if expression.expression.terms[0].value >= var_info['size']:
                     raise SemanticError(f"Index out of bounds")
                 return var_info['type']
