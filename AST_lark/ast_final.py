@@ -128,6 +128,7 @@ class ASTBuilder(Visitor):
             if children[1]!=None:
                 statements.extend(children[1])
             # print(f"node_type:{node_type}, statements: {statements}")
+            
             return statements
         
         elif node_type == "equal_to":
@@ -579,6 +580,7 @@ class ASTBuilder(Visitor):
             return LetInStatement(data_type=data_type, variable_name=variable_name, value_or_letin=value, operation=operation)
 
         elif node_type == "statement":
+            
             if len(children) == 3:
                 # if children[0] == "++" or children[0] == "--" or children[0]=="`" or children[0]=="!":
                 if children[0].__class__.__name__ == "UnaryOperator":
@@ -598,6 +600,8 @@ class ASTBuilder(Visitor):
             if statement_type == "ConditionalStatement":
                 return children[0]
             elif statement_type == "TryCatchStatement":
+                return children[0]
+            elif statement_type == "LoopStatement":
                 return children[0]
             value = children[0]
             if statement_type == "Block":
@@ -709,60 +713,15 @@ def final_iteration(tree_node, tokens,graph, parent_node=None):
 parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
-
-define num add(num x, num y){
-	yield x + y;
-}
-define num subtract(num x, num y){
-	yield x - y;
-}
-define num multiply(num x, num y){
-	yield x * y; 
-}
-define num divide(num x, num y){
-    test{
-        given (y != 0) {
-            show(~valid divisor for divident.~);
-        }
-        otherwise {
-            pop(~ValueError~);
-        }
+define num main() {
+    list b = [1,2,~3~,444444,5];
+    ## str k = b[3];
+    iter(num i = 0; i<5; i++) {
+        show(34);
     }
-    arrest (~ValueError~) {
-        show(~ValueError: The age must be greater than or equal to 18 years.~);
-    }
-	yield x/y;
+    ##str jstrice = k[0:1];
+    yield 658;
 }
-
-
-define num main(){
-	show(~Calculator program~);
-	num firstNum = enter(~Enter first number:~);
-	num secondNum = enter(~Enter second number:~);
-	str calFunc = enter(~Enter calculating function: ~);
-
-	given(calFunc == ~+~){
-		num calcVal = add(firstNum, secondNum);
-		##show(firstnum, ~ + ~,secondNum, ~ = ~, calcVal);
-	}
-	other(calFunc == ~-~){
-		num calcVal = subtract(firstNum, secondNum);
-		##show(firstnum, ~ - ~ ,secondNum, ~ = ~, calcVal);
-	}
-	other(calFunc == ~*~){
-		num calcVal = multiply(firstNum, secondNum);
-		##show(firstnum, ~ * ~ ,secondNum, ~ = ~, calcVal);
-	}
-	other(calFunc == ~/~){
-		num calcVal = divide(firstNum, secondNum);
-		##show(firstnum, ~ / ~ ,secondNum, ~ = ~, calcVal);
-	}
-	otherwise{
-		##show(~invalid character input. Function returning with NULL.~);
-	}
-	yield 0;
-}
-
 """
 
 # ----------------------------------------------------------------------------------------------------------------------------
