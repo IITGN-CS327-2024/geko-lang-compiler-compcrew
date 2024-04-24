@@ -25,6 +25,7 @@ def write_code_main(node, file, symbol_table, ntabs=0):
         for child in node.children:
             write_code_main(child, file, symbol_table, ntabs + 1)
         file.write("\treturn 0;\n}\n")
+    
     elif node.__class__.__name__ == "VariableDeclaration":
         print_tabs(ntabs, file)
         mut, dt = node.data_type.split()
@@ -32,40 +33,27 @@ def write_code_main(node, file, symbol_table, ntabs=0):
             var_type = f"const {type_map[dt]}"
         else:
             var_type = f"{type_map[dt]}"
-        # var_type = "int" if node.data_type == 'num' else "auto"
-        file.write(f"{var_type} {node.variable_name}")
-        file.write("= ")
+        file.write(f"{var_type} {node.variable_name} = ")
         if node.equal_to:
             for j in node.equal_to:
-                if j is not None:
-                    # Assuming the first term in equal_to contains the value for initialization
-                    if j.__class__.__name__ == "Term":
-                        value = j.value if j.value else (j.identifier if j.identifier else 0)
-                        file.write(f" {value}")
-
-                    elif j.__class__.__name__ == "BinaryOperator":
-                        operator = j.operator if j.operator else ""
-                        file.write(f" {operator} ")
-                    
+                if isinstance(j, Term):
+                    write_term(j, file, symbol_table, ntabs)
+                elif isinstance(j, Expression):
+                    write_expression(j, file, symbol_table, ntabs)
         file.write(";\n")
+    
     elif node.__class__.__name__ == "Expression":
-        if node.operator_if_exists:
-            print(node.operator_if_exists)
-            file.write(f" {node.operator_if_exists} ")
-            for term in node.terms:
-                write_code_main(term,file,symbol_table,ntabs)
-        else:
-            for term in node.terms:
-                write_code_main(term,file,symbol_table,ntabs)
+        write_expression(node, file, symbol_table, ntabs)
+    
     elif node.__class__.__name__ == "Term":
-        if node.value:
-            file.write(f"{node.value}")
-        elif node.identifier:
-            file.write(f"{node.identifier}")
+        write_term(node, file, symbol_table, ntabs)
+        file.write(";\n")  # Assuming terms outside expressions need to be terminated with a semicolon
+    
     elif node.__class__.__name__ == "Assignment":
         print_tabs(ntabs, file)
         file.write(f"{node.variable_name} {node.assignment_operators} ")
-        write_code_main(node.value,file,symbol_table,ntabs)
+        if isinstance(node.value, (Term, Expression)):
+            write_code_main(node.value, file, symbol_table, ntabs)  # This should handle both Term and Expression cases
         file.write(";\n")
 
 
@@ -80,8 +68,9 @@ def write_code_main(node, file, symbol_table, ntabs=0):
         file.write(" << std::endl;\n")
 
 
-    
     else:
+        # Handling other nodes generically
+        print_tabs(ntabs, file)
         file.write("int main() {\n")
         for child in node.statements:
             write_code_main(child, file, symbol_table, ntabs + 1)
