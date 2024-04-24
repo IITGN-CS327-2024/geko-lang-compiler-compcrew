@@ -707,19 +707,61 @@ def final_iteration(tree_node, tokens,graph, parent_node=None):
 parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
+define void trial(num x, flag arr[10], str qwerty) {
+    num i;
+    i = 7/1*-5+9;
+    yield;
+}
+define num add(num x, num y) {
+    show(~adding~);
+    num sm = x + y;
+    yield sm;
+}
+define num diff(num a, num y) {
+    show(~subtracting~);
+    num sub = a - y;
+    yield sub;
+}
+define flag arr(flag abc[6]) {
+    show(~arraying~);
+    flag first = yay;
+    flag second = nay;
+    yield first + second;
+}
 define num main(){
-    num a;
-    list b;
-    list c;
-    num d;
-    list ls = [1,2,3];
-    a = 1;
-    b = tail(ls);
-    c = append(7,ls);
-    d = length(ls);
+    list b = [5,~qwe~,6,nay];
+    tup c = [5,4,6];
+    num age;
+    test {
+        age = 10;
+        num r = 125;
+        given (age >= 18) {
+            show (~valid age~);
+        }
+        otherwise {
+            pop (~ValueError~);
+        }
+    }
+    arrest (~ValueError~) {
+        show(~ValueError: The age must be greater than or equal to 18 years.~);
+    }
+
+    num arr[3] = [9,8,7];
+    flag x2 = isEmpty(b);
+    num qw = length(arr) + length(b);
+    num temp = 1;
+    list d = [1,5,~qwer~,yay, 9,nay];
+    num y;
+    num t = let y = 9 in y / 3;
+    num q;
+    t = let q = 9 in q - 5;
+    temp = arr[2];
+    arr[1] = t;
+    ## x = 0;
+    num sum = 5 + (6 - (5 * y) / 2);
+    sum = add(y,temp);
 	yield 0;
 }
-
 """
 # ----------------------------------------------------------------------------------------------------------------------------
 
