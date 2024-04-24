@@ -1,7 +1,7 @@
 from ast_final import *
 from ast_classes import *
 # from sem_combine import *
-from sem_shreya_copy import *
+from code_gen import *
 import rich
 # Code Generation
 type_map = {
@@ -40,21 +40,51 @@ def write_code_main(node, file, symbol_table, ntabs=0):
     elif node.__class__.__name__ == "VariableDeclaration":
         write_variable_declaration(node, file, symbol_table, ntabs)
     
+    elif node.__class__.__name__ == "LoopStatement":
+        write_loop_statement(node, file, symbol_table, ntabs=0)
+
     elif node.__class__.__name__ == "Expression":
         write_expression(node, file, symbol_table, ntabs)
     
     elif node.__class__.__name__ == "Term":
         write_term(node, file, symbol_table, ntabs)
         file.write(";\n")  # Assuming terms outside expressions need to be terminated with a semicolon
-    
+    elif node.__class__.__name__ == "FunctionCall":
+        write_function_call(node, file, symbol_table, ntabs)
+
+    elif node.__class__.__name__ == "ListAppendTail":
+        write_list_append_tail(node, file, symbol_table, ntabs)
+
+    elif node.__class__.__name__ == "Block":
+        write_block(node, file, symbol_table, ntabs)
+
+    elif node.__class__.__name__ == "OtherBlock":
+        write_other_block(node, file, symbol_table, ntabs)
+
+
+    elif node.__class__.__name__ == "ConditionalStatement":
+        file.write("if (")
+        write_conditional_argument(node.conditional_argument, file, symbol_table, ntabs)
+        file.write(") {\n")
+        write_block(node.conditional_block, file, symbol_table, ntabs + 1)
+        file.write("}\n")
+        if node.other_blocks:
+            for other_block in node.other_blocks:
+                write_other_block(other_block, file, symbol_table, ntabs)
+        if node.otherwise_block:
+            write_otherwise_block(node.otherwise_block, file, symbol_table, ntabs)
+
     elif node.__class__.__name__ == "Assignment":
-        print_tabs(ntabs, file)
-        file.write(f"{node.variable_name} {node.assignment_operators} ")
-        if isinstance(node.value, (Term, Expression)):
-            write_code_main(node.value, file, symbol_table, ntabs)  # This should handle both Term and Expression cases
-        file.write(";\n")
+        write_assignment(node, file, symbol_table, ntabs)
 
+    elif node.__class__.__name__ == "LetInStatement":
+        write_let_in_statement(node, file, symbol_table, ntabs)
 
+    elif node.__class__.__name__ == "UnaryStatement":
+        write_unary_statement(node, file, symbol_table, ntabs)
+
+    elif node.__class__.__name__ == "LoopStatement":
+        write_loop_statement(node, file, symbol_table, ntabs)
 
     elif node.__class__.__name__ == "ShowStatement":
         print_tabs(ntabs, file)
@@ -65,13 +95,6 @@ def write_code_main(node, file, symbol_table, ntabs=0):
                 file.write(" << ' ' << ")
         file.write(" << std::endl;\n")
 
-    elif node.__class__.__name__ == "LoopStatement":
-        print_tabs(ntabs, file)
-        loop_header = f"for ({write_variable_declaration(node.declaration, symbol_table)}; {write_expression(node.condition, symbol_table)}; {write_assignment(node.updation, symbol_table)})"
-        file.write(loop_header + " {\n")
-        write_code_main(node.block, file, symbol_table, ntabs + 1)
-        print_tabs(ntabs, file)
-        file.write("}\n")
 
     elif node.__class__.__name__ == "TryCatchStatement":
         print_tabs(ntabs, file)
@@ -83,24 +106,9 @@ def write_code_main(node, file, symbol_table, ntabs=0):
         print_tabs(ntabs, file)
         file.write("}\n")
 
+
     elif node.__class__.__name__ == "ConditionalStatement":
-        print_tabs(ntabs, file)
-        file.write("if (")
-        file.write(write_expression(node.conditional_argument.expression, symbol_table))
-        file.write(") {\n")
-        write_code_main(node.conditional_block, file, symbol_table, ntabs + 1)
-        for other in node.other_blocks:
-            print_tabs(ntabs, file)
-            file.write("else if (")
-            file.write(write_expression(other.condition, symbol_table))
-            file.write(") {\n")
-            write_code_main(other.conditional_block, file, symbol_table, ntabs + 1)
-        if node.otherwise_block:
-            print_tabs(ntabs, file)
-            file.write("else {\n")
-            write_code_main(node.otherwise_block.conditional_block, file, symbol_table, ntabs + 1)
-        print_tabs(ntabs, file)
-        file.write("}\n")
+        write_conditional_statement(node, file, symbol_table, ntabs)
 
     elif node.__class__.__name__ == "FunctionCall":
         file.write(node.function_name + "(")
@@ -114,6 +122,146 @@ def write_code_main(node, file, symbol_table, ntabs=0):
         for child in node.statements:
             write_code_main(child, file, symbol_table, ntabs + 1)
         file.write("\treturn 0;\n}\n")
+
+def write_loop_statement(node, file, symbol_table, ntabs=0):
+
+    print_tabs(ntabs, file)
+    
+    # Determine the type of loop and write the appropriate loop header
+    if node.loop_type == "iter":
+        # Start the for loop
+        file.write("for (")
+        if node.declaration:
+            if isinstance(node.declaration, VariableDeclaration):
+                write_variable_declaration(node.declaration, file, symbol_table, 0)  # Inline declaration, no newline
+            elif isinstance(node.declaration, AssignmentStatement):
+                write_assignment(node.declaration, file, symbol_table, 0)  # Inline assignment, no newline
+        else:
+            file.write("; ")
+        
+        if node.condition:
+            if isinstance(node.condition, Expression):
+                write_expression(node.condition, file, symbol_table, 0)  # Inline condition, no newline
+            elif isinstance(node.condition, ConditionalArgument):
+                write_conditional_argument(node.condition, file, symbol_table, 0)  # Inline conditional argument
+        file.write("; ")
+        
+        if node.updation:
+            if isinstance(node.updation, AssignmentStatement):
+                write_assignment(node.updation, file, symbol_table, 0)  # Inline update, no newline
+            elif isinstance(node.updation, UnaryStatement):
+                write_unary_statement(node.updation, file, symbol_table, 0, inline=True)  # Inline unary update
+        
+        file.write(") {\n")
+
+    elif node.loop_type == "while":
+        # Start the while loop
+        file.write("while (")
+        if node.condition:
+            if isinstance(node.condition, Expression):
+                write_expression(node.condition, file, symbol_table, 0)  # Inline condition
+            elif isinstance(node.condition, ConditionalArgument):
+                write_conditional_argument(node.condition, file, symbol_table, 0)  # Inline conditional argument
+        file.write(") {\n")
+
+    # Write the loop body
+    write_block(node.block, file, symbol_table, ntabs + 1)
+
+    # Close the loop
+    print_tabs(ntabs, file)
+    file.write("}\n")
+
+
+def write_list_append_tail(node, file, symbol_table, ntabs=0):
+
+    # If identifier is given, use it to perform the append operations
+    if node.identifier:
+        # Iterate over each expression in the elements list
+        for expr in node.elements:
+            print_tabs(ntabs, file)
+            # Assuming append uses a method like push_back for std::vector
+            file.write(f"{node.identifier}.push_back(")
+            write_expression(expr, file, symbol_table, 0)  # Write the expression for the element to be appended
+            file.write(");\n")
+
+        # If there's a tail operation to handle, add that code (assuming custom behavior)
+        if node.tail:
+            print_tabs(ntabs, file)
+            file.write(f"{node.tail}({node.identifier});\n")  # Example: tail_operation(list_identifier);
+
+        # If there's an additional custom append method specified
+        if node.append:
+            print_tabs(ntabs, file)
+            # Handle the custom append, which could be something like a special function
+            file.write(f"{node.identifier}.{node.append}();\n")  # Example: identifier.custom_append_method();
+    else:
+        file.write("{")
+        for i in range(len(node.elements)):
+            if (i != len(node.elements) - 1):
+                write_expression(node.elements[i], file, symbol_table, ntabs)
+                file.write(", ")
+            else:
+                write_expression(node.elements[i], file, symbol_table, ntabs)
+        file.write("}")
+def write_assignment(node, file, symbol_table, ntabs=0):
+    # Helper function to print tabs
+    def print_tabs(ntabs, file):
+        file.write('\t' * ntabs)
+
+    print_tabs(ntabs, file)
+    file.write(f"{node.variable_name} {node.assignment_operators} ")
+    
+    # Handle the value, which can be an Expression, SpecialFunction, or LetInStatement
+    if isinstance(node.value, Expression):
+        write_expression(node.value, file, symbol_table, 0)  # Inline expression
+    elif isinstance(node.value, SpecialFunction):
+        write_special_function(node.value, file, symbol_table, 0)  # Inline special function
+    elif isinstance(node.value, LetInStatement):
+        write_let_in_statement(node.value, file, symbol_table, 0)  # Inline let-in statement
+
+    file.write(";\n")
+
+def write_let_in_statement(node, file, symbol_table, ntabs=0):
+    # Helper function to print tabs
+    def print_tabs(ntabs, file):
+        file.write('\t' * ntabs)
+
+    print_tabs(ntabs, file)
+    
+    # Determine the type and write the variable declaration with initialization if present
+    file.write(f"{type_map[node.data_type]} {node.variable_name}")
+    
+    if node.value_or_letin:
+        file.write(" = ")
+        if isinstance(node.value_or_letin, Term):
+            write_term(node.value_or_letin, file, symbol_table, 0)  # Write the term directly
+        elif isinstance(node.value_or_letin, Expression):
+            write_expression(node.value_or_letin, file, symbol_table, 0)  # Write the expression
+        elif isinstance(node.value_or_letin, LetInStatement):
+            write_let_in_statement(node.value_or_letin, file, symbol_table, 0)  # Recursively handle nested let-in statements
+
+    file.write(";\n")
+    
+    # If there's an additional operation to perform with the variable, write that expression
+    if node.operation:
+        print_tabs(ntabs, file)
+        file.write(f"{node.variable_name} = ")  # Assuming the operation modifies the variable
+        write_expression(node.operation, file, symbol_table, 0)
+        file.write(";\n")
+
+
+def write_unary_statement(node, file, symbol_table, ntabs=0,inline=False):
+    # Helper function to print tabs
+
+    print_tabs(ntabs, file)
+    # Handling both pre and post unary operators
+    if node.pre_unary_operator:
+        file.write(f"{node.pre_unary_operator}")
+    file.write(f"{node.value}")
+    if node.post_unary_operator:
+        file.write(f"{node.post_unary_operator}")
+    if not inline:
+        file.write(";\n")
 
 
 def write_variable_declaration(declaration, file, symbol_table, ntabs=0):
@@ -135,16 +283,20 @@ def write_variable_declaration(declaration, file, symbol_table, ntabs=0):
     # If there is an initialization expression
     if declaration.equal_to:
         file.write(" = ")
-        for item in declaration.equal_to:
-            if isinstance(item, Term):
-                write_term(item, file, symbol_table, ntabs)  # Direct writing of a term
-            elif isinstance(item, BinaryOperator):
-                if item.operator:  # Check if operator is not None
-                    file.write(f" {item.operator} ")
-            elif isinstance(item, Expression):
-                write_expression(item, file, symbol_table, ntabs)  # Recursive handling of expressions
-            elif item is None:
-                continue  # Ignore None items in the initialization list
+        if isinstance(declaration.equal_to, ListAppendTail):
+            write_list_append_tail(declaration.equal_to, file, symbol_table, ntabs)
+        
+        else:
+            for item in declaration.equal_to:
+                if isinstance(item, Term):
+                    write_term(item, file, symbol_table, ntabs)  # Direct writing of a term
+                elif isinstance(item, BinaryOperator):
+                    if item.operator:  # Check if operator is not None
+                        file.write(f" {item.operator} ")
+                elif isinstance(item, Expression):
+                    write_expression(item, file, symbol_table, ntabs)  # Recursive handling of expressions
+                elif item is None:
+                    continue  # Ignore None items in the initialization list
 
     file.write(";\n")  # End the statement with a semicolon
 
@@ -175,7 +327,9 @@ def write_expression(expression, file, symbol_table, ntabs=0):
 
 def write_term(term, file, symbol_table, ntabs=0):
     if term.value is not None:
-        if term.value == True:
+        if type(term.value) == int:
+            file.write(f"{term.value}")
+        elif term.value == True:
             file.write("true")
         elif term.value == False:
             file.write("false")
@@ -194,6 +348,9 @@ def write_term(term, file, symbol_table, ntabs=0):
         file.write(f"{term.post_unary_operator}")
 
 def write_function_definition(node, file, symbol_table, ntabs=0):
+    # Helper function to print tabs
+    def print_tabs(ntabs, file):
+        file.write('\t' * ntabs)
 
     print_tabs(ntabs, file)
     
@@ -211,31 +368,45 @@ def write_function_definition(node, file, symbol_table, ntabs=0):
                 param_type = f"{type_map[param_dt]}"
 
             if param.array_size:
-                params.append(f"{type_map[param_type]} {param.parameter_name}[{param.array_size}]")
+                params.append(f"{param_type} {param.parameter_name}[{param.array_size}]")
             else:
-                params.append(f"{type_map[param_type]} {param.parameter_name}")
+                params.append(f"{param_type} {param.parameter_name}")
         file.write(", ".join(params))
     file.write(") {\n")
     
-    # Write function body
-    for statement in node.function_block.statements:
-        write_code_main(statement, file, symbol_table, ntabs + 1)
-    
-    # Handle return value
-    if node.function_block.return_value:
-        print_tabs(ntabs + 1, file)
-        if isinstance(node.function_block.return_value, Expression):
-            file.write("return ")
-            write_expression(node.function_block.return_value, file, symbol_table, ntabs + 1)
-            file.write(";\n")
-        elif isinstance(node.function_block.return_value, FunctionCall):
-            file.write("return ")
-            write_function_call(node.function_block.return_value, file, symbol_table, ntabs + 1)
-            file.write(";\n")
+    # Delegate the function body writing to the write_function_block
+    write_function_block(node.function_block, file, symbol_table, ntabs + 1)
     
     # Close function
     print_tabs(ntabs, file)
     file.write("}\n")
+
+
+def write_function_block(node, file, symbol_table, ntabs=0):
+    # Helper function to print tabs
+    def print_tabs(ntabs, file):
+        file.write('\t' * ntabs)
+
+    # Write each statement in the function block
+    for statement in node.statements:
+        write_code_main(statement, file, symbol_table, ntabs)
+
+    # Handle the return value if present
+    if node.return_value:
+        print_tabs(ntabs, file)
+        file.write("return ")
+        if isinstance(node.return_value, Expression):
+            if node.return_value.operator_if_exists is None and node.return_value.terms is None:
+                print_tabs(ntabs, file)
+            else:
+                write_expression(node.return_value, file, symbol_table, ntabs)
+        elif isinstance(node.return_value, FunctionCall):
+            write_function_call(node.return_value, file, symbol_table, ntabs)
+        file.write(";\n")
+    else:
+        print_tabs(ntabs, file)
+        file.write("return;\n")
+
 
 
 
@@ -264,12 +435,7 @@ def write_special_function(node, file, symbol_table, ntabs=0):
     elif node.function_call:
         print("Function call found")
         write_function_call(node.function_call, file, symbol_table, ntabs)
-        # file.write(f"{node.function_call.function_name}(")
-        # for i, arg in enumerate(node.function_call.arguments):
-        #     write_expression(arg, file, symbol_table, ntabs)
-        #     if i < len(node.function_call.arguments) - 1:
-        #         file.write(", ")
-        # file.write(");\n")
+ 
 
 def write_function_call(node, file, symbol_table, ntabs=0):
     print("Function call found")
@@ -286,7 +452,61 @@ def write_function_call(node, file, symbol_table, ntabs=0):
         if i < len(node.arguments) - 1:
             file.write(", ")  # Add a comma between arguments
 
-    file.write(");\n")  # Close the function call with a parenthesis and semicolon
+    file.write(")")  # Close the function call with a parenthesis and semicolon
+
+def write_conditional_statement(node, file, symbol_table, ntabs=0):
+
+    print_tabs(1, file)
+    file.write("if (")
+    write_conditional_argument(node.conditional_argument, file, symbol_table, ntabs)  # Updated to use new function
+    file.write(") {\n")
+    write_block(node.conditional_block, file, symbol_table, ntabs + 1)  # Updated to use new function
+    print_tabs(ntabs, file)
+    file.write("}\n")
+
+    # Handle additional else-if blocks using write_other_block function
+    if node.other_blocks:
+        for other in node.other_blocks:
+            write_other_block(other, file, symbol_table, ntabs)  # Updated to use new function
+
+    # Handle the optional else block using write_otherwise_block function
+    if node.otherwise_block:
+        write_otherwise_block(node.otherwise_block, file, symbol_table, ntabs)  # Updated to use new function
+
+def write_conditional_argument(node, file, symbol_table, ntabs=0):
+
+    if node.is_special:
+        write_special_function(node.is_special, file, symbol_table, ntabs)
+    if node.comparison_operator:
+        file.write(f" {node.comparison_operator} ")
+    write_expression(node.expression, file, symbol_table, ntabs)
+
+def write_block(node, file, symbol_table, ntabs=0):
+    for statement in node.statements:
+        write_code_main(statement, file, symbol_table, ntabs)
+
+def write_other_block(node, file, symbol_table, ntabs=0):
+
+    print_tabs(ntabs, file)
+    file.write("else if (")
+
+    # Assume that node.condition is always a ConditionalArgument, use the existing function to handle it
+    write_conditional_argument(node.condition, file, symbol_table, ntabs)
+
+    file.write(") {\n")
+    write_block(node.conditional_block, file, symbol_table, ntabs + 1)
+    print_tabs(ntabs, file)
+    file.write("}\n")
+
+
+def write_otherwise_block(node, file, symbol_table, ntabs=0):
+
+    print_tabs(ntabs, file)
+    file.write("else {\n")
+    write_block(node.conditional_block, file, symbol_table, ntabs + 1)
+    print_tabs(ntabs, file)
+    file.write("}\n")
+
 
 
 def print_tabs(ntabs, file):
@@ -317,12 +537,13 @@ import subprocess
 
 semantic_analyzer = SemanticAnalyzer()
 ast, message = semantic_analyzer.analyze(ast)
+# ast = semantic_analyzer.analyze(ast)
 # Assuming 'ast' is your Abstract Syntax Tree instance
+
 if __name__ == '__main__':
     if (message == "Semantic analysis completed successfully.") :
         print("AST is semantically correct. Generating code.")
         generate_cpp_code(ast)
     else:
+        print(message)
         print("AST is not semantically correct. Skipping code generation.")
-    # subprocess.run(["g++", "generated_code.cpp", "-o", "gp"])
-    # subprocess.run(["./gp"])
