@@ -27,9 +27,6 @@ class SemanticAnalyzer:
         self.symbol_table = {}
         self.scopes = []
 
-    # def enter_scope(self):
-    #     # Enter a new scope by adding a scope to the stack
-    #     self.symbol_table.append({})
     def enter_scope(self, scp):
         # Enter a new scope by adding a scope to the stack
         self.scopes.append(scp)
@@ -43,45 +40,35 @@ class SemanticAnalyzer:
             raise SemanticError("Trying to exit the global scope")
 
     def declare_variable(self, name, data_type, mutability, size = None):
-        # print(self.symbol_table[self.scopes[-1]])
-        # print(self.scopes[-1])
         if name in self.symbol_table[self.scopes[-1]]:
             raise SemanticError(f"This variable '{name}' already declared in this scope")
         if size is not None:
             self.symbol_table[self.scopes[-1]][name] = {'type': data_type, 'mutability': mutability, 'size': size}
         else:  
             self.symbol_table[self.scopes[-1]][name] = {'type': data_type, 'mutability': mutability}
-        # print(self.scopes)
 
     def declare_list(self, name, data_type, mutability,size, list_for_elements):
         # Declare a variable in the current scope
         if name in self.symbol_table[self.scopes[-1]]:
             raise SemanticError(f"Variable '{name}' already declared in this scope")
         self.symbol_table[self.scopes[-1]][name] = {'type': data_type, 'mutability': mutability, 'size': size, 'elements_type': list_for_elements}
-        # print(self.scopes)
     
     def declare_string(self, name, data_type, mutability, length):
         # Declare a variable in the current scope
         if name in self.symbol_table[self.scopes[-1]]:
             raise SemanticError(f"Variable '{name}' already declared in this scope")
         self.symbol_table[self.scopes[-1]][name] = {'type': data_type, 'mutability': mutability, 'length': length}
-        # print(self.scopes)
 
     def check_variable_declared(self, name):
         # Check if a variable is declared in any accessible scope
-        # print(self.scopes[-1],"\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
         if name in self.symbol_table[self.scopes[-1]]:
-            # print(self.scopes[-1])
             return self.symbol_table[self.scopes[-1]][name]
         elif self.scopes[-1] == 'Block' or self.scopes[-1] == 'ConditionalStatement' or self.scopes[-1] == 'Try' or self.scopes[-1].startswith('LetIn'):
             for i in range(len(self.scopes)-2,-1,-1):
                 if name in self.symbol_table[self.scopes[i]]:
-                    # print(self.scopes[i])
                     return self.symbol_table[self.scopes[i]][name]
         elif 'parameters' in  self.symbol_table[self.scopes[-1]]:
             if name in self.symbol_table[self.scopes[-1]]['parameters']:
-                # print("found in parameters")
-                # print(name, self.symbol_table[self.scopes[-1]]['parameters'][name])
                 return self.symbol_table[self.scopes[-1]]['parameters'][name]
         raise SemanticError(f"Variable '{name}' not declared")
 
@@ -96,7 +83,6 @@ class SemanticAnalyzer:
         elif isinstance(expression, UnaryOperator):
             operand_type = self.type_of_expression(expression.operand)
             return operand_type
-        # elif isinstance(expression, Term):
         elif expression.__class__.__name__ == 'Term':
             #to handle b[2] on RHS
             if expression.identifier is not None and expression.expression is not None:
@@ -105,24 +91,22 @@ class SemanticAnalyzer:
                     raise SemanticError(f"Variable '{expression.identifier}' is not an array/list/tuple")
                 if var_info['size'] == 0:
                     raise SemanticError(f"Variable '{expression.identifier}' is an empty list/tuple")
+                if var_info['type'] == 'list' or var_info['type'] == 'tup':
+                    raise SemanticError(f"Cannot access element in variable '{expression.identifier}' of type '{var_info['type']}'") 
                 if expression.expression.terms[0].value >= var_info['size']:
                     raise SemanticError(f"Index out of bounds")
                 return var_info['type']
             if expression.value is not None:
-                print('value:',expression.value)
-                print(type(expression.value))
                 return type(expression.value).__name__
             if expression.expression:
                 return self.type_of_expression(expression.expression)
             if expression.identifier:
                 var_info = self.check_variable_declared(expression.identifier)
-                # print("var_info:",var_info)
                 if (type(var_info) is not dict) and (var_info in dict_types):
                     return dict_types[var_info]
                 else:
                     return dict_types[var_info['type']]
-            # else:
-            #     return self.type_of_expression(expression.value)
+                    
         elif expression.__class__.__name__ == "Expression":
             expr_type_list = []
             if expression.terms:
@@ -135,35 +119,22 @@ class SemanticAnalyzer:
                 if (i != exp_typ):
                     exp_typ = "Undetermined"
                     break
-            # print("exp_typ", exp_typ)
             return exp_typ
         elif isinstance (expression, SpecialFunction):
             return self.visit(expression)
-            # if expression.function_call:
-            #     return self.visit(expression.function_call)
         elif isinstance(expression, BinaryOperator):
             # Handle binary operations like +, -, *, etc.
-            # You need to determine the resulting type based on the operation
-            # This is a simplified example and might need adjustment based on your language's rules
             left_type = self.type_of_expression(expression.left)
             right_type = self.type_of_expression(expression.right)
             # Assuming for simplicity that the result type is the same as the operand type
             return left_type if left_type == right_type else None
         elif isinstance(expression, (int, float)):
             return 'int'
-    # Add more comprehensive handling here based on your expression AST node types
-
-    # def visit_FunctionCall(self, node):
-    #     if node.function_name not in 
-
-    # You should add more comprehensive handling here based on your expression AST node types
 
     def visit_SpecialFunction(self, node):
-        # print('SpecialFunction')
-        #array, list, tup teeno ke liye ek saath handle karega
+        #array, list, tup handled together
         typ = None
         if node.length and node.identifier:
-            # print('/length')
             var_info = self.check_variable_declared(node.identifier)
             # print('var_info',var_info)
             if len(var_info) == 2:
