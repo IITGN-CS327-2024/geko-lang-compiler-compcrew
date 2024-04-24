@@ -317,7 +317,7 @@ class ASTBuilder(Visitor):
         
         elif node_type == "value_change_array":
             identifier = str(children[0])
-            index = int(children[2])
+            index = children[2]
             assignment_operators = children[4]
             value = children[5]
             # print(f"node_type:{node_type}, identifier: {identifier}, index: {index}, assignment_operators: {assignment_operators}, value: {value}")
