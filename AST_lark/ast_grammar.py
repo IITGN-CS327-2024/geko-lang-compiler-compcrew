@@ -61,6 +61,7 @@ assignment_statement	:	IDENTIFIER assignment_operators post_equal_to
 show_statement	        :	SHOW OPEN_PARENTHESIS expression expressions CLOSE_PARENTHESIS
 block	                :	OPEN_BRACES statements CLOSE_BRACES
 value_change_array	    :	IDENTIFIER OPEN_BRACKET NUM_LITERAL CLOSE_BRACKET assignment_operators expression
+                        | IDENTIFIER OPEN_BRACKET IDENTIFIER CLOSE_BRACKET assignment_operators expression
 
 expressions             :   ELEMENT_SEPERATOR expression expressions
                         |   epsilon
