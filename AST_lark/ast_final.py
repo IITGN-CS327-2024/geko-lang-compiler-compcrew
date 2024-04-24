@@ -101,7 +101,7 @@ class ASTBuilder(Visitor):
                 data_type = str(children[0])
                 parameter_name = str(children[1])
                 # print(f"node_type:{node_type}, parameter_name: {parameter_name}")
-                return Parameter(None, parameter_name, None)
+                return Parameter(data_type, parameter_name, None)
             else:
                 data_type = str(children[0])
                 parameter_name = str(children[1])
@@ -714,13 +714,14 @@ parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
 define num main() {
-    list b = [1,2,~3~,444444,5];
-    ## str k = b[3];
-    iter(num i = 0; i<5; i++) {
-        show(34);
-    }
-    ##str jstrice = k[0:1];
-    yield 658;
+    num b = 0;
+    num c = b;
+    list a = [1, 2, 3, 4, 5];
+    num d[5] = [1, 2, 3, 4, 5];
+    list e = tail(a);
+
+    show (a[0]);
+    yield 0;
 }
 """
 
