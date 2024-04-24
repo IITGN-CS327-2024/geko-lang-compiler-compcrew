@@ -46,7 +46,7 @@ class SemanticAnalyzer:
         print(self.symbol_table[self.scopes[-1]])
         print(self.scopes[-1])
         if name in self.symbol_table[self.scopes[-1]]:
-            raise SemanticError(f"This variable '{name}' already declared in this scope")
+            raise SemanticError(f"Variable '{name}' already declared in this scope")
         if size is not None:
             self.symbol_table[self.scopes[-1]][name] = {'type': data_type, 'mutability': mutability, 'size': size}
         else:  
@@ -60,13 +60,16 @@ class SemanticAnalyzer:
         self.symbol_table[self.scopes[-1]][name] = {'type': data_type, 'mutability': mutability, 'size': size, 'elements_type': list_for_elements}
         # print(self.scopes)
 
+
+
     def check_variable_declared(self, name):
         # Check if a variable is declared in any accessible scope
         # print(self.scopes[-1],"\nIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
         if name in self.symbol_table[self.scopes[-1]]:
             # print(self.scopes[-1])
             return self.symbol_table[self.scopes[-1]][name]
-        elif self.scopes[-1] == 'Block':
+        elif self.scopes[-1] == 'Block' or self.scopes[-1].startswith('LetIn'):
+            print(self.scopes)
             for i in range(len(self.scopes)-2,-1,-1):
                 if name in self.symbol_table[self.scopes[i]]:
                     print(self.scopes[i])
@@ -178,6 +181,8 @@ class SemanticAnalyzer:
             return func_call_list
 
     
+
+
     # 'add': {'parameters': {'return_value': 'num', 'x': 'num', 'y': 'num'}, 'sum': {'type': 'num', 'mutability': 'None'}}    
     def visit_FunctionCall(self,node):
         if node.function_name not in self.symbol_table:
@@ -248,6 +253,7 @@ class SemanticAnalyzer:
 
     def visit_VariableDeclaration(self, node):
         # node.data_type might contain "None num", "let num", or "fix num"
+
         if (node.data_type == 'list' or node.data_type == 'tup'):
             mutability =  None
             type_name = node.data_type
@@ -262,12 +268,46 @@ class SemanticAnalyzer:
                 
             #to handle empty list, tuple                
             if node.equal_to.elements[0].terms == None:
+                print('empty')
                 self.declare_list(node.variable_name, type_name, mutability, 0, [])
                 return
             (length_list, type_list_list) = self.visit(node.equal_to)
             self.declare_list(node.variable_name, type_name, mutability, length_list, type_list_list)
             return
         
+        elif node.equal_to[0].__class__.__name__ == "LetInStatement":
+            # print('LetInStatement')
+            # print(node.equal_to[0].operation)
+            # self.enter_scope("LetIn")
+            self.visit(node.equal_to[0])
+            # self.exit_scope()
+            # mutability, type_declared = node.equal_to[0].data_type.split()
+            # self.declare_variable(node.equal_to[0].variable_name, type_declared, mutability)
+            # print("6666666666666666666666666666666666666666666666")
+            # # print(self.symbol_table)
+            # # variable type checking 
+            # type_of_var = self.type_of_expression(node.equal_to[0].value_or_letin)
+            # type_of_var = dict_of_types[type_of_var]
+            # if type_of_var != type_declared:
+            #     raise SemanticError(f"Type mismatch: variable '{node.equal_to[0].variable_name}' declared as '{type_declared}' but assigned '{type_of_var}'")
+            
+
+            # for stmt in node.equal_to[0].operation:
+            #     type_of_stmt = self.type_of_expression(stmt)
+            #     type_of_stmt = dict_of_types[type_of_stmt]
+            #     if type_of_stmt != type_declared:
+            #         raise SemanticError(f"Type mismatch: variable '{node.equal_to[0].variable_name}' declared as '{type_declared}' but assigned '{type_of_stmt}'")
+            # self.exit_scope()
+
+            mutability, type_declared = node.data_type.split()
+            self.declare_variable(node.variable_name, type_declared, mutability)
+            # type checking for the variable
+            type_of_stmt = self.type_of_expression(node.equal_to[0].value_or_letin)
+            type_of_stmt = dict_of_types[type_of_stmt]
+            if type_of_stmt != type_declared:
+                raise SemanticError(f"Type mismatch: variable '{node.variable_name}' declared as '{type_name}' but assigned '{type_of_stmt}'")
+            return
+
         elif node.size_array is not None: #when the variable is an array
             print('array')
             mutability, type_name = node.data_type.split()
@@ -278,12 +318,13 @@ class SemanticAnalyzer:
             else:
                 raise SemanticError(f"Array size must be an integer")
             size = node.size_array
+
             # var_info = self.check_variable_declared(node.variable_name)
+
             print(node.equal_to)
             (length_arr, type_list_arr) = self.visit(node.equal_to)
 
             if type_list_arr == []:
-                print(4)
                 self.declare_variable(node.variable_name, type_name, mutability,size)
                 return 
 
@@ -298,13 +339,15 @@ class SemanticAnalyzer:
                 if type_list_arr[i] != type_name:
                     raise SemanticError(f"Type mismatch: variable '{node.variable_name}' declared as '{type_name}' but assigned '{type_list_arr[i]}'")
             # phir us variable ko symbol table me store karo 
-            print(2)
+            
             self.declare_variable(node.variable_name, type_name, mutability,size)
+
         else:
             mutability, type_name = node.data_type.split()
             print(mutability)
             print(type_name)
             test_lst = []
+
             if (node.equal_to):
                 for i in node.equal_to[:-1]: #-1 is for epsilon
                     if (isinstance(i, Term)):
@@ -429,6 +472,37 @@ class SemanticAnalyzer:
             #     self.declare_variable(node.variable_name, type_name, mutability)
             # return
 
+    def visit_LetInStatement(self, node, depth=0):
+        # print('LetInStatement')
+        # print(node.data_type)
+        self.enter_scope("LetIn" + str(depth))
+        mutability, type_name = node.data_type.split()
+
+        print("9999")
+        print(self.symbol_table)
+        # type checking for the variable
+        type_of_stmt = self.type_of_expression(node.value_or_letin)
+        type_of_stmt = dict_of_types[type_of_stmt]
+        if type_of_stmt != type_name:
+            raise SemanticError(f"Type mismatch: variable '{node.variable_name}' declared as '{type_name}' but assigned '{type_of_stmt}'")
+        self.declare_variable(node.variable_name, type_name, mutability)
+        
+
+        if node.operation.__class__.__name__ == "LetInStatement":
+            # self.visit(node.operation, depth=depth+1)
+            self.visit_LetInStatement(node.operation, depth=depth+1)
+            # return
+        else:
+            for stmt in node.operation:
+                type_of_stmt = self.type_of_expression(stmt)
+                type_of_stmt = dict_of_types[type_of_stmt]
+                if type_of_stmt != type_name:
+                    raise SemanticError(f"Type mismatch: variable '{node.variable_name}' declared as '{type_name}' but assigned '{type_of_stmt}'")
+        
+        
+        self.exit_scope()
+        return
+
     def visit_UnaryStatement(self, node):
         self.check_variable_declared(node.value)
     
@@ -537,11 +611,8 @@ class SemanticAnalyzer:
 
 
     def visit_ConditionalStatement(self, node):
-        # self.enter_scope("Conditional")
         self.visit(node.conditional_argument)
         self.visit(node.conditional_block)
-        # for statement in node.conditional_block.statements:
-        #     self.type_of_expression(statement)
         if len(node.other_blocks) > 0:
             for other in node.other_blocks:
                 self.visit(other)
@@ -551,13 +622,9 @@ class SemanticAnalyzer:
     def visit_OtherBlock(self, node):
         self.visit(node.condition)
         self.visit(node.conditional_block)
-        # for statement in node.conditional_block.statements:
-        #     self.type_of_expression(statement)
     
     def visit_OtherwiseBlock(self,node):
         self.visit(node.conditional_block)
-        # for statement in node.conditional_block.statements:
-        #     self.type_of_expression(statement)
 
     def visit_TryCatchStatement(self, node):
         self.enter_scope("Try")
@@ -605,6 +672,7 @@ class SemanticAnalyzer:
                     self.visit(statement)
         rich.print(self.symbol_table)
         SymTable = self.symbol_table
+
         self.exit_scope()
 
     def visit_FunctionDef(self, node):
