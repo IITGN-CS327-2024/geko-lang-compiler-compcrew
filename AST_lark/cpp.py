@@ -1,7 +1,6 @@
 from ast_final import *
 from ast_classes import *
-# from sem_combine import *
-from code_gen import *
+from semantic_analyser import *
 import rich
 # Code Generation
 type_map = {
@@ -61,6 +60,8 @@ def write_code_main(node, file, symbol_table, ntabs=0):
     elif node.__class__.__name__ == "OtherBlock":
         write_other_block(node, file, symbol_table, ntabs)
 
+    elif node.__class__.__name__ == "ValueChangeArray":
+        write_value_change_array(node, file, symbol_table, ntabs)
 
     elif node.__class__.__name__ == "ConditionalStatement":
         file.write("if (")
@@ -122,6 +123,19 @@ def write_code_main(node, file, symbol_table, ntabs=0):
         for child in node.statements:
             write_code_main(child, file, symbol_table, ntabs + 1)
         file.write("\treturn 0;\n}\n")
+
+
+def write_value_change_array(node, file, symbol_table, ntabs=0):
+    # Helper function to print tabs
+    def print_tabs(ntabs, file):
+        file.write('\t' * ntabs)
+
+    print_tabs(ntabs, file)
+    # Writing the array element modification line
+    file.write(f"{node.identifier}[{node.index}] {node.assignment_operators.operator} ")
+    write_expression(node.value, file, symbol_table, 0)  # Write the expression to be assigned
+    file.write(";\n")
+
 
 def write_loop_statement(node, file, symbol_table, ntabs=0):
 
@@ -268,7 +282,11 @@ def write_variable_declaration(declaration, file, symbol_table, ntabs=0):
     print_tabs(ntabs, file)
     
     # Splitting the data_type to extract mutability and actual type
-    mut, dt = declaration.data_type.split()
+    if declaration.data_type == "list" or declaration.data_type == "tup":
+        dt = declaration.data_type
+        mut = "None"
+    else:
+        mut, dt = declaration.data_type.split()
     if mut == "fix":
         var_type = f"const {type_map[dt]}"
     else:
@@ -317,11 +335,12 @@ def write_expression(expression, file, symbol_table, ntabs=0):
                     file.write(f" {expression.operator_if_exists} ")  # Add operator between terms
         else:
             # Handle simple or unary expressions
-            for term in expression.terms:
-                if isinstance(term, Expression):
-                    write_expression(term, file, symbol_table, ntabs)  # Recursively handle nested expressions
-                elif isinstance(term, Term):
-                    write_term(term, file, symbol_table, ntabs)  # Handle terms directly
+            if expression.terms is not None:
+                for term in expression.terms:
+                    if isinstance(term, Expression):
+                        write_expression(term, file, symbol_table, ntabs)  # Recursively handle nested expressions
+                    elif isinstance(term, Term):
+                        write_term(term, file, symbol_table, ntabs)  # Handle terms directly
 
 
 
@@ -342,6 +361,10 @@ def write_term(term, file, symbol_table, ntabs=0):
         file.write(f"{term.pre_unary_operator}")
     elif term.identifier:
         file.write(f"{term.identifier}")
+        if term.expression and term.expression.terms:
+            file.write("[")
+            write_expression(term.expression, file, symbol_table, ntabs)
+            file.write("]")
     elif term.expression:
         write_expression(term.expression, file, symbol_table, ntabs)
     elif term.post_unary_operator:
@@ -361,11 +384,14 @@ def write_function_definition(node, file, symbol_table, ntabs=0):
     if node.parameters:
         params = []
         for param in node.parameters:
-            param_mut, param_dt = param.data_type.split()
-            if param_mut == "fix":
-                param_type = f"const {type_map[param_dt]}"
+            if(param.data_type == "list"):
+                param_type = f"std::vector"
             else:
-                param_type = f"{type_map[param_dt]}"
+                param_mut, param_dt = param.data_type.split()
+                if param_mut == "fix":
+                    param_type = f"const {type_map[param_dt]}"
+                else:
+                    param_type = f"{type_map[param_dt]}"
 
             if param.array_size:
                 params.append(f"{param_type} {param.parameter_name}[{param.array_size}]")
@@ -384,8 +410,6 @@ def write_function_definition(node, file, symbol_table, ntabs=0):
 
 def write_function_block(node, file, symbol_table, ntabs=0):
     # Helper function to print tabs
-    def print_tabs(ntabs, file):
-        file.write('\t' * ntabs)
 
     # Write each statement in the function block
     for statement in node.statements:
@@ -520,16 +544,19 @@ def generate_cpp_code(ast):
     print(symbol_table)
     with open(output_filename, 'w') as file:
         file.write("#include <iostream>\n\n")
+        file.write("#include <vector>\n")
         file.write("using namespace std;\n\n")
+  
+        file.write("extern \"C\" {\n")
          # First, write all function definitions from the AST
         if hasattr(ast, 'function_defs') and ast.function_defs:
             for func_def in ast.function_defs:
                 write_code_main(func_def, file, symbol_table, 0)
                 file.write("\n")  # Add a newline for better separation between function definitions
-
+        file.write("}\n")
         # Then, write the main function
-        if hasattr(ast, 'main_function'):
-            write_code_main(ast.main_function, file, symbol_table, 0)
+        # if hasattr(ast, 'main_function'):
+        #     write_code_main(ast.main_function, file, symbol_table, 0)
 
         print("C++ code generation complete. Code written to:", output_filename)
 

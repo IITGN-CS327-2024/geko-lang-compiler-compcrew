@@ -104,14 +104,16 @@ class SemanticAnalyzer:
                 var_info = self.check_variable_declared(expression.identifier)
                 if type(var_info) is not dict and len(var_info) == 2:
                     raise SemanticError(f"Variable '{expression.identifier}' is not an array/list/tuple IIIIIIIIIIIIIIIIIIIIIIII")
-                if var_info['size'] == 0:
-                    raise SemanticError(f"Variable '{expression.identifier}' is an empty list/tuple")
+                if type(var_info) is dict:
+                    if var_info['size'] == 0:
+                        raise SemanticError(f"Variable '{expression.identifier}' is an empty list/tuple")
                 if expression.expression.terms[0].value is not None:
                     if expression.expression.terms[0].value >= var_info['size']:
                         raise SemanticError(f"Index out of bounds")
-                if var_info['type'] == 'list':
-                    return var_info['elements_type']
-                return var_info['type']
+                if var_info is dict:
+                    if var_info['type'] == 'list':
+                        return var_info['elements_type']
+                return var_info['type'] if var_info is dict else var_info
             if expression.value is not None:
                 return type(expression.value).__name__
             if expression.expression:
@@ -215,8 +217,9 @@ class SemanticAnalyzer:
                 actual_param_lst[i] = dict_types[actual_param_lst[i]] if type(actual_param_lst[i]) is not dict else dict_types[actual_param_lst[i]['type']]
             for arg in node.arguments:
                 param_lst.append(self.type_of_expression(arg))
-            # print(param_lst)
-            # print(actual_param_lst)
+            print("idhar checking hoega abhi")
+            print(param_lst)
+            print(actual_param_lst)
             if (param_lst != actual_param_lst):
                 raise SemanticError(f"invalid parameters given to the declared function")
             return (return_tp,None)
@@ -450,8 +453,16 @@ class SemanticAnalyzer:
                                         expr_type = expr_type[i.expression.terms[0].value]
                                         print(expr_type)
                                         print()
-                                    if expr_type in dict_of_types.keys():
-                                        expr_type = dict_of_types[expr_type]
+                                    print("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
+                                    print(expr_type)
+                                    print("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
+                                    if type(expr_type) is not dict:
+                                        if expr_type in dict_of_types.keys():
+                                            expr_type = dict_of_types[expr_type]
+                                    else:
+                                        expr_type = expr_type['type']
+                                        if expr_type in dict_of_types.keys():
+                                            expr_type = dict_of_types[expr_type]
                                     test_lst.append(expr_type)
                         # change expr_type according to dict_of_types
                         print('###################################')
@@ -616,8 +627,9 @@ class SemanticAnalyzer:
     #to handle a[2] = 5 value change array;
         print('ValueChangeArray')
         var_info_lhs = self.check_variable_declared(node.identifier)
-        if len(var_info_lhs) == 2:
-            raise SemanticError(f"Variable '{node.identifier}' is not an array")
+        if type(var_info_lhs) is not dict:
+            if len(var_info_lhs) == 2:
+                raise SemanticError(f"Variable '{node.identifier}' is not an array")
         if len(var_info_lhs) == 3: #in case of array
             if var_info_lhs['size'] == 0:
                 raise SemanticError(f"Variable '{node.identifier}' is an empty array")
