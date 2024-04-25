@@ -1,35 +1,37 @@
-define void caesarEncrypt(list plaintext, num key){
-    iter(num i = 0; i < length(plaintext); i++){
-        plaintext[i] = (plaintext[i] + key) % 26;
+define void caesarEncrypt(num plaintext[7], num len, num key){
+    iter(num i = 0; i < len; i++){
+        num pre = plaintext[i] + key;
+        plaintext[i] =  pre % 26;
     }
     yield;
 }
 
-define void caesarDecrypt(list ciphertext, num key){
-    iter (num i=0; i< length(ciphertext); i++){
+define void caesarDecrypt(num ciphertext[7], num len, num key){
+    iter (num i=0; i< len; i++){
         ciphertext[i] = (ciphertext[i] - key + 26) % 26;  ## Reverse the Caesar cipher shift
     }
     yield;
 }
 
 define num main(){
-    list plaintext = [0, 1, 2, 3, 4, 5];  
+    num plaintext[6] = [0, 1, 2, 3, 4, 5];  
     num key = 3;
 
     show(~Original text (as integers): ~);
-    iter (num i = 0; i < length(plaintext); ++i) {
+    num j = length(plaintext);
+    iter (num i = 0; i < j; ++i) {
         show(plaintext[i],~ ~);
     }
 
-    caesarEncrypt(plaintext, key);  ## Pass the array, size, and key to encrypt
+    caesarEncrypt(plaintext,j, key);  ## Pass the array, size, and key to encrypt
     show(~Encrypted text (as integers): ~);
     iter (num i = 0; i < length(plaintext); ++i) {
         show(plaintext[i],~ ~);
     }
 
-    caesarDecrypt(plaintext, key);  ##Pass the array, size, and key to decrypt
+    caesarDecrypt(plaintext,j, key);  ##Pass the array, size, and key to decrypt
     show(~Decrypted text (as integers): ~);
-    iter (num i = 0; i < length(plaintext); ++i) {
+    iter (num i = 0; i < j; ++i) {
         show(plaintext[i], ~ ~);
     }
 
