@@ -1,6 +1,6 @@
 # GROUP NAME: CompCrew
 ### Our Programming Language: Geko
-### Final Folder: Geko_Compiler
+### Final Folder: Geko_CompCrew
 #### MEMBERS:
 |Name              |Roll Number      |
 |:------------------|:-----------------|
