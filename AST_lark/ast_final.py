@@ -713,16 +713,44 @@ def final_iteration(tree_node, tokens,graph, parent_node=None):
 parser = Lark(grammar, start='start', parser = 'lalr')#, lexer = lexer_lark)
 
 code = """
-define num main() {
-    num b = 0;
-    num c = b;
-    list a = [1, 2, 3, 4, 5];
-    num d[5] = [1, 2, 3, 4, 5];
-    list e = tail(a);
-
-    show (a[0]);
-    yield 0;
+define void caesarEncrypt(list plaintext, num key){
+    iter(num i = 0; i < length(plaintext); i++){
+        plaintext[i] = (plaintext[i] + key) % 26;
+    }
+    yield;
 }
+
+define void caesarDecrypt(list ciphertext, num key){
+    iter (num i=0; i< length(ciphertext); i++){
+        ciphertext[i] = (ciphertext[i] - key + 26) % 26;  ## Reverse the Caesar cipher shift
+    }
+    yield;
+}
+
+define num main(){
+    list plaintext = [0, 1, 2, 3, 4, 5];  
+    num key = 3;
+
+    show(~Original text (as integers): ~);
+    iter (num i = 0; i < length(plaintext); ++i) {
+        show(plaintext[i],~ ~);
+    }
+
+    caesarEncrypt(plaintext, key);  ## Pass the array, size, and key to encrypt
+    show(~Encrypted text (as integers): ~);
+    iter (num i = 0; i < length(plaintext); ++i) {
+        show(plaintext[i],~ ~);
+    }
+
+    caesarDecrypt(plaintext, key);  ##Pass the array, size, and key to decrypt
+    show(~Decrypted text (as integers): ~);
+    iter (num i = 0; i < length(plaintext); ++i) {
+        show(plaintext[i], ~ ~);
+    }
+
+    yield 0; 
+}
+
 """
 
 # ----------------------------------------------------------------------------------------------------------------------------
