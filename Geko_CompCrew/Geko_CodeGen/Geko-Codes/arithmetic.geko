@@ -1,0 +1,29 @@
+define num add(num a,num b){
+    yield a + b;
+}
+
+define num sub(num a,num b){
+    yield a - b;
+}
+
+define num mul(num a,num b){
+    yield a * b;
+}
+
+define num divi(num a,num b){
+    yield a / b;
+}
+
+define num mod(num a,num b){
+    yield a % b;
+}
+
+define num main(){
+    show(~Add:~,add(5,3));
+    show(~Subtract:~,sub(5,3));
+    show(~Multiply:~,mul(5,3));
+    show(~Divide:~,divi(5,3));
+    show(~Modulo:~,mod(5,3));
+    yield 0;
+}
+

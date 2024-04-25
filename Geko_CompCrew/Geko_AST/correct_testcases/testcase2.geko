@@ -1,0 +1,55 @@
+##This is the test code for loops, conditionals statements, enter, & ##void keywords
+
+define num main() {
+    num y = 2;
+    while (y>=8){
+        num z = 14098;
+        z /= 56/4;
+        given(y>36){
+           skip;	
+        }
+        other(y==36){
+             ##num z = num(enter(~Enter any number~));
+        }
+        otherwise {
+            z -= 2;
+        }
+        y*=4;
+    }
+
+
+
+    iter (num i=0;i<10;i++) {
+        given(i%2==0){
+            show(i);
+            num j = i+5;
+            given(j!=0) {
+                skip;
+            }
+        }
+        otherwise{
+            show(j++);
+            given(i==3){
+                stop;
+            }
+        }
+        j*=5;
+    }
+
+
+
+
+
+    define void testing(){
+	show(~This is a testcase!~);
+	yield;
+    }
+
+    repeat {
+        num j = i**2;
+        show(j);
+        i++;
+    } while (i<=60);
+
+    yield 0;
+}

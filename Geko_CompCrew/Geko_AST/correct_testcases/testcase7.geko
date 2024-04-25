@@ -1,0 +1,19 @@
+##define num func_ex( num a, flag b){
+##  yield a + b;
+##}
+
+define num func_ex (){
+    yield 3;
+}
+define num main(){
+    flag three = 0;
+    given(three==0){
+        show(~Hello!~);
+    }
+    num ex_var = func_ex();
+	yield 0;
+}
+
+
+
+

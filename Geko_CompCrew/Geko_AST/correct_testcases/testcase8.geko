@@ -1,0 +1,5 @@
+define num main(){
+    num b[2] = [1,2];
+    num a = b;
+    yield 0;
+}

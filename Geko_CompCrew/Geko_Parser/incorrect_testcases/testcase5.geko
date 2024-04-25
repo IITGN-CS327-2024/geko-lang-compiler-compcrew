@@ -1,0 +1,51 @@
+define num add(num x, num y){
+}
+define subtract(num x, num y){
+	yield x - y;
+}
+define num multiply(num x, num y){
+	yield x * y; 
+}
+define num divide(num x; num y){
+	test{
+		given(y!=0){
+			yield x/y;
+		}
+		otherwise{
+			pop (~Zeroerror~);
+		}
+	}
+	arrest(~Zeroerror~){
+		show (~Divison by zero is not possible!~);
+	}
+	yield x / y;
+}
+
+
+define num main(){
+	show(~Calculator program~);
+	num firstNum = enter(~Enter first number:~);
+	num secondNum = enter(~Enter second number:~);
+	str calFunc = enter(~Enter calculating function: ~);
+
+	given(calFunc == ~+~){
+		num calcVal = add(firstNum, secondNum);
+		show(firstnum, ~ + ~,secondNum, ~ = ~, calcVal);
+	}
+	other(calFunc == ~-~){
+		num calcVal = subtract(firstNum, secondNum);
+		show(firstnum, ~ - ~ ,secondNum, ~ = ~, calcVal);
+	}
+	other(calFunc == ~*~){
+		num calcVal = multiply(firstNum, secondNum);
+		show(firstnum, ~ * ~ ,secondNum, ~ = ~, calcVal);
+	}
+	other(calFunc == ~/~){
+		num calcVal = divide(firstNum, secondNum);
+		show(firstnum, ~ / ~ ,secondNum, ~ = ~, calcVal);
+	}
+	otherwise{
+		show(~invalid character input. Function returning with NULL.~);
+	}
+	yield 0;
+}
