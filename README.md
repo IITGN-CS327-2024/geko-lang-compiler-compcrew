@@ -13,6 +13,11 @@
 
 <p align="left"><img src="https://github.com/IITGN-CS327-2024/our-own-compiler-compcrew/assets/134190955/c304842e-fb75-4203-a09b-e26c32378bce" alt="geko" height="150"></p>
 
+## COMPILER
+Our final compiler with all the intermediate stages is in Geko_CompCrew Folder.
+
+For stage specific code, there are dedicated folders as follows:
+
 ## LEXER:
 
 - The lexer file is named lexer.py, and all the tescases are also nested under the testcases folder.
